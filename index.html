@@ -221,6 +221,58 @@
     font-size: 14px;
   }
 
+  /* ---------- SECCIÓN "¿SOS TRANSPORTISTA?" ---------- */
+  .contenedor-transportistas { max-width: 760px; margin: 0 auto; padding: 18px 16px 0; }
+  .tarjeta-transportistas {
+    background: #FFF6E6;
+    border: 1px dashed var(--amber-dark);
+    border-radius: 12px;
+    padding: 18px 20px;
+    text-align: center;
+  }
+  .tarjeta-transportistas h2 { margin: 0 0 6px; font-size: 17px; color: var(--navy); }
+  .tarjeta-transportistas p { margin: 0; font-size: 13.5px; color: var(--muted); }
+  .btn-form {
+    display: inline-block;
+    background: var(--amber);
+    color: var(--navy);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 13.5px;
+    padding: 10px 18px;
+    border-radius: 8px;
+  }
+  .btn-form:hover { background: var(--amber-dark); color: white; }
+
+  /* ---------- FOOTER ---------- */
+  footer {
+    max-width: 760px;
+    margin: 30px auto 0;
+    padding: 24px 20px 40px;
+    text-align: center;
+    border-top: 1px solid var(--line);
+  }
+  .footer-titulo { font-size: 13.5px; color: var(--muted); margin: 0 0 12px; }
+  .footer-contactos {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .footer-contactos a {
+    text-decoration: none;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--navy);
+    background: var(--cream);
+    border: 1px solid var(--line);
+    padding: 8px 12px;
+    border-radius: 7px;
+  }
+  .footer-contactos a:hover { background: white; border-color: var(--navy); }
+  .footer-nota { font-size: 11.5px; color: var(--muted); margin: 0; }
+
   @media (max-width: 480px) {
     header h1 { font-size: 21px; }
     .boleto { flex-direction: column; }
@@ -230,6 +282,20 @@
     .boleto h3 { padding-right: 0; }
   }
 </style>
+<!--
+  GOOGLE ANALYTICS
+  Reemplaza G-XXXXXXXXXX por tu ID de medición real (lo obtienes al crear
+  la propiedad en analytics.google.com). Mientras tanto, estas líneas no
+  hacen nada (Google las ignora si el ID no es válido).
+-->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZZSVWT05KE"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ZZSVWT05KE');
+</script>
+
 </head>
 <body>
 
@@ -265,9 +331,29 @@
 
 <div id="mapa"></div>
 
+<div class="contenedor-transportistas">
+  <div class="tarjeta-transportistas">
+    <h2>¿Sos transportista?</h2>
+    <p>Si querés que te agreguemos, o si tus datos (teléfono, bodega, horario o destinos) cambiaron, contanos:</p>
+    <div class="acciones" style="justify-content:center; margin-top:12px;">
+      <a class="btn-form" href="https://docs.google.com/forms/d/e/1FAIpQLSeX8iJwM3M_SEm4VsUXj6NlhjEq_lPWwxQ4CbMYIFk-HlB4ww/viewform" target="_blank">📝 Enviar o actualizar mis datos</a>
+    </div>
+  </div>
+</div>
+
 <div id="resultados">
   <p class="vacio">Escribe un destino o el nombre de un transportista arriba para empezar.</p>
 </div>
+
+<footer>
+  <p class="footer-titulo">¿Dudas, sugerencias o algo no funciona?</p>
+  <div class="footer-contactos">
+    <a href="https://wa.me/50686335442?text=Hola%2C%20tengo%20una%20consulta%20sobre%20Rutas%20CR" target="_blank">💬 WhatsApp: +506 8633-5442</a>
+    <a href="mailto:santiago2658@gmail.com">✉️ santiago2658@gmail.com</a>
+    <a href="tel:+50686335442">☎ Llamar</a>
+  </div>
+  <p class="footer-nota">Rutas CR — directorio comunitario de transportistas de encomiendas en Costa Rica.</p>
+</footer>
 
 <script>
   const API_URL = 'https://script.google.com/macros/s/AKfycbziHUb11q9tHuAnqFQY8EG-u18Q763C8a-a4CE0Rwii_iTRNPqmTTzaZvN5PRtx14NqaA/exec';
