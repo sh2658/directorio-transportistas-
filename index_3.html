@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rutas CR · Directorio de Transportistas de Encomiendas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0B2545;
+    --navy-2: #12325E;
+    --amber: #F2A93B;
+    --amber-dark: #C97F16;
+    --cream: #FAF8F3;
+    --ink: #16202B;
+    --muted: #6B7785;
+    --line: #DFDAD0;
+    --green: #3E7C59;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+  }
+  h1, h2, h3 { font-family: 'Space Grotesk', 'Inter', sans-serif; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ---------- HEADER ---------- */
+  header {
+    background: var(--navy);
+    color: white;
+    padding: 28px 20px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  header .ruta-punteada {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-image: repeating-linear-gradient(to right, var(--amber) 0 14px, transparent 14px 26px);
+    opacity: 0.35;
+  }
+  header .contenido { position: relative; max-width: 760px; }
+  header .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin: 0 0 8px;
+  }
+  header h1 { margin: 0; font-size: 26px; font-weight: 700; line-height: 1.2; }
+  header p { margin: 8px 0 0; font-size: 14px; color: #C9D3E0; max-width: 480px; }
+
+  /* ---------- BUSCADOR (flotante) ---------- */
+  .contenedor-buscador { max-width: 760px; margin: -26px auto 0; padding: 0 16px; position: relative; z-index: 2; }
+  .buscador {
+    background: white;
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 10px 30px rgba(11,37,69,0.18);
+    border: 1px solid var(--line);
+  }
+  .segmentado {
+    display: flex;
+    background: var(--cream);
+    border-radius: 9px;
+    padding: 3px;
+    margin-bottom: 10px;
+    gap: 3px;
+  }
+  .segmentado label {
+    flex: 1;
+    text-align: center;
+    padding: 8px 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--muted);
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all .15s ease;
+    user-select: none;
+  }
+  .segmentado input { display: none; }
+  .segmentado input:checked + span { color: var(--navy); }
+  .segmentado label:has(input:checked) { background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.12); color: var(--navy); }
+
+  .fila-input { display: flex; gap: 8px; }
+  .fila-input input[type="text"] {
+    flex: 1;
+    padding: 12px 14px;
+    font-size: 15px;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    font-family: 'Inter', sans-serif;
+    min-width: 0;
+  }
+  .fila-input input[type="text"]:focus { outline: 2px solid var(--amber); border-color: var(--amber); }
+  .fila-input button {
+    background: var(--navy);
+    color: white;
+    border: none;
+    padding: 0 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 9px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .fila-input button:hover { background: var(--navy-2); }
+
+  #estadoUbicacion {
+    max-width: 760px;
+    margin: 10px auto 0;
+    padding: 0 20px;
+    font-size: 12.5px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  #mapa { width: 100%; height: 300px; margin-top: 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+
+  /* ---------- RESULTADOS: estilo "boleto" ---------- */
+  #resultados { max-width: 760px; margin: 0 auto; padding: 20px 16px 50px; }
+
+  .boleto {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(11,37,69,0.08);
+    border: 1px solid var(--line);
+    display: flex;
+    position: relative;
+    overflow: hidden;
+  }
+  .boleto .foto-col {
+    width: 96px;
+    flex-shrink: 0;
+    background: var(--navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .boleto .foto-col img { width: 100%; height: 100%; object-fit: cover; }
+  .boleto .foto-col .placeholder { font-size: 30px; opacity: 0.6; }
+  .boleto .divisor {
+    width: 0;
+    border-left: 2px dashed var(--line);
+    margin: 10px 0;
+  }
+  .boleto .info-col { flex: 1; padding: 14px 16px; min-width: 0; }
+
+  .boleto .sello {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 2px dashed var(--amber-dark);
+    color: var(--amber-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 500;
+    line-height: 1.1;
+    transform: rotate(-8deg);
+    text-align: center;
+    background: white;
+  }
+  .boleto .sello b { font-size: 13px; }
+
+  .boleto h3 { margin: 0 4px 4px 0; font-size: 16.5px; font-weight: 700; color: var(--navy); padding-right: 56px; }
+  .boleto .zona-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    color: var(--green);
+    background: #EAF3EC;
+    padding: 2px 7px;
+    border-radius: 5px;
+    margin-bottom: 6px;
+  }
+  .boleto p { margin: 3px 0; font-size: 13.5px; color: var(--muted); }
+  .boleto p strong { color: var(--ink); font-weight: 600; }
+  .boleto .destinos-lista { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+
+  .boleto .bodega-item { border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 8px; }
+  .boleto .bodega-item:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+
+  .acciones { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .acciones a {
+    text-decoration: none;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 7px 11px;
+    border-radius: 7px;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .btn-waze { background: #33ccff; color: #003049; }
+  .btn-maps { background: var(--green); }
+  .btn-tel { background: var(--navy); font-family: 'JetBrains Mono', monospace; }
+
+  .vacio {
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 20px;
+    font-size: 14px;
+  }
+
+  @media (max-width: 480px) {
+    header h1 { font-size: 21px; }
+    .boleto { flex-direction: column; }
+    .boleto .foto-col { width: 100%; height: 110px; }
+    .boleto .divisor { display: none; }
+    .boleto .sello { top: auto; bottom: 10px; right: 10px; }
+    .boleto h3 { padding-right: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="ruta-punteada"></div>
+  <div class="contenido">
+    <p class="eyebrow">San José · Costa Rica</p>
+    <h1>Rutas CR</h1>
+    <p>Encuentra qué transportista viaja hacia tu destino, o busca uno que ya conoces, y navega directo a su bodega con Waze o Google Maps.</p>
+  </div>
+</header>
+
+<div class="contenedor-buscador">
+  <div class="buscador">
+    <div class="segmentado">
+      <label><input type="radio" name="modo" value="destino" checked onchange="cambiarModo()"><span>Por destino</span></label>
+      <label><input type="radio" name="modo" value="transportista" onchange="cambiarModo()"><span>Por transportista</span></label>
+    </div>
+    <div id="filaDestino" class="fila-input">
+      <input type="text" list="listaDestinos" id="inputDestino" placeholder="¿A dónde envías? (ej: Nosara, Liberia...)">
+      <datalist id="listaDestinos"></datalist>
+      <button onclick="buscar()">Buscar</button>
+    </div>
+    <div id="filaTransportista" class="fila-input" style="display:none;">
+      <input type="text" list="listaTransportistas" id="inputTransportista" placeholder="Nombre del transportista...">
+      <datalist id="listaTransportistas"></datalist>
+      <button onclick="buscar()">Buscar</button>
+    </div>
+  </div>
+</div>
+
+<div id="estadoUbicacion">◎ Obteniendo tu ubicación...</div>
+
+<div id="mapa"></div>
+
+<div id="resultados">
+  <p class="vacio">Escribe un destino o el nombre de un transportista arriba para empezar.</p>
+</div>
+
+<script>
+  const API_URL = 'https://script.google.com/macros/s/AKfycbziHUb11q9tHuAnqFQY8EG-u18Q763C8a-a4CE0Rwii_iTRNPqmTTzaZvN5PRtx14NqaA/exec';
+
+  let transportistas = [];
+  let map, userMarker;
+  let marcadores = [];
+  let ubicacionUsuario = null; // {lat, lng}
+
+  const CENTRO_DEFAULT = { lat: 9.9281, lng: -84.0907 }; // San José, Costa Rica
+
+  function initMap() {
+    map = new google.maps.Map(document.getElementById('mapa'), {
+      center: CENTRO_DEFAULT,
+      zoom: 8,
+      styles: [
+        { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }
+      ]
+    });
+    cargarDatos();
+    pedirUbicacion();
+  }
+
+  function cargarDatos() {
+    fetch(API_URL)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        transportistas = data;
+        construirListaDestinos(data);
+        construirListaTransportistas(data);
+      })
+      .catch(function (err) {
+        document.getElementById('resultados').innerHTML =
+          '<p class="vacio">No se pudieron cargar los datos. Intenta recargar la página.</p>';
+        console.error(err);
+      });
+  }
+
+  function construirListaDestinos(data) {
+    var set = new Set();
+    data.forEach(function (t) { (t.destinos || []).forEach(function (d) { set.add(d); }); });
+    var lista = Array.from(set).sort();
+    document.getElementById('listaDestinos').innerHTML =
+      lista.map(function (d) { return '<option value="' + d.replace(/"/g, '') + '">'; }).join('');
+  }
+
+  function construirListaTransportistas(data) {
+    var nombres = data.map(function (t) { return t.nombre; }).filter(Boolean).sort();
+    document.getElementById('listaTransportistas').innerHTML =
+      nombres.map(function (n) { return '<option value="' + n.replace(/"/g, '') + '">'; }).join('');
+  }
+
+  function cambiarModo() {
+    var modo = document.querySelector('input[name="modo"]:checked').value;
+    document.getElementById('filaDestino').style.display = (modo === 'destino') ? 'flex' : 'none';
+    document.getElementById('filaTransportista').style.display = (modo === 'transportista') ? 'flex' : 'none';
+  }
+
+  function pedirUbicacion() {
+    var estado = document.getElementById('estadoUbicacion');
+    if (!navigator.geolocation) {
+      estado.textContent = '⚠ Tu navegador no permite ubicación automática. Igual puedes buscar por destino.';
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      function (pos) {
+        ubicacionUsuario = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        estado.textContent = '◉ Ubicación detectada — los resultados se ordenan por cercanía.';
+        map.setCenter(ubicacionUsuario);
+        map.setZoom(11);
+        userMarker = new google.maps.Marker({
+          position: ubicacionUsuario,
+          map: map,
+          label: 'Tú',
+          icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+        });
+      },
+      function () {
+        estado.textContent = '○ No se pudo obtener tu ubicación. Los resultados se muestran sin ordenar por distancia.';
+      }
+    );
+  }
+
+  function distanciaKm(lat1, lng1, lat2, lng2) {
+    var R = 6371;
+    var dLat = (lat2 - lat1) * Math.PI / 180;
+    var dLng = (lng2 - lng1) * Math.PI / 180;
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  function normalizar(txt) {
+    return (txt || '').toString().trim().toUpperCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  // Distancia de edición entre dos textos: cuántos cambios (letras) hay que
+  // hacer para convertir uno en el otro. Entre más bajo, más parecidos son.
+  function distanciaLevenshtein(a, b) {
+    a = a || ''; b = b || '';
+    var matriz = [];
+    for (var i = 0; i <= b.length; i++) matriz[i] = [i];
+    for (var j = 0; j <= a.length; j++) matriz[0][j] = j;
+    for (var i = 1; i <= b.length; i++) {
+      for (var j = 1; j <= a.length; j++) {
+        if (b.charAt(i - 1) === a.charAt(j - 1)) {
+          matriz[i][j] = matriz[i - 1][j - 1];
+        } else {
+          matriz[i][j] = Math.min(
+            matriz[i - 1][j - 1] + 1, // sustitución
+            matriz[i][j - 1] + 1,     // inserción
+            matriz[i - 1][j] + 1      // eliminación
+          );
+        }
+      }
+    }
+    return matriz[b.length][a.length];
+  }
+
+  // true si "candidato" coincide exacto, contiene/está contenido en "buscado",
+  // o es lo bastante parecido según distancia de edición (tolera errores de tipeo/acentos)
+  function coincideAproximado(candidato, buscado) {
+    var c = normalizar(candidato);
+    var b = normalizar(buscado);
+    if (!c || !b) return false;
+    if (c === b) return true;
+    if (c.indexOf(b) !== -1 || b.indexOf(c) !== -1) return true;
+    var distancia = distanciaLevenshtein(c, b);
+    var umbral = Math.max(2, Math.floor(b.length * 0.3)); // tolera ~30% de diferencia
+    return distancia <= umbral;
+  }
+
+  function fotoHtml(t) {
+    if (t.imagen) {
+      return '<img src="' + t.imagen + '" alt="' + t.nombre + '" onerror="this.parentNode.innerHTML=\'<span class=&quot;placeholder&quot;>📦</span>\'">';
+    }
+    return '<span class="placeholder">📦</span>';
+  }
+
+  function telefonosHtml(t) {
+    return (t.telefonos || []).map(function (tel) {
+      return '<a class="btn-tel" href="tel:' + tel.numero.replace(/\D/g, '') + '">☎ ' + tel.numero + '</a>';
+    }).join('');
+  }
+
+  function buscar() {
+    var modo = document.querySelector('input[name="modo"]:checked').value;
+    if (modo === 'transportista') { buscarPorTransportista(); }
+    else { buscarPorDestino(); }
+  }
+
+  function buscarPorDestino() {
+    var destinoBuscado = document.getElementById('inputDestino').value.trim();
+    if (!destinoBuscado) { alert('Escribe un destino primero.'); return; }
+
+    var coincidencias = transportistas.filter(function (t) {
+      return (t.destinos || []).some(function (d) { return coincideAproximado(d, destinoBuscado); });
+    });
+
+    if (coincidencias.length === 0) {
+      mostrarSugerenciasDestino(destinoBuscado);
+      renderMarcadores([]);
+      return;
+    }
+
+    var conDistancia = coincidencias.map(function (t) {
+      var bodegasConCoords = (t.bodegas || []).filter(function (b) { return b.lat && b.lng; });
+      var mejorBodega = null, distancia = null;
+
+      if (ubicacionUsuario && bodegasConCoords.length > 0) {
+        bodegasConCoords.forEach(function (b) {
+          var d = distanciaKm(ubicacionUsuario.lat, ubicacionUsuario.lng, b.lat, b.lng);
+          if (distancia === null || d < distancia) { distancia = d; mejorBodega = b; }
+        });
+      } else if (bodegasConCoords.length > 0) {
+        mejorBodega = bodegasConCoords[0];
+      }
+      return { transportista: t, bodega: mejorBodega, distancia: distancia };
+    });
+
+    conDistancia.sort(function (a, b) {
+      if (a.distancia === null && b.distancia === null) return 0;
+      if (a.distancia === null) return 1;
+      if (b.distancia === null) return -1;
+      return a.distancia - b.distancia;
+    });
+
+    renderResultadosDestino(conDistancia);
+    renderMarcadores(conDistancia.map(function (item) { return item.bodega; }).filter(Boolean));
+  }
+
+  function mostrarSugerenciasDestino(textoBuscado) {
+    var todos = new Set();
+    transportistas.forEach(function (t) { (t.destinos || []).forEach(function (d) { todos.add(d); }); });
+
+    var candidatos = Array.from(todos).map(function (d) {
+      return { destino: d, distancia: distanciaLevenshtein(normalizar(d), normalizar(textoBuscado)) };
+    }).sort(function (a, b) { return a.distancia - b.distancia; }).slice(0, 5);
+
+    var cont = document.getElementById('resultados');
+    cont.innerHTML =
+      '<p class="vacio">No encontramos "' + textoBuscado + '" exactamente. ¿Quisiste decir alguno de estos?</p>' +
+      '<div class="acciones" style="justify-content:center;">' +
+        candidatos.map(function (c) {
+          return '<a href="#" class="btn-maps" onclick="event.preventDefault(); document.getElementById(\'inputDestino\').value=\'' +
+            c.destino.replace(/'/g, '') + '\'; buscarPorDestino();">' + c.destino + '</a>';
+        }).join('') +
+      '</div>';
+  }
+
+  function renderResultadosDestino(lista) {
+    var cont = document.getElementById('resultados');
+    if (lista.length === 0) {
+      cont.innerHTML = '<p class="vacio">No encontramos transportistas para ese destino. Revisa la ortografía o prueba con un lugar cercano.</p>';
+      return;
+    }
+
+    cont.innerHTML = lista.map(function (item) {
+      var t = item.transportista;
+      var acciones = telefonosHtml(t);
+      if (item.bodega) {
+        var wazeUrl = 'https://waze.com/ul?ll=' + item.bodega.lat + ',' + item.bodega.lng + '&navigate=yes';
+        var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + item.bodega.lat + ',' + item.bodega.lng;
+        acciones += '<a class="btn-waze" href="' + wazeUrl + '" target="_blank">🚗 Waze</a>' +
+                    '<a class="btn-maps" href="' + mapsUrl + '" target="_blank">📍 Maps</a>';
+      }
+      var sello = item.distancia !== null
+        ? '<div class="sello"><b>' + item.distancia.toFixed(1) + '</b>km</div>'
+        : '';
+
+      return '' +
+        '<div class="boleto">' +
+          '<div class="foto-col">' + fotoHtml(t) + '</div>' +
+          '<div class="divisor"></div>' +
+          '<div class="info-col">' +
+            sello +
+            (item.bodega && item.bodega.zona ? '<span class="zona-tag">' + item.bodega.zona + '</span><br>' : '') +
+            '<h3>' + t.nombre + '</h3>' +
+            (t.horario ? '<p><strong>Horario:</strong> ' + t.horario + '</p>' : '') +
+            (item.bodega ? '<p><strong>Bodega:</strong> ' + (item.bodega.direccion || item.bodega.zona) + '</p>' : '<p><em>Sin coordenadas de bodega registradas</em></p>') +
+            '<div class="acciones">' + acciones + '</div>' +
+          '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function buscarPorTransportista() {
+    var nombreBuscado = document.getElementById('inputTransportista').value.trim();
+    if (!nombreBuscado) { alert('Escribe el nombre de un transportista primero.'); return; }
+
+    var coincidencias = transportistas.filter(function (t) {
+      return coincideAproximado(t.nombre, nombreBuscado);
+    });
+
+    if (coincidencias.length === 0) {
+      mostrarSugerenciasTransportista(nombreBuscado);
+      renderMarcadores([]);
+      return;
+    }
+
+    renderResultadosTransportista(coincidencias);
+
+    var todasLasBodegas = [];
+    coincidencias.forEach(function (t) {
+      (t.bodegas || []).forEach(function (b) { if (b.lat && b.lng) todasLasBodegas.push(b); });
+    });
+    renderMarcadores(todasLasBodegas);
+  }
+
+  function mostrarSugerenciasTransportista(textoBuscado) {
+    var candidatos = transportistas.map(function (t) {
+      return { nombre: t.nombre, distancia: distanciaLevenshtein(normalizar(t.nombre), normalizar(textoBuscado)) };
+    }).sort(function (a, b) { return a.distancia - b.distancia; }).slice(0, 5);
+
+    var cont = document.getElementById('resultados');
+    cont.innerHTML =
+      '<p class="vacio">No encontramos "' + textoBuscado + '" exactamente. ¿Quisiste decir alguno de estos?</p>' +
+      '<div class="acciones" style="justify-content:center;">' +
+        candidatos.map(function (c) {
+          return '<a href="#" class="btn-maps" onclick="event.preventDefault(); document.getElementById(\'inputTransportista\').value=\'' +
+            c.nombre.replace(/'/g, '') + '\'; buscarPorTransportista();">' + c.nombre + '</a>';
+        }).join('') +
+      '</div>';
+  }
+
+  function renderResultadosTransportista(lista) {
+    var cont = document.getElementById('resultados');
+
+    cont.innerHTML = lista.map(function (t) {
+      var bodegasHtml = (t.bodegas || []).map(function (b) {
+        var acciones = '';
+        if (b.lat && b.lng) {
+          var wazeUrl = 'https://waze.com/ul?ll=' + b.lat + ',' + b.lng + '&navigate=yes';
+          var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + b.lat + ',' + b.lng;
+          acciones = '<a class="btn-waze" href="' + wazeUrl + '" target="_blank">🚗 Waze</a>' +
+                     '<a class="btn-maps" href="' + mapsUrl + '" target="_blank">📍 Maps</a>';
+        }
+        var distanciaTxt = '';
+        if (ubicacionUsuario && b.lat && b.lng) {
+          var d = distanciaKm(ubicacionUsuario.lat, ubicacionUsuario.lng, b.lat, b.lng);
+          distanciaTxt = ' <span class="mono">(~' + d.toFixed(1) + ' km de ti)</span>';
+        }
+        return '' +
+          '<div class="bodega-item">' +
+            (b.zona ? '<span class="zona-tag">' + b.zona + '</span><br>' : '') +
+            '<p><strong>Bodega:</strong> ' + (b.direccion || 'Sin dirección registrada') + distanciaTxt + '</p>' +
+            (acciones ? '<div class="acciones">' + acciones + '</div>' : '<p><em>Sin coordenadas registradas</em></p>') +
+          '</div>';
+      }).join('') || '<p><em>Sin bodegas registradas</em></p>';
+
+      var destinosHtml = (t.destinos && t.destinos.length)
+        ? '<p class="destinos-lista"><strong>Destinos que cubre:</strong> ' + t.destinos.join(', ') + '</p>'
+        : '';
+
+      return '' +
+        '<div class="boleto">' +
+          '<div class="foto-col">' + fotoHtml(t) + '</div>' +
+          '<div class="divisor"></div>' +
+          '<div class="info-col">' +
+            '<h3>' + t.nombre + '</h3>' +
+            (t.horario ? '<p><strong>Horario:</strong> ' + t.horario + '</p>' : '') +
+            '<div class="acciones">' + telefonosHtml(t) + '</div>' +
+            bodegasHtml +
+            destinosHtml +
+          '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function renderMarcadores(bodegas) {
+    marcadores.forEach(function (m) { m.setMap(null); });
+    marcadores = [];
+
+    var bounds = new google.maps.LatLngBounds();
+    var hubo = false;
+
+    bodegas.forEach(function (b) {
+      var marker = new google.maps.Marker({ position: { lat: b.lat, lng: b.lng }, map: map });
+      marcadores.push(marker);
+      bounds.extend(marker.getPosition());
+      hubo = true;
+    });
+
+    if (ubicacionUsuario) { bounds.extend(ubicacionUsuario); hubo = true; }
+    if (hubo) { map.fitBounds(bounds); }
+  }
+</script>
+
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNgElFdkoAY-Osohv2FdzlnlV8PiHYnU8&callback=initMap">
+</script>
+
+</body>
+</html>
