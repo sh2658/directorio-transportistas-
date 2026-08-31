@@ -139,16 +139,81 @@
     overflow: hidden;
   }
   .boleto .foto-col {
-    width: 96px;
+    width: 148px;
+    min-height: 176px;
     flex-shrink: 0;
-    background: var(--navy);
+    padding: 12px;
+    box-sizing: border-box;
+    background: linear-gradient(145deg, #f8fafc, #eef2f6);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     position: relative;
   }
-  .boleto .foto-col img { width: 100%; height: 100%; object-fit: cover; }
+  .boleto .foto-col img {
+    width: 100%;
+    height: 148px;
+    object-fit: contain;
+    object-position: center;
+    box-sizing: border-box;
+    padding: 5px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    box-shadow: 0 2px 7px rgba(11,37,69,0.10);
+    cursor: zoom-in;
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .boleto .foto-col img:hover {
+    transform: scale(1.025);
+    box-shadow: 0 5px 14px rgba(11,37,69,0.16);
+  }
   .boleto .foto-col .placeholder { font-size: 30px; opacity: 0.6; }
+
+  .visor-imagen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(5, 18, 34, 0.82);
+    backdrop-filter: blur(4px);
+  }
+  .visor-imagen.abierto { display: flex; }
+  .visor-contenido {
+    position: relative;
+    width: min(900px, 96vw);
+    max-height: 92vh;
+    padding: 16px;
+    box-sizing: border-box;
+    border-radius: 14px;
+    background: white;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
+  }
+  .visor-contenido img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: calc(92vh - 70px);
+    object-fit: contain;
+  }
+  .visor-cerrar {
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    width: 38px;
+    height: 38px;
+    border: 2px solid white;
+    border-radius: 50%;
+    background: var(--navy);
+    color: white;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,.3);
+  }
   .boleto .divisor {
     width: 0;
     border-left: 2px dashed var(--line);
@@ -276,7 +341,13 @@
   @media (max-width: 480px) {
     header h1 { font-size: 21px; }
     .boleto { flex-direction: column; }
-    .boleto .foto-col { width: 100%; height: 110px; }
+    .boleto .foto-col {
+      width: 100%;
+      min-height: 188px;
+      padding: 12px;
+      align-items: center;
+    }
+    .boleto .foto-col img { width: 100%; max-width: 310px; height: 164px; }
     .boleto .divisor { display: none; }
     .boleto .sello { top: auto; bottom: 10px; right: 10px; }
     .boleto h3 { padding-right: 0; }
@@ -343,6 +414,13 @@
 
 <div id="resultados">
   <p class="vacio">Escribe un destino o el nombre de un transportista arriba para empezar.</p>
+</div>
+
+<div id="visorImagen" class="visor-imagen" role="dialog" aria-modal="true" aria-label="Imagen ampliada" onclick="cerrarVisor(event)">
+  <div class="visor-contenido">
+    <button class="visor-cerrar" type="button" aria-label="Cerrar imagen" onclick="cerrarVisor()">×</button>
+    <img id="imagenAmpliada" src="" alt="">
+  </div>
 </div>
 
 <footer>
@@ -491,10 +569,30 @@
 
   function fotoHtml(t) {
     if (t.imagen) {
-      return '<img src="' + t.imagen + '" alt="' + t.nombre + '" onerror="this.parentNode.innerHTML=\'<span class=&quot;placeholder&quot;>📦</span>\'">';
+      return '<img src="' + t.imagen + '" alt="Imagen de ' + t.nombre + '" loading="lazy" title="Toca para ampliar" onclick="abrirVisor(this)" onerror="console.error(\'No se pudo cargar la imagen:\', this.src); this.parentNode.innerHTML=\'<span class=&quot;placeholder&quot;>📦</span>\'">';
     }
     return '<span class="placeholder">📦</span>';
   }
+
+  function abrirVisor(imagen) {
+    var visor = document.getElementById('visorImagen');
+    var ampliada = document.getElementById('imagenAmpliada');
+    ampliada.src = imagen.src;
+    ampliada.alt = imagen.alt;
+    visor.classList.add('abierto');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function cerrarVisor(evento) {
+    if (evento && evento.target !== evento.currentTarget) return;
+    document.getElementById('visorImagen').classList.remove('abierto');
+    document.getElementById('imagenAmpliada').src = '';
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', function (evento) {
+    if (evento.key === 'Escape') cerrarVisor();
+  });
 
   function telefonosHtml(t) {
     return (t.telefonos || []).map(function (tel) {
