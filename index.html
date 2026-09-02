@@ -457,11 +457,17 @@
 
   function cargarDatos() {
     fetch(API_URL)
-      .then(function (r) { return r.json(); })
+      .then(function (r) {
+        if (!r.ok) throw new Error('API respondió con estado ' + r.status);
+        return r.json();
+      })
       .then(function (data) {
-        transportistas = data;
-        construirListaDestinos(data);
-        construirListaTransportistas(data);
+        if (!Array.isArray(data)) throw new Error('La API no devolvió una lista válida');
+        transportistas = data.filter(function (t) {
+          return t && typeof t === 'object' && typeof t.nombre === 'string';
+        });
+        construirListaDestinos(transportistas);
+        construirListaTransportistas(transportistas);
       })
       .catch(function (err) {
         document.getElementById('resultados').innerHTML =
@@ -470,18 +476,29 @@
       });
   }
 
+  function llenarDatalist(id, valores) {
+    var lista = document.getElementById(id);
+    lista.replaceChildren();
+    valores.forEach(function (valor) {
+      var option = document.createElement('option');
+      option.value = String(valor || '');
+      lista.appendChild(option);
+    });
+  }
+
   function construirListaDestinos(data) {
     var set = new Set();
-    data.forEach(function (t) { (t.destinos || []).forEach(function (d) { set.add(d); }); });
-    var lista = Array.from(set).sort();
-    document.getElementById('listaDestinos').innerHTML =
-      lista.map(function (d) { return '<option value="' + d.replace(/"/g, '') + '">'; }).join('');
+    data.forEach(function (t) {
+      (Array.isArray(t.destinos) ? t.destinos : []).forEach(function (d) {
+        if (typeof d === 'string' && d.trim()) set.add(d.trim());
+      });
+    });
+    llenarDatalist('listaDestinos', Array.from(set).sort());
   }
 
   function construirListaTransportistas(data) {
     var nombres = data.map(function (t) { return t.nombre; }).filter(Boolean).sort();
-    document.getElementById('listaTransportistas').innerHTML =
-      nombres.map(function (n) { return '<option value="' + n.replace(/"/g, '') + '">'; }).join('');
+    llenarDatalist('listaTransportistas', nombres);
   }
 
   function cambiarModo() {
@@ -531,6 +548,35 @@
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   }
 
+  function escapeHtml(valor) {
+    return String(valor == null ? '' : valor).replace(/[&<>"']/g, function (caracter) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[caracter];
+    });
+  }
+
+  function urlHttpSegura(valor) {
+    try {
+      var url = new URL(String(valor || ''), window.location.href);
+      return (url.protocol === 'https:' || url.protocol === 'http:') ? url.href : '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function coordenadasValidas(bodega) {
+    var lat = Number(bodega && bodega.lat);
+    var lng = Number(bodega && bodega.lng);
+    return Number.isFinite(lat) && Number.isFinite(lng) &&
+      lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+  }
+
+  function aplicarSugerencia(valor, modo) {
+    var id = modo === 'transportista' ? 'inputTransportista' : 'inputDestino';
+    document.getElementById(id).value = valor;
+    if (modo === 'transportista') buscarPorTransportista();
+    else buscarPorDestino();
+  }
+
   // Distancia de edición entre dos textos: cuántos cambios (letras) hay que
   // hacer para convertir uno en el otro. Entre más bajo, más parecidos son.
   function distanciaLevenshtein(a, b) {
@@ -568,8 +614,9 @@
   }
 
   function fotoHtml(t) {
-    if (t.imagen) {
-      return '<img src="' + t.imagen + '" alt="Imagen de ' + t.nombre + '" loading="lazy" title="Toca para ampliar" onclick="abrirVisor(this)" onerror="console.error(\'No se pudo cargar la imagen:\', this.src); this.parentNode.innerHTML=\'<span class=&quot;placeholder&quot;>📦</span>\'">';
+    var imagen = urlHttpSegura(t.imagen);
+    if (imagen) {
+      return '<img src="' + escapeHtml(imagen) + '" alt="Imagen de ' + escapeHtml(t.nombre) + '" loading="lazy" title="Toca para ampliar" onclick="abrirVisor(this)" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'), {className:\'placeholder\', textContent:\'📦\'}))">';
     }
     return '<span class="placeholder">📦</span>';
   }
@@ -595,8 +642,11 @@
   });
 
   function telefonosHtml(t) {
-    return (t.telefonos || []).map(function (tel) {
-      return '<a class="btn-tel" href="tel:' + tel.numero.replace(/\D/g, '') + '">☎ ' + tel.numero + '</a>';
+    return (Array.isArray(t.telefonos) ? t.telefonos : []).map(function (tel) {
+      var numero = String(tel && tel.numero || '');
+      var marcable = numero.replace(/\D/g, '');
+      if (!marcable) return '';
+      return '<a class="btn-tel" href="tel:' + marcable + '">☎ ' + escapeHtml(numero) + '</a>';
     }).join('');
   }
 
@@ -621,7 +671,7 @@
     }
 
     var conDistancia = coincidencias.map(function (t) {
-      var bodegasConCoords = (t.bodegas || []).filter(function (b) { return b.lat && b.lng; });
+      var bodegasConCoords = (Array.isArray(t.bodegas) ? t.bodegas : []).filter(coordenadasValidas);
       var mejorBodega = null, distancia = null;
 
       if (ubicacionUsuario && bodegasConCoords.length > 0) {
@@ -656,11 +706,12 @@
 
     var cont = document.getElementById('resultados');
     cont.innerHTML =
-      '<p class="vacio">No encontramos "' + textoBuscado + '" exactamente. ¿Quisiste decir alguno de estos?</p>' +
+      '<p class="vacio">No encontramos "' + escapeHtml(textoBuscado) + '" exactamente. ¿Quisiste decir alguno de estos?</p>' +
       '<div class="acciones" style="justify-content:center;">' +
         candidatos.map(function (c) {
-          return '<a href="#" class="btn-maps" onclick="event.preventDefault(); document.getElementById(\'inputDestino\').value=\'' +
-            c.destino.replace(/'/g, '') + '\'; buscarPorDestino();">' + c.destino + '</a>';
+          return '<a href="#" class="btn-maps" data-sugerencia="' + escapeHtml(c.destino) +
+            '" onclick="event.preventDefault(); aplicarSugerencia(this.dataset.sugerencia, \'destino\')">' +
+            escapeHtml(c.destino) + '</a>';
         }).join('') +
       '</div>';
   }
@@ -678,8 +729,8 @@
       if (item.bodega) {
         var wazeUrl = 'https://waze.com/ul?ll=' + item.bodega.lat + ',' + item.bodega.lng + '&navigate=yes';
         var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + item.bodega.lat + ',' + item.bodega.lng;
-        acciones += '<a class="btn-waze" href="' + wazeUrl + '" target="_blank">🚗 Waze</a>' +
-                    '<a class="btn-maps" href="' + mapsUrl + '" target="_blank">📍 Maps</a>';
+        acciones += '<a class="btn-waze" href="' + wazeUrl + '" target="_blank" rel="noopener noreferrer">🚗 Waze</a>' +
+                    '<a class="btn-maps" href="' + mapsUrl + '" target="_blank" rel="noopener noreferrer">📍 Maps</a>';
       }
       var sello = item.distancia !== null
         ? '<div class="sello"><b>' + item.distancia.toFixed(1) + '</b>km</div>'
@@ -691,10 +742,10 @@
           '<div class="divisor"></div>' +
           '<div class="info-col">' +
             sello +
-            (item.bodega && item.bodega.zona ? '<span class="zona-tag">' + item.bodega.zona + '</span><br>' : '') +
-            '<h3>' + t.nombre + '</h3>' +
-            (t.horario ? '<p><strong>Horario:</strong> ' + t.horario + '</p>' : '') +
-            (item.bodega ? '<p><strong>Bodega:</strong> ' + (item.bodega.direccion || item.bodega.zona) + '</p>' : '<p><em>Sin coordenadas de bodega registradas</em></p>') +
+            (item.bodega && item.bodega.zona ? '<span class="zona-tag">' + escapeHtml(item.bodega.zona) + '</span><br>' : '') +
+            '<h3>' + escapeHtml(t.nombre) + '</h3>' +
+            (t.horario ? '<p><strong>Horario:</strong> ' + escapeHtml(t.horario) + '</p>' : '') +
+            (item.bodega ? '<p><strong>Bodega:</strong> ' + escapeHtml(item.bodega.direccion || item.bodega.zona || 'Sin dirección registrada') + '</p>' : '<p><em>Sin coordenadas de bodega registradas</em></p>') +
             '<div class="acciones">' + acciones + '</div>' +
           '</div>' +
         '</div>';
@@ -719,7 +770,7 @@
 
     var todasLasBodegas = [];
     coincidencias.forEach(function (t) {
-      (t.bodegas || []).forEach(function (b) { if (b.lat && b.lng) todasLasBodegas.push(b); });
+      (Array.isArray(t.bodegas) ? t.bodegas : []).forEach(function (b) { if (coordenadasValidas(b)) todasLasBodegas.push(b); });
     });
     renderMarcadores(todasLasBodegas);
   }
@@ -731,11 +782,12 @@
 
     var cont = document.getElementById('resultados');
     cont.innerHTML =
-      '<p class="vacio">No encontramos "' + textoBuscado + '" exactamente. ¿Quisiste decir alguno de estos?</p>' +
+      '<p class="vacio">No encontramos "' + escapeHtml(textoBuscado) + '" exactamente. ¿Quisiste decir alguno de estos?</p>' +
       '<div class="acciones" style="justify-content:center;">' +
         candidatos.map(function (c) {
-          return '<a href="#" class="btn-maps" onclick="event.preventDefault(); document.getElementById(\'inputTransportista\').value=\'' +
-            c.nombre.replace(/'/g, '') + '\'; buscarPorTransportista();">' + c.nombre + '</a>';
+          return '<a href="#" class="btn-maps" data-sugerencia="' + escapeHtml(c.nombre) +
+            '" onclick="event.preventDefault(); aplicarSugerencia(this.dataset.sugerencia, \'transportista\')">' +
+            escapeHtml(c.nombre) + '</a>';
         }).join('') +
       '</div>';
   }
@@ -744,29 +796,29 @@
     var cont = document.getElementById('resultados');
 
     cont.innerHTML = lista.map(function (t) {
-      var bodegasHtml = (t.bodegas || []).map(function (b) {
+      var bodegasHtml = (Array.isArray(t.bodegas) ? t.bodegas : []).map(function (b) {
         var acciones = '';
-        if (b.lat && b.lng) {
+        if (coordenadasValidas(b)) {
           var wazeUrl = 'https://waze.com/ul?ll=' + b.lat + ',' + b.lng + '&navigate=yes';
           var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + b.lat + ',' + b.lng;
-          acciones = '<a class="btn-waze" href="' + wazeUrl + '" target="_blank">🚗 Waze</a>' +
-                     '<a class="btn-maps" href="' + mapsUrl + '" target="_blank">📍 Maps</a>';
+          acciones = '<a class="btn-waze" href="' + wazeUrl + '" target="_blank" rel="noopener noreferrer">🚗 Waze</a>' +
+                     '<a class="btn-maps" href="' + mapsUrl + '" target="_blank" rel="noopener noreferrer">📍 Maps</a>';
         }
         var distanciaTxt = '';
-        if (ubicacionUsuario && b.lat && b.lng) {
+        if (ubicacionUsuario && coordenadasValidas(b)) {
           var d = distanciaKm(ubicacionUsuario.lat, ubicacionUsuario.lng, b.lat, b.lng);
           distanciaTxt = ' <span class="mono">(~' + d.toFixed(1) + ' km de ti)</span>';
         }
         return '' +
           '<div class="bodega-item">' +
-            (b.zona ? '<span class="zona-tag">' + b.zona + '</span><br>' : '') +
-            '<p><strong>Bodega:</strong> ' + (b.direccion || 'Sin dirección registrada') + distanciaTxt + '</p>' +
+            (b.zona ? '<span class="zona-tag">' + escapeHtml(b.zona) + '</span><br>' : '') +
+            '<p><strong>Bodega:</strong> ' + escapeHtml(b.direccion || 'Sin dirección registrada') + distanciaTxt + '</p>' +
             (acciones ? '<div class="acciones">' + acciones + '</div>' : '<p><em>Sin coordenadas registradas</em></p>') +
           '</div>';
       }).join('') || '<p><em>Sin bodegas registradas</em></p>';
 
       var destinosHtml = (t.destinos && t.destinos.length)
-        ? '<p class="destinos-lista"><strong>Destinos que cubre:</strong> ' + t.destinos.join(', ') + '</p>'
+        ? '<p class="destinos-lista"><strong>Destinos que cubre:</strong> ' + t.destinos.map(escapeHtml).join(', ') + '</p>'
         : '';
 
       return '' +
@@ -774,8 +826,8 @@
           '<div class="foto-col">' + fotoHtml(t) + '</div>' +
           '<div class="divisor"></div>' +
           '<div class="info-col">' +
-            '<h3>' + t.nombre + '</h3>' +
-            (t.horario ? '<p><strong>Horario:</strong> ' + t.horario + '</p>' : '') +
+            '<h3>' + escapeHtml(t.nombre) + '</h3>' +
+            (t.horario ? '<p><strong>Horario:</strong> ' + escapeHtml(t.horario) + '</p>' : '') +
             '<div class="acciones">' + telefonosHtml(t) + '</div>' +
             bodegasHtml +
             destinosHtml +
@@ -803,8 +855,8 @@
   }
 </script>
 
-<script async defer
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDuPaQudck14T3awVycnwh54TDa53hSEbI&callback=initMap">
+<script async
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDuPaQudck14T3awVycnwh54TDa53hSEbI&callback=initMap&loading=async&auth_referrer_policy=origin">
 </script>
 
 </body>
