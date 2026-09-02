@@ -507,6 +507,20 @@
     document.getElementById('filaTransportista').style.display = (modo === 'transportista') ? 'flex' : 'none';
   }
 
+  document.getElementById('inputDestino').addEventListener('keydown', function (evento) {
+    if (evento.key === 'Enter') {
+      evento.preventDefault();
+      buscarPorDestino();
+    }
+  });
+
+  document.getElementById('inputTransportista').addEventListener('keydown', function (evento) {
+    if (evento.key === 'Enter') {
+      evento.preventDefault();
+      buscarPorTransportista();
+    }
+  });
+
   function pedirUbicacion() {
     var estado = document.getElementById('estadoUbicacion');
     if (!navigator.geolocation) {
@@ -609,8 +623,12 @@
     if (c === b) return true;
     if (c.indexOf(b) !== -1 || b.indexOf(c) !== -1) return true;
     var distancia = distanciaLevenshtein(c, b);
-    var umbral = Math.max(2, Math.floor(b.length * 0.3)); // tolera ~30% de diferencia
+    var umbral = Math.max(2, Math.floor(b.length * 0.3)); // solo se usa para nombres y sugerencias
     return distancia <= umbral;
+  }
+
+  function coincideDestinoExacto(candidato, buscado) {
+    return normalizar(candidato) === normalizar(buscado);
   }
 
   function fotoHtml(t) {
@@ -661,7 +679,7 @@
     if (!destinoBuscado) { alert('Escribe un destino primero.'); return; }
 
     var coincidencias = transportistas.filter(function (t) {
-      return (t.destinos || []).some(function (d) { return coincideAproximado(d, destinoBuscado); });
+      return (t.destinos || []).some(function (d) { return coincideDestinoExacto(d, destinoBuscado); });
     });
 
     if (coincidencias.length === 0) {
