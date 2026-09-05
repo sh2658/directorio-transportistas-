@@ -325,3 +325,54 @@ function obtenerBlobImagen(urlOId) {
   const resp = UrlFetchApp.fetch(urlOId, { muteHttpExceptions: true });
   return resp.getBlob();
 }
+
+/**
+ * ==============================================================================
+ * EJECUTAR ESTA FUNCIÓN PRIMERO (1 SOLO CLIC):
+ * Crea automáticamente las hojas "Capturas_Revision" y "Capturas_Detalle"
+ * en tu Google Sheet con todos los encabezados y colores profesionales.
+ * ==============================================================================
+ */
+function inicializarEstructuraEnSheet() {
+  const ss = SpreadsheetApp.openById(CONFIG.ID_HOJA);
+  asegurarEstructuraTablas(ss);
+  Logger.log("✅ Estructura de tablas creada exitosamente en el Google Sheet: " + CONFIG.ID_HOJA);
+}
+
+/**
+ * ==============================================================================
+ * ENDPOINT WEBHOOK PARA APPSHEET (doPost):
+ * Permite que AppSheet llame a este script automáticamente:
+ * - Para procesar una foto recién subida: { "accion": "procesar", "idCaptura": "...", "urlImagen": "...", "gps": "..." }
+ * - Para aprobar y distribuir: { "accion": "aprobar", "idCaptura": "..." }
+ * ==============================================================================
+ */
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents || "{}");
+    const accion = data.accion || "procesar";
+
+    if (accion === "aprobar") {
+      const resAprobacion = aprobarYDistribuirCaptura(data.idCaptura);
+      return ContentService.createTextOutput(JSON.stringify(resAprobacion))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Acción por defecto: procesar imagen con Gemini
+    const resultado = procesarCapturaConGemini(data.idCaptura, data.urlImagen, data.gps);
+    return ContentService.createTextOutput(JSON.stringify(resultado))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ exito: false, error: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  return ContentService.createTextOutput(JSON.stringify({
+    estado: "Servicio Rutas CR Gemini OCR Activo",
+    hoja: CONFIG.ID_HOJA
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
