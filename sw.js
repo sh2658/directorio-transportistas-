@@ -1,5 +1,5 @@
-// Service Worker para Rutas CR - PWA Offline Support
-const CACHE_NAME = 'rutas-cr-v1';
+// Service Worker para Rutas CR - PWA Offline Support (v4)
+const CACHE_NAME = 'rutas-cr-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -15,7 +15,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS).catch((err) => {
-        console.warn('Algunos recursos estáticos no pudieron ser cacheados en install:', err);
+        console.warn('Algunos recursos no pudieron ser cacheados en install:', err);
       });
     })
   );
@@ -28,6 +28,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
+            console.log('Borrando caché antigua de Service Worker:', key);
             return caches.delete(key);
           }
         })
@@ -38,19 +39,34 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Ignorar peticiones que no sean GET o llamadas a Google Script (las gestiona SWR)
   if (event.request.method !== 'GET') return;
-  if (event.request.url.includes('script.google.com') || event.request.url.includes('google-analytics')) {
+  if (event.request.url.includes('script.google.com') || event.request.url.includes('google-analytics') || event.request.url.includes('googletagmanager')) {
     return;
   }
 
+  // Para el documento HTML principal: Network First (siempre busca la versión más fresca de GitHub Pages)
+  if (event.request.mode === 'navigate' || event.request.url.endsWith('/') || event.request.url.endsWith('index.html')) {
+    event.respondWith(
+      fetch(event.request).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const clone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
+        return networkResponse;
+      }).catch(() => {
+        return caches.match('./index.html') || caches.match('./');
+      })
+    );
+    return;
+  }
+
+  // Para recursos estáticos (CSS, JS, iconos, fuentes): Cache First con fallback a red
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
         return cachedResponse;
       }
       return fetch(event.request).then((networkResponse) => {
-        // Cachear recursos válidos de Leaflet o Fuentes
         if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
@@ -59,7 +75,6 @@ self.addEventListener('fetch', (event) => {
         }
         return networkResponse;
       }).catch(() => {
-        // Fallback si estamos offline
         return caches.match('./index.html');
       });
     })
