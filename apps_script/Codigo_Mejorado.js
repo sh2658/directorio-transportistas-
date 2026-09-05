@@ -257,9 +257,9 @@ function extraerDatosMultiTransportistaGemini_(blob, apiKey) {
     }
   };
 
-  // Obtener la lista de modelos válidos para tu cuenta/API Key
-  const modelosIntentar = obtenerListaModelosValidos_(apiKey);
-  Logger.log("Intentando con los siguientes modelos: " + JSON.stringify(modelosIntentar));
+  // Modelos de visión multimodal confirmados en tu cuenta (excluyendo modelos de audio/tts)
+  const modelosIntentar = ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash-lite', 'gemini-3.1-flash-lite'];
+  Logger.log("Intentando extracción con modelos de visión: " + JSON.stringify(modelosIntentar));
 
   let lastError = null;
   for (let i = 0; i < modelosIntentar.length; i++) {
@@ -282,40 +282,16 @@ function extraerDatosMultiTransportistaGemini_(blob, apiKey) {
         parsed.candidates[0].content && parsed.candidates[0].content.parts &&
         parsed.candidates[0].content.parts[0] && parsed.candidates[0].content.parts[0].text;
       if (!text) throw new Error('Gemini no devolvió contenido de texto.');
-      Logger.log("✅ Extracción exitosa con modelo: " + model);
+      Logger.log("✅ Extracción exitosa con modelo de visión: " + model);
       return JSON.parse(text);
     }
 
     lastError = new Error('Gemini respondió HTTP ' + code + ': ' + resumirMensajeApi_(body));
     Logger.log("Modelo " + model + " falló con HTTP " + code + ": " + resumirMensajeApi_(body));
-    if (code !== 404) break;
   }
   throw lastError || new Error('No fue posible consultar la API de Gemini.');
 }
 
-/**
- * Consulta la API para saber qué modelos exactos están habilitados en tu cuenta
- */
-function obtenerListaModelosValidos_(apiKey) {
-  try {
-    const url = 'https://generativelanguage.googleapis.com/v1beta/models?key=' + apiKey;
-    const resp = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
-    if (resp.getResponseCode() === 200) {
-      const json = JSON.parse(resp.getContentText());
-      const disponibles = (json.models || [])
-        .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent"))
-        .map(m => m.name.replace("models/", ""));
-      
-      if (disponibles.length > 0) {
-        return disponibles;
-      }
-    }
-  } catch (e) {
-    Logger.log("No se pudo autodetectar modelos: " + e.message);
-  }
-  // Fallbacks universales
-  return ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash', 'gemini-1.5-flash-latest', 'gemini-1.5-flash'];
-}
 
 /**
  * FUNCIÓN DE DIAGNÓSTICO:
