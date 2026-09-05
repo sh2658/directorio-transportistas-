@@ -84,6 +84,7 @@ function procesarCapturasPendientes() {
     // Mapeo dinámico de encabezados
     const idxFoto           = findColIndex_(headers, ["FOTO", "Foto"]);
     const idxEstado         = findColIndex_(headers, ["ESTADO", "Estado"]);
+    const idxIdTransporte   = findColIndex_(headers, ["IDTRANSPORTE", "ID TRANSPORTE"]);
     const idxGps            = findColIndex_(headers, ["GPS"]);
     const idxTransportista  = findColIndex_(headers, ["NOMBRE DEL TRANSPORTISTA", "TRANSPORTISTA"]);
     const idxTelefonos      = findColIndex_(headers, ["TELEFONOS", "Teléfonos"]);
@@ -120,7 +121,7 @@ function procesarCapturasPendientes() {
         
         // Reparto de transportistas en la hoja CAPTURAS
         escribirRepartoEnCapturas_(sheet, rowNumber, photoPath, gpsValue, resultadoIA, {
-          idxFoto, idxEstado, idxGps, idxTransportista, idxTelefonos,
+          idxFoto, idxEstado, idxIdTransporte, idxGps, idxTransportista, idxTelefonos,
           idxDestinos, idxBodegas, idxHorario, idxObservaciones, headersCount: headers.length
         });
 
@@ -247,11 +248,16 @@ function extraerDatosMultiTransportistaGemini_(blob, apiKey) {
 
 /**
  * Distribuye los resultados en la hoja CAPTURAS:
+ * - Si el transportista YA EXISTE en TRANSPORTISTA, llena su IDTRANSPORTE y avisa: [YA EXISTE: TRP-XXXX].
  * - Si es 1 solo transportista: actualiza la fila existente.
  * - Si son varios: actualiza la primera fila con el primero y agrega filas adicionales
  *   para los demás con la MISMA FOTO, MISMO GPS, MISMA BODEGA y MISMO HORARIO.
  */
 function escribirRepartoEnCapturas_(sheet, rowNumber, photoPath, gpsValue, dataIA, cols) {
+  const ss = sheet.getParent();
+  const sheetTrp = ss.getSheetByName('TRANSPORTISTA');
+  const mapExistentes = sheetTrp ? obtenerMapTransportistasExistentes_(sheetTrp) : new Map();
+
   const bodegaComun = String(dataIA.bodega_compartida || '').trim().toUpperCase();
   const horarioComun = String(dataIA.horario_general || '').trim().toUpperCase();
   const obsComun = String(dataIA.observaciones_bodega || '').trim().toUpperCase();
@@ -262,45 +268,78 @@ function escribirRepartoEnCapturas_(sheet, rowNumber, photoPath, gpsValue, dataI
   const total = transportistas.length;
 
   // 1. Asignar el primer transportista a la fila original
-  asignarFilaCaptura_(sheet, rowNumber, transportistas[0], bodegaComun, horarioComun, obsComun, total > 1 ? `[1 DE ${total} EN ESTA BODEGA]` : '', cols);
+  asignarFilaCaptura_(sheet, rowNumber, transportistas[0], bodegaComun, horarioComun, obsComun, total > 1 ? `[1 DE ${total}]` : '', mapExistentes, cols);
 
   // 2. Si hay más transportistas en el mismo rótulo/bodega, agregar una fila para cada uno
   for (let k = 1; k < total; k++) {
     const t = transportistas[k];
+    const nombreNorm = normalizarClave_(t.nombre);
+    const existeId = mapExistentes.get(nombreNorm) || '';
+
     const nuevaFila = new Array(cols.headersCount).fill('');
 
     if (cols.idxFoto !== -1) nuevaFila[cols.idxFoto] = photoPath;
-    if (cols.idxEstado !== -1) nuevaFila[cols.idxEstado] = CONFIG.STATUS_DONE;
+    if (cols.idxEstado !== -1) {
+      nuevaFila[cols.idxEstado] = existeId ? 'Existe - ¿Actualizar?' : CONFIG.STATUS_DONE;
+    }
     if (cols.idxGps !== -1) nuevaFila[cols.idxGps] = gpsValue;
+    if (cols.idxIdTransporte !== -1 && existeId) nuevaFila[cols.idxIdTransporte] = existeId;
     if (cols.idxTransportista !== -1) nuevaFila[cols.idxTransportista] = String(t.nombre || '').trim().toUpperCase();
     if (cols.idxTelefonos !== -1) nuevaFila[cols.idxTelefonos] = limpiarListaTexto_(t.telefonos).join('\n');
     if (cols.idxDestinos !== -1) nuevaFila[cols.idxDestinos] = limpiarListaTexto_(t.destinos).join('\n');
     if (cols.idxBodegas !== -1) nuevaFila[cols.idxBodegas] = bodegaComun;
     if (cols.idxHorario !== -1) nuevaFila[cols.idxHorario] = String(t.horario_especifico || horarioComun).trim().toUpperCase();
     if (cols.idxObservaciones !== -1) {
-      nuevaFila[cols.idxObservaciones] = `[${k + 1} DE ${total} EN ESTA BODEGA] ${obsComun}`.trim();
+      const tagExiste = existeId ? `[YA EXISTE: ${existeId}] ` : '';
+      nuevaFila[cols.idxObservaciones] = `${tagExiste}[${k + 1} DE ${total} EN ESTA BODEGA] ${obsComun}`.trim();
     }
 
     sheet.appendRow(nuevaFila);
   }
 }
 
-function asignarFilaCaptura_(sheet, rowNumber, t, bodegaComun, horarioComun, obsComun, tagMulti, cols) {
+function asignarFilaCaptura_(sheet, rowNumber, t, bodegaComun, horarioComun, obsComun, tagMulti, mapExistentes, cols) {
   const nombre = String(t.nombre || '').trim().toUpperCase();
+  const nombreNorm = normalizarClave_(nombre);
+  const existeId = mapExistentes.get(nombreNorm) || '';
+
   const telefonos = limpiarListaTexto_(t.telefonos).join('\n');
   const destinos = limpiarListaTexto_(t.destinos).join('\n');
   const horario = String(t.horario_especifico || horarioComun).trim().toUpperCase();
-  const obs = (tagMulti ? tagMulti + ' ' : '') + obsComun;
+  
+  const tagExiste = existeId ? `[YA EXISTE: ${existeId}] ` : '';
+  const obs = `${tagExiste}${tagMulti ? tagMulti + ' ' : ''}${obsComun}`.trim();
 
   if (cols.idxTransportista !== -1) sheet.getRange(rowNumber, cols.idxTransportista + 1).setValue(nombre);
+  if (cols.idxIdTransporte !== -1 && existeId) sheet.getRange(rowNumber, cols.idxIdTransporte + 1).setValue(existeId);
   if (cols.idxTelefonos !== -1) sheet.getRange(rowNumber, cols.idxTelefonos + 1).setValue(telefonos);
   if (cols.idxDestinos !== -1) sheet.getRange(rowNumber, cols.idxDestinos + 1).setValue(destinos);
   if (cols.idxBodegas !== -1) sheet.getRange(rowNumber, cols.idxBodegas + 1).setValue(bodegaComun);
   if (cols.idxHorario !== -1) sheet.getRange(rowNumber, cols.idxHorario + 1).setValue(horario);
   if (cols.idxObservaciones !== -1) sheet.getRange(rowNumber, cols.idxObservaciones + 1).setValue(obs);
   
-  if (cols.idxEstado !== -1) sheet.getRange(rowNumber, cols.idxEstado + 1).setValue(CONFIG.STATUS_DONE);
+  if (cols.idxEstado !== -1) {
+    const estadoFinal = existeId ? 'Existe - ¿Actualizar?' : CONFIG.STATUS_DONE;
+    sheet.getRange(rowNumber, cols.idxEstado + 1).setValue(estadoFinal);
+  }
 }
+
+function obtenerMapTransportistasExistentes_(sheetTrp) {
+  const map = new Map();
+  const data = sheetTrp.getDataRange().getValues();
+  if (data.length <= 1) return map;
+  
+  // Asume columna 0 = IDTRANSPORTE, columna 1 = NOMBRE
+  for (let i = 1; i < data.length; i++) {
+    const id = String(data[i][0] || '').trim();
+    const nombreNorm = normalizarClave_(data[i][1]);
+    if (id && nombreNorm) {
+      map.set(nombreNorm, id);
+    }
+  }
+  return map;
+}
+
 
 function registrarError_(sheet, rowNumber, idxEstado, idxObservaciones, error) {
   const safeMessage = String(error && error.message ? error.message : error)
