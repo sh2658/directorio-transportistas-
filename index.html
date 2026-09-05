@@ -395,13 +395,14 @@
     color: white;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    transition: opacity 0.15s ease;
+    gap: 5px;
+    transition: opacity 0.15s ease, transform 0.15s ease;
   }
-  .acciones a:hover { opacity: 0.9; }
-  .btn-waze { background: var(--waze-blue); color: var(--waze-text) !important; }
-  .btn-maps { background: var(--green); }
-  .btn-tel { background: var(--navy); font-family: 'JetBrains Mono', monospace; }
+  .acciones a:hover { opacity: 0.92; transform: translateY(-1px); }
+  .btn-wa { background: #25D366 !important; color: white !important; font-weight: 600; }
+  .btn-waze { background: var(--waze-blue); color: var(--waze-text) !important; font-weight: 600; }
+  .btn-maps { background: var(--green); font-weight: 600; }
+  .btn-tel { background: var(--navy); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
 
   .vacio {
     text-align: center;
@@ -926,13 +927,112 @@
     if (evento.key === 'Escape') cerrarVisor();
   });
 
+  const SVG_WA = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-2px;margin-right:3px;"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.7c.974.531 1.769.781 2.791.781 3.182 0 5.768-2.587 5.768-5.766 0-3.18-2.586-5.766-5.768-5.766zm9.969 5.766c0 5.503-4.467 9.97-9.97 9.97-1.748 0-3.376-.453-4.797-1.246L2 22l1.371-5.008C2.53 15.539 2.03 13.82 2.03 11.938 2.03 6.435 6.497 1.968 12 1.968c5.503 0 10 4.467 10 9.97z"/></svg>';
+  const SVG_WAZE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-2px;margin-right:3px;"><path d="M12 2C6.48 2 2 6.48 2 12c0 2.25.75 4.33 2.02 6L3 22l4.2-1c1.47.64 3.09 1 4.8 1 5.52 0 10-4.48 10-10S17.52 2 12 2zm-3.5 12c-.83 0-1.5-.67-1.5-1.5S7.67 11 8.5 11s1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm7 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-3.5 3c-1.8 0-3.35-.97-4.14-2.41.22-.06.45-.09.68-.09h6.92c.23 0 .46.03.68.09-.79 1.44-2.34 2.41-4.14 2.41z"/></svg>';
+  const SVG_MAPS = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-2px;margin-right:3px;"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>';
+
+  // Analiza y formatea el teléfono, asegurando el código +506 e identificando si admite WhatsApp
+  function procesarTelefono(numeroRaw, nombreEmpresa) {
+    if (!numeroRaw) return null;
+    var limpio = String(numeroRaw).replace(/\D/g, '');
+    if (!limpio) return null;
+
+    var numeroLocal = limpio;
+    if (limpio.length === 11 && limpio.indexOf('506') === 0) {
+      numeroLocal = limpio.substring(3);
+    }
+
+    var primerDigito = numeroLocal.charAt(0);
+    // En Costa Rica:
+    // 6, 7, 8 -> Celulares (Kolbi, Claro, Liberty) -> Tienen WhatsApp activo
+    // 2 -> Teléfono fijo de oficina
+    var esCelular = (primerDigito === '6' || primerDigito === '7' || primerDigito === '8');
+    var numeroCompleto = '506' + numeroLocal;
+
+    var msg = encodeURIComponent('Hola ' + (nombreEmpresa || '') + ', vi su contacto en Rutas CR y quisiera consultar sobre un envío.');
+    var waUrl = 'https://wa.me/' + numeroCompleto + '?text=' + msg;
+    var telUrl = 'tel:+' + numeroCompleto;
+    var formatoVisible = (numeroLocal.length === 8)
+      ? (numeroLocal.substring(0, 4) + '-' + numeroLocal.substring(4))
+      : numeroRaw;
+
+    return {
+      esCelular: esCelular,
+      waUrl: waUrl,
+      telUrl: telUrl,
+      formatoVisible: formatoVisible
+    };
+  }
+
   function telefonosHtml(t) {
-    return (Array.isArray(t.telefonos) ? t.telefonos : []).map(function (tel) {
-      var numero = String(tel && tel.numero || '');
-      var marcable = numero.replace(/\D/g, '');
-      if (!marcable) return '';
-      return '<a class="btn-tel" href="tel:' + marcable + '">☎ ' + escapeHtml(numero) + '</a>';
+    var telefonos = Array.isArray(t.telefonos) ? t.telefonos : [];
+    return telefonos.map(function (tel) {
+      var raw = tel && tel.numero;
+      var info = procesarTelefono(raw, t.nombre);
+      if (!info) return '';
+
+      var botones = '';
+      if (info.esCelular) {
+        botones += '<a class="btn-wa" href="' + info.waUrl + '" target="_blank" rel="noopener noreferrer" title="Escribir por WhatsApp a ' + escapeHtml(t.nombre) + '">' +
+                   SVG_WA + ' WhatsApp</a>';
+      }
+      botones += '<a class="btn-tel" href="' + info.telUrl + '">☎ ' + escapeHtml(info.formatoVisible) + '</a>';
+      return botones;
     }).join('');
+  }
+
+  // Navegación inteligente: intenta abrir la aplicación nativa y si no está instalada, recurre a la versión web
+  function navegar(app, lat, lng) {
+    var esAndroid = /Android/i.test(navigator.userAgent);
+    var esIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if (app === 'waze') {
+      var webWaze = 'https://www.waze.com/live-map/directions?to=ll.' + lat + '%2C' + lng;
+      if (esAndroid) {
+        // En Android, Intent con S.browser_fallback_url abre la app nativa si existe, o Waze Web si no
+        var intentWaze = 'intent://?ll=' + lat + ',' + lng + '&navigate=yes#Intent;scheme=waze;package=com.waze;S.browser_fallback_url=' + encodeURIComponent(webWaze) + ';end';
+        window.location.href = intentWaze;
+      } else if (esIOS) {
+        // En iOS intenta waze:// y si no responde en 1.2s, redirige a Waze Web
+        var appWaze = 'waze://?ll=' + lat + ',' + lng + '&navigate=yes';
+        var t0 = Date.now();
+        window.location.href = appWaze;
+        setTimeout(function () {
+          if (Date.now() - t0 < 2000) {
+            window.location.href = webWaze;
+          }
+        }, 1200);
+      } else {
+        window.open(webWaze, '_blank', 'noopener,noreferrer');
+      }
+    } else if (app === 'maps') {
+      var webMaps = 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng;
+      if (esAndroid) {
+        // En Android, Intent a Google Maps nativo con fallback a web
+        var intentMaps = 'intent://maps.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng + '#Intent;scheme=https;package=com.google.android.apps.maps;S.browser_fallback_url=' + encodeURIComponent(webMaps) + ';end';
+        window.location.href = intentMaps;
+      } else if (esIOS) {
+        // En iOS intenta comgooglemaps:// y si no responde, abre la web
+        var appMaps = 'comgooglemaps://?daddr=' + lat + ',' + lng + '&directionsmode=driving';
+        var t1 = Date.now();
+        window.location.href = appMaps;
+        setTimeout(function () {
+          if (Date.now() - t1 < 2000) {
+            window.location.href = webMaps;
+          }
+        }, 1200);
+      } else {
+        window.open(webMaps, '_blank', 'noopener,noreferrer');
+      }
+    }
+  }
+
+  function botonesNavegacionHtml(lat, lng) {
+    var webWaze = 'https://www.waze.com/live-map/directions?to=ll.' + lat + '%2C' + lng;
+    var webMaps = 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng;
+
+    return '<a class="btn-waze" href="' + webWaze + '" onclick="navegar(\'waze\',' + lat + ',' + lng + '); return false;" target="_blank" rel="noopener">' + SVG_WAZE + ' Waze</a>' +
+           '<a class="btn-maps" href="' + webMaps + '" onclick="navegar(\'maps\',' + lat + ',' + lng + '); return false;" target="_blank" rel="noopener">' + SVG_MAPS + ' Maps</a>';
   }
 
   function buscar() {
@@ -1011,11 +1111,8 @@
     cont.innerHTML = lista.map(function (item) {
       var t = item.transportista;
       var acciones = telefonosHtml(t);
-      if (item.bodega) {
-        var wazeUrl = 'https://waze.com/ul?ll=' + item.bodega.lat + ',' + item.bodega.lng + '&navigate=yes';
-        var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + item.bodega.lat + ',' + item.bodega.lng;
-        acciones += '<a class="btn-waze" href="' + wazeUrl + '" target="_blank" rel="noopener">🚗 Waze</a>' +
-                    '<a class="btn-maps" href="' + mapsUrl + '" target="_blank" rel="noopener">📍 Maps</a>';
+      if (item.bodega && coordenadasValidas(item.bodega)) {
+        acciones += botonesNavegacionHtml(item.bodega.lat, item.bodega.lng);
       }
       var sello = item.distancia !== null
         ? '<div class="sello"><b>' + item.distancia.toFixed(1) + '</b>km</div>'
@@ -1084,10 +1181,7 @@
       var bodegasHtml = (Array.isArray(t.bodegas) ? t.bodegas : []).map(function (b) {
         var acciones = '';
         if (coordenadasValidas(b)) {
-          var wazeUrl = 'https://waze.com/ul?ll=' + b.lat + ',' + b.lng + '&navigate=yes';
-          var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + b.lat + ',' + b.lng;
-          acciones = '<a class="btn-waze" href="' + wazeUrl + '" target="_blank" rel="noopener">🚗 Waze</a>' +
-                     '<a class="btn-maps" href="' + mapsUrl + '" target="_blank" rel="noopener">📍 Maps</a>';
+          acciones = botonesNavegacionHtml(b.lat, b.lng);
         }
         var distanciaTxt = '';
         if (ubicacionUsuario && coordenadasValidas(b)) {
@@ -1152,15 +1246,12 @@
       var lat = Number(b.lat);
       var lng = Number(b.lng);
       var marker = L.marker([lat, lng]).addTo(map);
-      var wazeUrl = 'https://waze.com/ul?ll=' + lat + ',' + lng + '&navigate=yes';
-      var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng;
       var popupContent = '' +
         '<div style="font-family:Inter,sans-serif; min-width:180px;">' +
           '<b style="font-size:13.5px;color:#0B2545;">' + escapeHtml(b.zona || 'Bodega') + '</b><br>' +
           '<span style="font-size:12px;color:#6B7785;">' + escapeHtml(b.direccion || 'Sin dirección registrada') + '</span>' +
           '<div style="margin-top:8px;display:flex;gap:6px;">' +
-            '<a href="' + wazeUrl + '" target="_blank" rel="noopener" style="background:#33ccff;color:#003049;padding:4px 8px;border-radius:5px;text-decoration:none;font-size:11px;font-weight:600;">🚗 Waze</a>' +
-            '<a href="' + mapsUrl + '" target="_blank" rel="noopener" style="background:#3E7C59;color:white;padding:4px 8px;border-radius:5px;text-decoration:none;font-size:11px;font-weight:600;">📍 Maps</a>' +
+            botonesNavegacionHtml(lat, lng) +
           '</div>' +
         '</div>';
       marker.bindPopup(popupContent);
