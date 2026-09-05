@@ -4,8 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rutas CR · Directorio de Transportistas de Encomiendas</title>
+<meta name="description" content="Directorio comunitario de transportistas de encomiendas en Costa Rica. Encuentra rutas, bodegas, teléfonos y navegación directa con Waze o Google Maps.">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B2545">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rutas CR">
+<link rel="icon" type="image/png" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+
+<!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Leaflet CSS & JS (100% Gratuito y Open Source) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
 <style>
   :root {
     --navy: #0B2545;
@@ -17,6 +33,8 @@
     --muted: #6B7785;
     --line: #DFDAD0;
     --green: #3E7C59;
+    --waze-blue: #33ccff;
+    --waze-text: #003049;
   }
   * { box-sizing: border-box; }
   body {
@@ -32,7 +50,7 @@
   header {
     background: var(--navy);
     color: white;
-    padding: 28px 20px 40px;
+    padding: 28px 20px 42px;
     position: relative;
     overflow: hidden;
   }
@@ -45,7 +63,7 @@
     background-image: repeating-linear-gradient(to right, var(--amber) 0 14px, transparent 14px 26px);
     opacity: 0.35;
   }
-  header .contenido { position: relative; max-width: 760px; }
+  header .contenido { position: relative; max-width: 760px; margin: 0 auto; }
   header .eyebrow {
     font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
@@ -55,14 +73,14 @@
     margin: 0 0 8px;
   }
   header h1 { margin: 0; font-size: 26px; font-weight: 700; line-height: 1.2; }
-  header p { margin: 8px 0 0; font-size: 14px; color: #C9D3E0; max-width: 480px; }
+  header p { margin: 8px 0 0; font-size: 14px; color: #C9D3E0; max-width: 520px; }
 
   /* ---------- BUSCADOR (flotante) ---------- */
-  .contenedor-buscador { max-width: 760px; margin: -26px auto 0; padding: 0 16px; position: relative; z-index: 2; }
+  .contenedor-buscador { max-width: 760px; margin: -26px auto 0; padding: 0 16px; position: relative; z-index: 1000; }
   .buscador {
     background: white;
     border-radius: 14px;
-    padding: 14px;
+    padding: 16px;
     box-shadow: 0 10px 30px rgba(11,37,69,0.18);
     border: 1px solid var(--line);
   }
@@ -71,7 +89,7 @@
     background: var(--cream);
     border-radius: 9px;
     padding: 3px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     gap: 3px;
   }
   .segmentado label {
@@ -111,19 +129,119 @@
     border-radius: 9px;
     cursor: pointer;
     white-space: nowrap;
+    transition: background .15s ease;
   }
   .fila-input button:hover { background: var(--navy-2); }
 
-  #estadoUbicacion {
+  /* Chips de destinos populares */
+  .chips-destinos {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    align-items: center;
+  }
+  .chips-etiqueta {
+    font-size: 11.5px;
+    color: var(--muted);
+    font-weight: 500;
+    margin-right: 2px;
+  }
+  .chip {
+    font-size: 11.5px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--cream);
+    border: 1px solid var(--line);
+    color: var(--navy);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+  .chip:hover {
+    background: var(--navy);
+    color: white;
+    border-color: var(--navy);
+  }
+  .chip-ver-todos {
+    background: #FFF6E6;
+    border-color: var(--amber);
+    color: var(--navy);
+    font-weight: 600;
+  }
+  .chip-ver-todos:hover {
+    background: var(--amber);
+    color: var(--navy);
+  }
+
+  /* Barra de Estado SWR */
+  .swr-barra {
     max-width: 760px;
     margin: 10px auto 0;
     padding: 0 20px;
-    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .swr-badge {
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .swr-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10B981;
+    display: inline-block;
+  }
+  .swr-dot.cargando {
+    background: var(--amber);
+    animation: pulse 1.2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+  }
+
+  #estadoUbicacion {
+    font-size: 12px;
     color: var(--muted);
     font-family: 'JetBrains Mono', monospace;
   }
 
-  #mapa { width: 100%; height: 300px; margin-top: 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  /* ---------- MAPA LEAFLET ---------- */
+  #mapa {
+    width: 100%;
+    height: 320px;
+    margin-top: 18px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: #e5e3df;
+    z-index: 10;
+  }
+  .leaflet-popup-content-wrapper {
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(11,37,69,0.20);
+    font-family: 'Inter', sans-serif;
+  }
+  .leaflet-popup-content {
+    margin: 12px 14px;
+    line-height: 1.4;
+    font-size: 13px;
+  }
+  .leaflet-popup-content b {
+    color: var(--navy);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+  }
 
   /* ---------- RESULTADOS: estilo "boleto" ---------- */
   #resultados { max-width: 760px; margin: 0 auto; padding: 20px 16px 50px; }
@@ -137,6 +255,10 @@
     display: flex;
     position: relative;
     overflow: hidden;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .boleto:hover {
+    box-shadow: 0 6px 18px rgba(11,37,69,0.11);
   }
   .boleto .foto-col {
     width: 148px;
@@ -168,7 +290,7 @@
     transform: scale(1.025);
     box-shadow: 0 5px 14px rgba(11,37,69,0.16);
   }
-  .boleto .foto-col .placeholder { font-size: 30px; opacity: 0.6; }
+  .boleto .foto-col .placeholder { font-size: 32px; opacity: 0.6; align-self: center; }
 
   .visor-imagen {
     position: fixed;
@@ -225,8 +347,8 @@
     position: absolute;
     top: 10px;
     right: 10px;
-    width: 52px;
-    height: 52px;
+    width: 54px;
+    height: 54px;
     border-radius: 50%;
     border: 2px dashed var(--amber-dark);
     color: var(--amber-dark);
@@ -242,7 +364,7 @@
     text-align: center;
     background: white;
   }
-  .boleto .sello b { font-size: 13px; }
+  .boleto .sello b { font-size: 13.5px; }
 
   .boleto h3 { margin: 0 4px 4px 0; font-size: 16.5px; font-weight: 700; color: var(--navy); padding-right: 56px; }
   .boleto .zona-tag {
@@ -258,7 +380,7 @@
   }
   .boleto p { margin: 3px 0; font-size: 13.5px; color: var(--muted); }
   .boleto p strong { color: var(--ink); font-weight: 600; }
-  .boleto .destinos-lista { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+  .boleto .destinos-lista { font-size: 12.5px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
 
   .boleto .bodega-item { border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 8px; }
   .boleto .bodega-item:first-child { border-top: none; padding-top: 0; margin-top: 0; }
@@ -274,16 +396,19 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    transition: opacity 0.15s ease;
   }
-  .btn-waze { background: #33ccff; color: #003049; }
+  .acciones a:hover { opacity: 0.9; }
+  .btn-waze { background: var(--waze-blue); color: var(--waze-text) !important; }
   .btn-maps { background: var(--green); }
   .btn-tel { background: var(--navy); font-family: 'JetBrains Mono', monospace; }
 
   .vacio {
     text-align: center;
     color: var(--muted);
-    padding: 40px 20px;
-    font-size: 14px;
+    padding: 36px 20px;
+    font-size: 14.5px;
+    line-height: 1.5;
   }
 
   /* ---------- SECCIÓN "¿SOS TRANSPORTISTA?" ---------- */
@@ -306,6 +431,7 @@
     font-size: 13.5px;
     padding: 10px 18px;
     border-radius: 8px;
+    transition: background .15s ease;
   }
   .btn-form:hover { background: var(--amber-dark); color: white; }
 
@@ -353,12 +479,8 @@
     .boleto h3 { padding-right: 0; }
   }
 </style>
-<!--
-  GOOGLE ANALYTICS
-  Reemplaza G-XXXXXXXXXX por tu ID de medición real (lo obtienes al crear
-  la propiedad en analytics.google.com). Mientras tanto, estas líneas no
-  hacen nada (Google las ignora si el ID no es válido).
--->
+
+<!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZZSVWT05KE"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -373,7 +495,7 @@
 <header>
   <div class="ruta-punteada"></div>
   <div class="contenido">
-    <p class="eyebrow">San José · Costa Rica</p>
+    <p class="eyebrow">Costa Rica · Rutas y Encomiendas</p>
     <h1>Rutas CR</h1>
     <p>Encuentra qué transportista viaja hacia tu destino, o busca uno que ya conoces, y navega directo a su bodega con Waze o Google Maps.</p>
   </div>
@@ -386,20 +508,38 @@
       <label><input type="radio" name="modo" value="transportista" onchange="cambiarModo()"><span>Por transportista</span></label>
     </div>
     <div id="filaDestino" class="fila-input">
-      <input type="text" list="listaDestinos" id="inputDestino" placeholder="¿A dónde envías? (ej: Nosara, Liberia...)">
+      <input type="text" list="listaDestinos" id="inputDestino" placeholder="¿A dónde envías? (ej: Pérez Zeledón, Liberia...)" autocomplete="off">
       <datalist id="listaDestinos"></datalist>
       <button onclick="buscar()">Buscar</button>
     </div>
     <div id="filaTransportista" class="fila-input" style="display:none;">
-      <input type="text" list="listaTransportistas" id="inputTransportista" placeholder="Nombre del transportista...">
+      <input type="text" list="listaTransportistas" id="inputTransportista" placeholder="Nombre de la empresa..." autocomplete="off">
       <datalist id="listaTransportistas"></datalist>
       <button onclick="buscar()">Buscar</button>
+    </div>
+
+    <!-- Chips de acceso rápido -->
+    <div class="chips-destinos">
+      <span class="chips-etiqueta">Frecuentes:</span>
+      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('Pérez Zeledón', 'destino')">Pérez Zeledón</a>
+      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('Liberia', 'destino')">Liberia</a>
+      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('San Carlos', 'destino')">San Carlos</a>
+      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('Limón', 'destino')">Limón</a>
+      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('Puntarenas', 'destino')">Puntarenas</a>
+      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('Golfito', 'destino')">Golfito</a>
+      <a href="#" class="chip chip-ver-todos" onclick="event.preventDefault(); mostrarTodos()">📋 Ver todos</a>
     </div>
   </div>
 </div>
 
-<div id="estadoUbicacion">◎ Obteniendo tu ubicación...</div>
+<div class="swr-barra">
+  <div id="estadoSWR" class="swr-badge">
+    <span class="swr-dot cargando"></span> Conectando con el directorio...
+  </div>
+  <div id="estadoUbicacion">◎ Obteniendo tu ubicación...</div>
+</div>
 
+<!-- Contenedor del Mapa Leaflet -->
 <div id="mapa"></div>
 
 <div class="contenedor-transportistas">
@@ -407,13 +547,13 @@
     <h2>¿Sos transportista?</h2>
     <p>Si querés que te agreguemos, o si tus datos (teléfono, bodega, horario o destinos) cambiaron, contanos:</p>
     <div class="acciones" style="justify-content:center; margin-top:12px;">
-      <a class="btn-form" href="https://docs.google.com/forms/d/e/1FAIpQLSeX8iJwM3M_SEm4VsUXj6NlhjEq_lPWwxQ4CbMYIFk-HlB4ww/viewform" target="_blank">📝 Enviar o actualizar mis datos</a>
+      <a class="btn-form" href="https://docs.google.com/forms/d/e/1FAIpQLSeX8iJwM3M_SEm4VsUXj6NlhjEq_lPWwxQ4CbMYIFk-HlB4ww/viewform" target="_blank" rel="noopener">📝 Enviar o actualizar mis datos</a>
     </div>
   </div>
 </div>
 
 <div id="resultados">
-  <p class="vacio">Escribe un destino o el nombre de un transportista arriba para empezar.</p>
+  <p class="vacio">Escribe un destino o el nombre de un transportista arriba para empezar, o toca uno de los destinos frecuentes.</p>
 </div>
 
 <div id="visorImagen" class="visor-imagen" role="dialog" aria-modal="true" aria-label="Imagen ampliada" onclick="cerrarVisor(event)">
@@ -426,7 +566,7 @@
 <footer>
   <p class="footer-titulo">¿Dudas, sugerencias o algo no funciona?</p>
   <div class="footer-contactos">
-    <a href="https://wa.me/50686335442?text=Hola%2C%20tengo%20una%20consulta%20sobre%20Rutas%20CR" target="_blank">💬 WhatsApp: +506 8633-5442</a>
+    <a href="https://wa.me/50686335442?text=Hola%2C%20tengo%20una%20consulta%20sobre%20Rutas%20CR" target="_blank" rel="noopener">💬 WhatsApp: +506 8633-5442</a>
     <a href="mailto:santiago2658@gmail.com">✉️ santiago2658@gmail.com</a>
     <a href="tel:+50686335442">☎ Llamar</a>
   </div>
@@ -435,27 +575,128 @@
 
 <script>
   const API_URL = 'https://script.google.com/macros/s/AKfycbziHUb11q9tHuAnqFQY8EG-u18Q763C8a-a4CE0Rwii_iTRNPqmTTzaZvN5PRtx14NqaA/exec';
+  const CACHE_KEY = 'rutas_cr_transportistas_v2';
+  const CACHE_TIME_KEY = 'rutas_cr_cache_timestamp';
 
   let transportistas = [];
-  let map, userMarker;
+  let map = null;
+  let userMarker = null;
   let marcadores = [];
   let ubicacionUsuario = null; // {lat, lng}
 
   const CENTRO_DEFAULT = { lat: 9.9281, lng: -84.0907 }; // San José, Costa Rica
 
-  function initMap() {
-    map = new google.maps.Map(document.getElementById('mapa'), {
-      center: CENTRO_DEFAULT,
-      zoom: 8,
-      styles: [
-        { featureType: 'poi', elementType: 'labels', stylers: [{ visibility: 'off' }] }
-      ]
+  // Registra Service Worker para PWA si el navegador lo soporta
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('sw.js').catch(function(e) {
+        console.log('SW registration skipped:', e);
+      });
     });
+  }
+
+  // Diccionario inteligente para corregir textos corrompidos (Mojibake / pérdida de tildes)
+  function limpiarTexto(str) {
+    if (!str || typeof str !== 'string') return '';
+    var res = str;
+    var correcciones = [
+      [/\bPREZ ZELEDN\b/gi, 'Pérez Zeledón'],
+      [/\bSAN JOS\b/gi, 'San José'],
+      [/\bLIMN\b/gi, 'Limón'],
+      [/\bGUPILES\b/gi, 'Guápiles'],
+      [/\bPOCOC\b/gi, 'Pococí'],
+      [/\bSAN RAMN\b/gi, 'San Ramón'],
+      [/\bSARAPIQU\b/gi, 'Sarapiquí'],
+      [/\bJAC\b/gi, 'Jacó'],
+      [/\bTARRAZ\b/gi, 'Tarrazú'],
+      [/\bLEN CORTS\b/gi, 'León Cortés'],
+      [/\bTIBAS\b/gi, 'Tibás'],
+      [/\bESCAZ\b/gi, 'Escazú'],
+      [/\bASERR\b/gi, 'Aserrí'],
+      [/\bBELN\b/gi, 'Belén'],
+      [/\bCAAS\b/gi, 'Cañas'],
+      [/\bRO DE JANEIRO\b/gi, 'Río de Janeiro'],
+      [/\bSAN CARLOS\b/gi, 'San Carlos'],
+      [/\bCIUDAD QUESADA\b/gi, 'Ciudad Quesada'],
+      [/\bZONA SUR\b/gi, 'Zona Sur'],
+      [/\bPUERTO VIEJO\b/gi, 'Puerto Viejo'],
+      [/\bVALLE DE LA ESTRELLA\b/gi, 'Valle de La Estrella'],
+      [/\bPASO CANOAS\b/gi, 'Paso Canoas']
+    ];
+    for (var i = 0; i < correcciones.length; i++) {
+      res = res.replace(correcciones[i][0], correcciones[i][1]);
+    }
+    return res.trim();
+  }
+
+  function actualizarBadgeEstado(mensaje, enLinea, cargando) {
+    var badge = document.getElementById('estadoSWR');
+    if (!badge) return;
+    var puntoClase = cargando ? 'swr-dot cargando' : 'swr-dot';
+    badge.innerHTML = '<span class="' + puntoClase + '"></span> ' + escapeHtml(mensaje);
+  }
+
+  function sanitizarDatos(data) {
+    if (!Array.isArray(data)) return [];
+    return data.filter(function (t) {
+      return t && typeof t === 'object' && typeof t.nombre === 'string';
+    }).map(function (t) {
+      var copia = Object.assign({}, t);
+      copia.nombre = limpiarTexto(copia.nombre);
+      if (Array.isArray(copia.destinos)) {
+        copia.destinos = copia.destinos.map(limpiarTexto).filter(Boolean);
+      }
+      if (Array.isArray(copia.bodegas)) {
+        copia.bodegas = copia.bodegas.map(function (b) {
+          return Object.assign({}, b, {
+            zona: limpiarTexto(b.zona || ''),
+            direccion: limpiarTexto(b.direccion || '')
+          });
+        });
+      }
+      return copia;
+    });
+  }
+
+  function initMap() {
+    try {
+      map = L.map('mapa').setView([CENTRO_DEFAULT.lat, CENTRO_DEFAULT.lng], 8);
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      }).addTo(map);
+    } catch(e) {
+      console.error('Error inicializando Leaflet:', e);
+    }
+
     cargarDatos();
     pedirUbicacion();
   }
 
+  // Carga SWR: 0ms inmediato con LocalStorage y revalidación asíncrona
   function cargarDatos() {
+    var cached = localStorage.getItem(CACHE_KEY);
+    var hayCache = false;
+
+    if (cached) {
+      try {
+        var parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          transportistas = sanitizarDatos(parsed);
+          construirListaDestinos(transportistas);
+          construirListaTransportistas(transportistas);
+          hayCache = true;
+          actualizarBadgeEstado('⚡ ' + transportistas.length + ' empresas listas (actualizando...)', true, true);
+        }
+      } catch (e) {
+        console.warn('Cache local inválido:', e);
+      }
+    }
+
+    if (!hayCache) {
+      actualizarBadgeEstado('⏳ Conectando con el directorio...', false, true);
+    }
+
     fetch(API_URL)
       .then(function (r) {
         if (!r.ok) throw new Error('API respondió con estado ' + r.status);
@@ -463,21 +704,33 @@
       })
       .then(function (data) {
         if (!Array.isArray(data)) throw new Error('La API no devolvió una lista válida');
-        transportistas = data.filter(function (t) {
-          return t && typeof t === 'object' && typeof t.nombre === 'string';
-        });
-        construirListaDestinos(transportistas);
-        construirListaTransportistas(transportistas);
+        var datosLimpios = sanitizarDatos(data);
+        if (datosLimpios.length > 0) {
+          transportistas = datosLimpios;
+          try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify(transportistas));
+            localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
+          } catch(e){}
+          construirListaDestinos(transportistas);
+          construirListaTransportistas(transportistas);
+          actualizarBadgeEstado('✅ En línea · ' + transportistas.length + ' empresas verificadas', true, false);
+        }
       })
       .catch(function (err) {
-        document.getElementById('resultados').innerHTML =
-          '<p class="vacio">No se pudieron cargar los datos. Intenta recargar la página.</p>';
-        console.error(err);
+        console.error('Error en fetch:', err);
+        if (hayCache) {
+          actualizarBadgeEstado('⚡ Modo sin conexión · ' + transportistas.length + ' empresas disponibles', true, false);
+        } else {
+          actualizarBadgeEstado('❌ Error de conexión al cargar datos', false, false);
+          document.getElementById('resultados').innerHTML =
+            '<p class="vacio">No se pudieron cargar los datos. Revisa tu conexión a internet o intenta recargar la página.</p>';
+        }
       });
   }
 
   function llenarDatalist(id, valores) {
     var lista = document.getElementById(id);
+    if (!lista) return;
     lista.replaceChildren();
     valores.forEach(function (valor) {
       var option = document.createElement('option');
@@ -493,11 +746,15 @@
         if (typeof d === 'string' && d.trim()) set.add(d.trim());
       });
     });
-    llenarDatalist('listaDestinos', Array.from(set).sort());
+    llenarDatalist('listaDestinos', Array.from(set).sort(function (a, b) {
+      return a.localeCompare(b, 'es', { sensitivity: 'base' });
+    }));
   }
 
   function construirListaTransportistas(data) {
-    var nombres = data.map(function (t) { return t.nombre; }).filter(Boolean).sort();
+    var nombres = data.map(function (t) { return t.nombre; }).filter(Boolean).sort(function (a, b) {
+      return a.localeCompare(b, 'es', { sensitivity: 'base' });
+    });
     llenarDatalist('listaTransportistas', nombres);
   }
 
@@ -524,24 +781,30 @@
   function pedirUbicacion() {
     var estado = document.getElementById('estadoUbicacion');
     if (!navigator.geolocation) {
-      estado.textContent = '⚠ Tu navegador no permite ubicación automática. Igual puedes buscar por destino.';
+      estado.textContent = '⚠ Tu navegador no permite ubicación automática.';
       return;
     }
     navigator.geolocation.getCurrentPosition(
       function (pos) {
         ubicacionUsuario = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        estado.textContent = '◉ Ubicación detectada — los resultados se ordenan por cercanía.';
-        map.setCenter(ubicacionUsuario);
-        map.setZoom(11);
-        userMarker = new google.maps.Marker({
-          position: ubicacionUsuario,
-          map: map,
-          label: 'Tú',
-          icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-        });
+        estado.textContent = '◉ Ubicación detectada — ordenando por cercanía.';
+        if (map) {
+          map.setView([ubicacionUsuario.lat, ubicacionUsuario.lng], 11);
+          if (userMarker) {
+            map.removeLayer(userMarker);
+          }
+          var userIcon = L.divIcon({
+            className: 'user-marker-pin',
+            html: '<div style="background:#2563eb;color:white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px rgba(37,99,235,0.3);font-size:16px;border:2px solid white;">📍</div>',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+          });
+          userMarker = L.marker([ubicacionUsuario.lat, ubicacionUsuario.lng], { icon: userIcon }).addTo(map);
+          userMarker.bindPopup('<b>Tu ubicación</b>');
+        }
       },
       function () {
-        estado.textContent = '○ No se pudo obtener tu ubicación. Los resultados se muestran sin ordenar por distancia.';
+        estado.textContent = '○ Sin ubicación (mostrando sin ordenar por distancia).';
       }
     );
   }
@@ -578,21 +841,27 @@
   }
 
   function coordenadasValidas(bodega) {
-    var lat = Number(bodega && bodega.lat);
-    var lng = Number(bodega && bodega.lng);
+    if (!bodega || typeof bodega !== 'object') return false;
+    var lat = Number(bodega.lat);
+    var lng = Number(bodega.lng);
     return Number.isFinite(lat) && Number.isFinite(lng) &&
-      lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+      lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat === 0 && lng === 0);
   }
 
   function aplicarSugerencia(valor, modo) {
     var id = modo === 'transportista' ? 'inputTransportista' : 'inputDestino';
     document.getElementById(id).value = valor;
-    if (modo === 'transportista') buscarPorTransportista();
-    else buscarPorDestino();
+    if (modo === 'transportista') {
+      document.querySelector('input[name="modo"][value="transportista"]').checked = true;
+      cambiarModo();
+      buscarPorTransportista();
+    } else {
+      document.querySelector('input[name="modo"][value="destino"]').checked = true;
+      cambiarModo();
+      buscarPorDestino();
+    }
   }
 
-  // Distancia de edición entre dos textos: cuántos cambios (letras) hay que
-  // hacer para convertir uno en el otro. Entre más bajo, más parecidos son.
   function distanciaLevenshtein(a, b) {
     a = a || ''; b = b || '';
     var matriz = [];
@@ -604,9 +873,9 @@
           matriz[i][j] = matriz[i - 1][j - 1];
         } else {
           matriz[i][j] = Math.min(
-            matriz[i - 1][j - 1] + 1, // sustitución
-            matriz[i][j - 1] + 1,     // inserción
-            matriz[i - 1][j] + 1      // eliminación
+            matriz[i - 1][j - 1] + 1,
+            matriz[i][j - 1] + 1,
+            matriz[i - 1][j] + 1
           );
         }
       }
@@ -614,8 +883,6 @@
     return matriz[b.length][a.length];
   }
 
-  // true si "candidato" coincide exacto, contiene/está contenido en "buscado",
-  // o es lo bastante parecido según distancia de edición (tolera errores de tipeo/acentos)
   function coincideAproximado(candidato, buscado) {
     var c = normalizar(candidato);
     var b = normalizar(buscado);
@@ -623,7 +890,7 @@
     if (c === b) return true;
     if (c.indexOf(b) !== -1 || b.indexOf(c) !== -1) return true;
     var distancia = distanciaLevenshtein(c, b);
-    var umbral = Math.max(2, Math.floor(b.length * 0.3)); // solo se usa para nombres y sugerencias
+    var umbral = Math.max(2, Math.floor(b.length * 0.3));
     return distancia <= umbral;
   }
 
@@ -747,8 +1014,8 @@
       if (item.bodega) {
         var wazeUrl = 'https://waze.com/ul?ll=' + item.bodega.lat + ',' + item.bodega.lng + '&navigate=yes';
         var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + item.bodega.lat + ',' + item.bodega.lng;
-        acciones += '<a class="btn-waze" href="' + wazeUrl + '" target="_blank" rel="noopener noreferrer">🚗 Waze</a>' +
-                    '<a class="btn-maps" href="' + mapsUrl + '" target="_blank" rel="noopener noreferrer">📍 Maps</a>';
+        acciones += '<a class="btn-waze" href="' + wazeUrl + '" target="_blank" rel="noopener">🚗 Waze</a>' +
+                    '<a class="btn-maps" href="' + mapsUrl + '" target="_blank" rel="noopener">📍 Maps</a>';
       }
       var sello = item.distancia !== null
         ? '<div class="sello"><b>' + item.distancia.toFixed(1) + '</b>km</div>'
@@ -819,8 +1086,8 @@
         if (coordenadasValidas(b)) {
           var wazeUrl = 'https://waze.com/ul?ll=' + b.lat + ',' + b.lng + '&navigate=yes';
           var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + b.lat + ',' + b.lng;
-          acciones = '<a class="btn-waze" href="' + wazeUrl + '" target="_blank" rel="noopener noreferrer">🚗 Waze</a>' +
-                     '<a class="btn-maps" href="' + mapsUrl + '" target="_blank" rel="noopener noreferrer">📍 Maps</a>';
+          acciones = '<a class="btn-waze" href="' + wazeUrl + '" target="_blank" rel="noopener">🚗 Waze</a>' +
+                     '<a class="btn-maps" href="' + mapsUrl + '" target="_blank" rel="noopener">📍 Maps</a>';
         }
         var distanciaTxt = '';
         if (ubicacionUsuario && coordenadasValidas(b)) {
@@ -854,27 +1121,73 @@
     }).join('');
   }
 
+  function mostrarTodos() {
+    if (!transportistas || transportistas.length === 0) return;
+    renderResultadosTransportista(transportistas);
+    var todasLasBodegas = [];
+    transportistas.forEach(function (t) {
+      (Array.isArray(t.bodegas) ? t.bodegas : []).forEach(function (b) {
+        if (coordenadasValidas(b)) todasLasBodegas.push(b);
+      });
+    });
+    renderMarcadores(todasLasBodegas);
+    var cont = document.getElementById('resultados');
+    var headerH2 = document.createElement('h2');
+    headerH2.style.cssText = 'font-size:18px; color:var(--navy); margin:10px 0 16px; text-align:center;';
+    headerH2.textContent = 'Mostrando las ' + transportistas.length + ' empresas registradas';
+    cont.prepend(headerH2);
+  }
+
+  // Renderiza marcadores con Leaflet
   function renderMarcadores(bodegas) {
-    marcadores.forEach(function (m) { m.setMap(null); });
+    if (!map) return;
+    marcadores.forEach(function (m) { map.removeLayer(m); });
     marcadores = [];
 
-    var bounds = new google.maps.LatLngBounds();
-    var hubo = false;
+    if (!Array.isArray(bodegas) || bodegas.length === 0) return;
 
+    var latlngs = [];
     bodegas.forEach(function (b) {
-      var marker = new google.maps.Marker({ position: { lat: b.lat, lng: b.lng }, map: map });
+      if (!coordenadasValidas(b)) return;
+      var lat = Number(b.lat);
+      var lng = Number(b.lng);
+      var marker = L.marker([lat, lng]).addTo(map);
+      var wazeUrl = 'https://waze.com/ul?ll=' + lat + ',' + lng + '&navigate=yes';
+      var mapsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng;
+      var popupContent = '' +
+        '<div style="font-family:Inter,sans-serif; min-width:180px;">' +
+          '<b style="font-size:13.5px;color:#0B2545;">' + escapeHtml(b.zona || 'Bodega') + '</b><br>' +
+          '<span style="font-size:12px;color:#6B7785;">' + escapeHtml(b.direccion || 'Sin dirección registrada') + '</span>' +
+          '<div style="margin-top:8px;display:flex;gap:6px;">' +
+            '<a href="' + wazeUrl + '" target="_blank" rel="noopener" style="background:#33ccff;color:#003049;padding:4px 8px;border-radius:5px;text-decoration:none;font-size:11px;font-weight:600;">🚗 Waze</a>' +
+            '<a href="' + mapsUrl + '" target="_blank" rel="noopener" style="background:#3E7C59;color:white;padding:4px 8px;border-radius:5px;text-decoration:none;font-size:11px;font-weight:600;">📍 Maps</a>' +
+          '</div>' +
+        '</div>';
+      marker.bindPopup(popupContent);
       marcadores.push(marker);
-      bounds.extend(marker.getPosition());
-      hubo = true;
+      latlngs.push([lat, lng]);
     });
 
-    if (ubicacionUsuario) { bounds.extend(ubicacionUsuario); hubo = true; }
-    if (hubo) { map.fitBounds(bounds); }
-  }
-</script>
+    if (ubicacionUsuario && typeof ubicacionUsuario.lat === 'number' && typeof ubicacionUsuario.lng === 'number') {
+      latlngs.push([ubicacionUsuario.lat, ubicacionUsuario.lng]);
+    }
 
-<script async
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDuPaQudck14T3awVycnwh54TDa53hSEbI&callback=initMap&loading=async&auth_referrer_policy=origin">
+    if (latlngs.length === 1) {
+      map.setView(latlngs[0], 13);
+    } else if (latlngs.length > 1) {
+      try {
+        var bounds = L.latLngBounds(latlngs);
+        if (bounds.isValid()) {
+          map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+        }
+      } catch(e) {
+        console.warn('Bounds fitting skipped:', e);
+      }
+    }
+  }
+
+  // Inicializar Leaflet automáticamente al cargar el DOM
+  window.addEventListener('DOMContentLoaded', initMap);
 </script>
 
 </body>
