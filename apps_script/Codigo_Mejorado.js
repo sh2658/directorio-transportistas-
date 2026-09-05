@@ -29,6 +29,7 @@ function onOpen() {
   try {
     SpreadsheetApp.getUi()
       .createMenu('Capturas con IA')
+      .addItem('⚡ Reprocesar fila seleccionada', 'reprocesarFilaSeleccionada')
       .addItem('Procesar pendientes ahora', 'procesarCapturasPendientes')
       .addItem('Asignar aprobadas ahora', 'asignarCapturasAprobadas')
       .addItem('Instalar revisión automática', 'configurarActivador')
@@ -36,6 +37,31 @@ function onOpen() {
   } catch (e) {
     Logger.log("Ejecución en segundo plano sin UI.");
   }
+}
+
+/**
+ * Permite al usuario pararse sobre cualquier fila en CAPTURAS y reprocesarla
+ * inmediatamente con Gemini sin importar su estado anterior.
+ */
+function reprocesarFilaSeleccionada() {
+  const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  const sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
+  if (!sheet) {
+    Logger.log("No existe la hoja " + CONFIG.SHEET_NAME);
+    return;
+  }
+  
+  const activeSheet = ss.getActiveSheet();
+  let rowNumber = activeSheet.getActiveCell().getRow();
+  
+  // Si no está parado en una fila válida, procesa la última fila con foto
+  if (activeSheet.getName() !== CONFIG.SHEET_NAME || rowNumber < 2) {
+    rowNumber = sheet.getLastRow();
+  }
+
+  Logger.log("Reprocesando manualmente fila: " + rowNumber);
+  sheet.getRange(rowNumber, findColIndex_(sheet.getDataRange().getValues()[0].map(String), ["ESTADO", "Estado"]) + 1).setValue(CONFIG.STATUS_PENDING);
+  procesarCapturasPendientes();
 }
 
 function configurarActivador() {
@@ -162,16 +188,31 @@ function extraerDatosMultiTransportistaGemini_(blob, apiKey) {
   }
 
   const prompt = [
-    'Eres un experto analista en logística y transportistas de encomiendas en Costa Rica.',
-    'Analiza esta imagen (letrero, rótulo de bodega, portón o volante comercial).',
-    'REGLAS OBLIGATORIAS:',
-    '1. MULTI-TRANSPORTISTA: Una sola imagen puede contener VARIAS empresas que comparten la misma bodega (ej: Transcama, San Carleños, Mejía, Damaka). Extrae CADA transportista por separado en la lista "transportistas".',
-    '2. BODEGA FÍSICA: Extrae la dirección exacta de la bodega o terminal (ej: "COLIMA DE TIBÁS, 100M NORTE DE CENTRAL DE BATERÍAS", "BARRIO MÉXICO"). Esta bodega es compartida por todos.',
-    '3. HORARIO GENERAL: Si hay un horario visible (ej: "L-V 7:00 AM - 5:00 PM, SÁB 7:00 AM - 12:00 MD"), extráelo. Se aplicará a todos a menos que alguno tenga un horario individual.',
-    '4. DESTINOS / LUGARES: Pueblos, cantones o rutas a los que viaja cada transportista (ej: San Carlos, Ciudad Quesada, Pital, Pérez Zeledón).',
-    '5. TELÉFONOS: Extrae los números de teléfono limpios (ej: "8888-8888", "2222-2222") asignados a la empresa correspondiente.',
-    '6. TODO EL TEXTO DEBE VENIR EN MAYÚSCULAS.'
-  ].join(' ');
+    'Eres un experto analista en logística y empresas de transporte y encomiendas en Costa Rica.',
+    'Analiza exhaustivamente esta imagen (volante, letrero, rótulo o portón).',
+    'REGLAS CRÍTICAS DE EXTRACCIÓN:',
+    '1. IDENTIFICACIÓN DE BODEGA COMPARTIDA VS TRANSPORTISTAS INDIVIDUALES:',
+    '   - El título superior puede ser el nombre de la BODEGA o TERMINAL (ej: "BODEGA GOLFO EXPRESS").',
+    '   - En el cuerpo del documento suele haber una lista con viñetas (bullets) donde CADA LÍNEA ES UNA EMPRESA DE ENCOMIENDA DIFERENTE.',
+    '     Ejemplos en este tipo de volantes:',
+    '     * "ENCOMIENDAS GOLFO EXPRESS"',
+    '     * "ENCOMIENDAS Y MUDANZAS CENTENO JUNIOR"',
+    '     * "TRANSPORTE RODRIGUEZ SERRANO"',
+    '     * "ENCOMIENDAS Y MUDANZAS CENTENO"',
+    '     * "TRANS SACO"',
+    '     * "TRANSPORTES UPALA EXPRESS"',
+    '   - ¡NUNCA agrupes todas las empresas en una sola! Debes extraer CADA EMPRESA como un elemento independiente dentro del array "transportistas". Si hay 6 empresas, devuelve 6 elementos.',
+    '2. UBICACIÓN FÍSICA DE LA BODEGA COMÚN:',
+    '   - Extrae la dirección exacta de la bodega o terminal (ej: "BARRIO MÉXICO, CONTIGUO A PARTES DE CHASIS, FRENTE A ANTIGUA BÓTICA SOLERA").',
+    '3. HORARIO GENERAL DE LA BODEGA:',
+    '   - Extrae el horario de atención (ej: "DE LUNES A VIERNES DE 8 AM A 5 PM").',
+    '4. DATOS ESPECÍFICOS POR CADA EMPRESA:',
+    '   - "nombre": Nombre exacto de la empresa en MAYÚSCULAS.',
+    '   - "telefonos": Teléfono propio de esa empresa (ej: "8340-3547") MÁS el teléfono general de la bodega si aparece arriba (ej: "2221-0338"). Corrige errores tipográficos evidentes como ":" en vez de "-" (ej: "8375:9370" -> "8375-9370").',
+    '   - "destinos": Lista de todos los pueblos, cantones o distritos a los que viaja esa empresa específica.',
+    '5. TODO EL TEXTO DEBE DEVOLVERSE EN MAYÚSCULAS.'
+  ].join('\n');
+
 
   const schema = {
     type: 'OBJECT',
