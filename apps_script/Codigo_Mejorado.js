@@ -15,8 +15,8 @@ const CONFIG = Object.freeze({
   SPREADSHEET_ID: '1gXtF2KcCuy_cdYRNTbGrulNbB5SYw_mrN-H_AVSXOeA',
   SHEET_NAME: 'CAPTURAS',
   API_KEY_PROPERTY: 'GEMINI_API_KEY',
-  // Modelos oficiales y de máxima velocidad para OCR y visión
-  MODELS: ['gemini-2.0-flash', 'gemini-1.5-flash'],
+  // Modelos oficiales confirmados activos en tu cuenta de Google AI
+  MODELS: ['gemini-2.5-flash', 'gemini-flash-latest', 'gemini-2.5-flash-lite', 'gemini-3.1-flash-lite'],
   STATUS_PENDING: 'Pendiente',
   STATUS_PROCESSING: 'Procesando', 
   STATUS_DONE: 'Procesado por IA',
