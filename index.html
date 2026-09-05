@@ -117,6 +117,7 @@
     border-radius: 9px;
     font-family: 'Inter', sans-serif;
     min-width: 0;
+    text-transform: uppercase;
   }
   .fila-input input[type="text"]:focus { outline: 2px solid var(--amber); border-color: var(--amber); }
   .fila-input button {
@@ -366,7 +367,7 @@
   }
   .boleto .sello b { font-size: 13.5px; }
 
-  .boleto h3 { margin: 0 4px 4px 0; font-size: 16.5px; font-weight: 700; color: var(--navy); padding-right: 56px; }
+  .boleto h3 { margin: 0 4px 4px 0; font-size: 16.5px; font-weight: 700; color: var(--navy); padding-right: 56px; text-transform: uppercase; }
   .boleto .zona-tag {
     display: inline-block;
     font-family: 'JetBrains Mono', monospace;
@@ -377,10 +378,11 @@
     padding: 2px 7px;
     border-radius: 5px;
     margin-bottom: 6px;
+    text-transform: uppercase;
   }
   .boleto p { margin: 3px 0; font-size: 13.5px; color: var(--muted); }
   .boleto p strong { color: var(--ink); font-weight: 600; }
-  .boleto .destinos-lista { font-size: 12.5px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+  .boleto .destinos-lista { font-size: 12.5px; color: var(--muted); margin-top: 6px; line-height: 1.4; text-transform: uppercase; }
 
   .boleto .bodega-item { border-top: 1px dashed var(--line); padding-top: 8px; margin-top: 8px; }
   .boleto .bodega-item:first-child { border-top: none; padding-top: 0; margin-top: 0; }
@@ -521,14 +523,14 @@
 
     <!-- Chips de acceso rápido -->
     <div class="chips-destinos">
-      <span class="chips-etiqueta">Frecuentes:</span>
-      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('Pérez Zeledón', 'destino')">Pérez Zeledón</a>
-      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('Liberia', 'destino')">Liberia</a>
-      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('San Carlos', 'destino')">San Carlos</a>
-      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('Limón', 'destino')">Limón</a>
-      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('Puntarenas', 'destino')">Puntarenas</a>
-      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('Golfito', 'destino')">Golfito</a>
-      <a href="#" class="chip chip-ver-todos" onclick="event.preventDefault(); mostrarTodos()">📋 Ver todos</a>
+      <span class="chips-etiqueta">FRECUENTES:</span>
+      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('PÉREZ ZELEDÓN', 'destino')">PÉREZ ZELEDÓN</a>
+      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('LIBERIA', 'destino')">LIBERIA</a>
+      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('SAN CARLOS', 'destino')">SAN CARLOS</a>
+      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('LIMÓN', 'destino')">LIMÓN</a>
+      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('PUNTARENAS', 'destino')">PUNTARENAS</a>
+      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('GOLFITO', 'destino')">GOLFITO</a>
+      <a href="#" class="chip chip-ver-todos" onclick="event.preventDefault(); mostrarTodos()">📋 VER TODOS</a>
     </div>
   </div>
 </div>
@@ -643,15 +645,20 @@
       return t && typeof t === 'object' && typeof t.nombre === 'string';
     }).map(function (t) {
       var copia = Object.assign({}, t);
-      copia.nombre = limpiarTexto(copia.nombre);
+      copia.nombre = limpiarTexto(copia.nombre).toUpperCase();
+      if (copia.horario) {
+        copia.horario = limpiarTexto(copia.horario).toUpperCase();
+      }
       if (Array.isArray(copia.destinos)) {
-        copia.destinos = copia.destinos.map(limpiarTexto).filter(Boolean);
+        copia.destinos = copia.destinos.map(function(d) {
+          return limpiarTexto(d).toUpperCase();
+        }).filter(Boolean);
       }
       if (Array.isArray(copia.bodegas)) {
         copia.bodegas = copia.bodegas.map(function (b) {
           return Object.assign({}, b, {
-            zona: limpiarTexto(b.zona || ''),
-            direccion: limpiarTexto(b.direccion || '')
+            zona: limpiarTexto(b.zona || '').toUpperCase(),
+            direccion: limpiarTexto(b.direccion || '').toUpperCase()
           });
         });
       }
