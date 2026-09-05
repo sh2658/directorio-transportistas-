@@ -34,10 +34,11 @@ graph LR
 ## ✨ Características Principales
 
 - **⚡ Carga Instantánea (0 ms):** Estrategia de caché *Stale-While-Revalidate* (SWR). El directorio carga de inmediato desde `localStorage` mientras sincroniza en segundo plano.
+- **💬 WhatsApp con Detección Celular (+506):** Identifica automáticamente líneas celulares (6, 7 y 8 según plan SUTEL), antepone el código internacional de Costa Rica y abre el chat con mensaje prellenado.
+- **🗺️ Navegación Inteligente (App Nativa o Web):** Enlaces con *Android Intents* y *Universal Links* que abren las apps nativas de **Waze** o **Google Maps** si están instaladas, y si no, abren fluidamente su versión web de navegación.
 - **📍 Geolocalización y Proximidad:** Ordena las bodegas por distancia en kilómetros (fórmula de Haversine) según el GPS del usuario.
-- **🗺️ Navegación Directa 1-Clic:** Enlaces listos para abrir la ruta en **Waze** (`waze.com/ul`) o **Google Maps**.
-- **🔍 Búsqueda Inteligente (Fuzzy Search):** Algoritmo de distancia de Levenshtein para sugerir destinos correctos aunque el usuario cometa errores ortográficos.
-- **📱 PWA (Progressive Web App):** Instalable en teléfonos Android e iPhone como una app nativa desde el navegador.
+- **🔍 Búsqueda Inteligente (Fuzzy Search):** Algoritmo de distancia de Levenshtein y normalizador fonético que repara textos con tildes ausentes (`PREZ ZELEDN` → `Pérez Zeledón`).
+- **📱 PWA (Progressive Web App):** Instalable en teléfonos Android e iPhone como una app nativa con soporte de caché offline (`sw.js`).
 - **🆓 Cero Costos de Google Cloud:** Mapa embebido basado en OpenStreetMap + Leaflet, sin claves de API expuestas ni consumo de cuotas de facturación.
 
 ---
