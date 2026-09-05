@@ -388,7 +388,7 @@
   .boleto .bodega-item:first-child { border-top: none; padding-top: 0; margin-top: 0; }
 
   .acciones { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
-  .acciones a {
+  .acciones a, .acciones button {
     text-decoration: none;
     font-size: 12.5px;
     font-weight: 600;
@@ -398,13 +398,75 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
+    border: none;
+    font-family: inherit;
+    cursor: pointer;
     transition: opacity 0.15s ease, transform 0.15s ease;
   }
-  .acciones a:hover { opacity: 0.92; transform: translateY(-1px); }
+  .acciones a:hover, .acciones button:hover { opacity: 0.92; transform: translateY(-1px); }
   .btn-wa { background: #25D366 !important; color: white !important; font-weight: 600; }
   .btn-waze { background: var(--waze-blue); color: var(--waze-text) !important; font-weight: 600; }
   .btn-maps { background: var(--green); font-weight: 600; }
   .btn-tel { background: var(--navy); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .btn-ver-mapa { background: #E8EEF5 !important; color: var(--navy) !important; border: 1px solid #C4D2E3 !important; }
+  .btn-compartir { background: #FAF8F3 !important; color: var(--navy) !important; border: 1px solid var(--line) !important; }
+
+  .input-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+  .input-wrapper input[type="text"] {
+    width: 100%;
+    padding-right: 36px;
+  }
+  .btn-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #e2e8f0;
+    color: #475569;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 13px;
+    line-height: 1;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.15s;
+    user-select: none;
+  }
+  .btn-clear:hover { background: #cbd5e1; color: #0f172a; }
+
+  .toast-aviso {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--navy);
+    color: white;
+    padding: 12px 22px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 10000;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    border: 1px solid var(--amber);
+  }
+  .toast-aviso.visible {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
 
   .vacio {
     text-align: center;
@@ -511,14 +573,18 @@
       <label><input type="radio" name="modo" value="transportista" onchange="cambiarModo()"><span>Por transportista</span></label>
     </div>
     <div id="filaDestino" class="fila-input">
-      <input type="text" list="listaDestinos" id="inputDestino" placeholder="¿A dónde envías? (ej: Pérez Zeledón, Liberia...)" autocomplete="off">
-      <datalist id="listaDestinos"></datalist>
-      <button onclick="buscar()">Buscar</button>
+      <div class="input-wrapper">
+        <input type="text" list="listaDestinos" id="inputDestino" placeholder="¿A DÓNDE ENVÍAS? (EJ: PÉREZ ZELEDÓN, LIBERIA...)" autocomplete="off" oninput="debounceBuscar()">
+        <button type="button" class="btn-clear" id="btnClearDestino" onclick="limpiarBuscador('inputDestino')" title="Limpiar búsqueda">✕</button>
+      </div>
+      <button onclick="buscar()">BUSCAR</button>
     </div>
     <div id="filaTransportista" class="fila-input" style="display:none;">
-      <input type="text" list="listaTransportistas" id="inputTransportista" placeholder="Nombre de la empresa..." autocomplete="off">
-      <datalist id="listaTransportistas"></datalist>
-      <button onclick="buscar()">Buscar</button>
+      <div class="input-wrapper">
+        <input type="text" list="listaTransportistas" id="inputTransportista" placeholder="NOMBRE DE LA EMPRESA..." autocomplete="off" oninput="debounceBuscar()">
+        <button type="button" class="btn-clear" id="btnClearTransportista" onclick="limpiarBuscador('inputTransportista')" title="Limpiar búsqueda">✕</button>
+      </div>
+      <button onclick="buscar()">BUSCAR</button>
     </div>
 
     <!-- Chips de acceso rápido -->
@@ -575,6 +641,8 @@
   </div>
   <p class="footer-nota">Rutas CR — directorio comunitario de transportistas de encomiendas en Costa Rica.</p>
 </footer>
+
+<div id="toastMensaje" class="toast-aviso"></div>
 
 <script>
   const API_URL = 'https://script.google.com/macros/s/AKfycbziHUb11q9tHuAnqFQY8EG-u18Q763C8a-a4CE0Rwii_iTRNPqmTTzaZvN5PRtx14NqaA/exec';
@@ -1042,6 +1110,106 @@
            '<a class="btn-maps" href="' + webMaps + '" onclick="navegar(\'maps\',' + lat + ',' + lng + '); return false;" target="_blank" rel="noopener">' + SVG_MAPS + ' Maps</a>';
   }
 
+  var timerBusqueda = null;
+  function debounceBuscar() {
+    clearTimeout(timerBusqueda);
+    var modo = document.querySelector('input[name="modo"]:checked').value;
+    var idInput = (modo === 'destino') ? 'inputDestino' : 'inputTransportista';
+    var inputElem = document.getElementById(idInput);
+    var valor = inputElem ? inputElem.value.trim() : '';
+
+    var btnClear = document.getElementById(modo === 'destino' ? 'btnClearDestino' : 'btnClearTransportista');
+    if (btnClear) {
+      btnClear.style.display = valor.length > 0 ? 'flex' : 'none';
+    }
+
+    if (valor.length === 0) {
+      return;
+    }
+
+    timerBusqueda = setTimeout(function () {
+      buscar();
+    }, 280);
+  }
+
+  function limpiarBuscador(idInput) {
+    var input = document.getElementById(idInput);
+    if (!input) return;
+    input.value = '';
+    input.focus();
+    var modo = document.querySelector('input[name="modo"]:checked').value;
+    var btnClear = document.getElementById(modo === 'destino' ? 'btnClearDestino' : 'btnClearTransportista');
+    if (btnClear) btnClear.style.display = 'none';
+    mostrarTodos();
+  }
+
+  function centrarEnMapa(lat, lng) {
+    if (!map) return;
+    var elemMapa = document.getElementById('mapa');
+    if (elemMapa) {
+      elemMapa.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    map.setView([lat, lng], 16, { animate: true });
+
+    setTimeout(function () {
+      var targetLat = Number(lat).toFixed(4);
+      var targetLng = Number(lng).toFixed(4);
+      for (var i = 0; i < marcadores.length; i++) {
+        var m = marcadores[i];
+        if (m.grupoBodega) {
+          if (m.grupoBodega.lat.toFixed(4) === targetLat && m.grupoBodega.lng.toFixed(4) === targetLng) {
+            m.openPopup();
+            break;
+          }
+        }
+      }
+    }, 450);
+  }
+
+  function compartirTransportista(nombre, zona, direccion, lat, lng, telefonosStr) {
+    var wazeLink = 'https://waze.com/ul?ll=' + lat + ',' + lng + '&navigate=yes';
+    var mapsLink = 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng;
+
+    var texto = '📦 *' + (nombre || '').toUpperCase() + '*\n' +
+      (zona ? '📍 BODEGA: ' + zona.toUpperCase() + '\n' : '') +
+      (direccion ? '🏢 DIRECCIÓN: ' + direccion.toUpperCase() + '\n' : '') +
+      (telefonosStr ? '☎ CONTACTO: ' + telefonosStr + '\n' : '') +
+      '🚗 WAZE: ' + wazeLink + '\n' +
+      '📍 GOOGLE MAPS: ' + mapsLink + '\n' +
+      'ℹ️ RUTAS CR: https://sh2658.github.io/directorio-transportistas-/';
+
+    if (navigator.share) {
+      navigator.share({
+        title: nombre,
+        text: texto
+      }).catch(function(e){ console.log('Share cancelado:', e); });
+    } else {
+      copiarAlPortapapeles(texto);
+    }
+  }
+
+  function copiarAlPortapapeles(texto) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(texto).then(function () {
+        mostrarToast('✅ ¡DATOS COPIADOS AL PORTAPAPELES!');
+      }).catch(function () {
+        prompt('Copia los datos de esta empresa:', texto);
+      });
+    } else {
+      prompt('Copia los datos de esta empresa:', texto);
+    }
+  }
+
+  function mostrarToast(msg) {
+    var toast = document.getElementById('toastMensaje');
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.add('visible');
+    setTimeout(function () {
+      toast.classList.remove('visible');
+    }, 2800);
+  }
+
   function buscar() {
     var modo = document.querySelector('input[name="modo"]:checked').value;
     if (modo === 'transportista') { buscarPorTransportista(); }
@@ -1085,7 +1253,11 @@
     });
 
     renderResultadosDestino(conDistancia);
-    renderMarcadores(conDistancia.map(function (item) { return item.bodega; }).filter(Boolean));
+
+    var bodegasConContexto = conDistancia.map(function (item) {
+      return item.bodega ? Object.assign({}, item.bodega, { transportista: item.transportista }) : null;
+    }).filter(Boolean);
+    renderMarcadores(bodegasConContexto);
   }
 
   function mostrarSugerenciasDestino(textoBuscado) {
@@ -1118,9 +1290,25 @@
     cont.innerHTML = lista.map(function (item) {
       var t = item.transportista;
       var acciones = telefonosHtml(t);
-      if (item.bodega && coordenadasValidas(item.bodega)) {
-        acciones += botonesNavegacionHtml(item.bodega.lat, item.bodega.lng);
+      var b = item.bodega;
+      if (b && coordenadasValidas(b)) {
+        acciones += botonesNavegacionHtml(b.lat, b.lng) +
+                    '<a href="#mapa" class="btn-ver-mapa" onclick="centrarEnMapa(' + b.lat + ',' + b.lng + '); return false;">🗺️ Ver mapa</a>';
       }
+      var telefonosTexto = (Array.isArray(t.telefonos) ? t.telefonos : []).map(function(tel){ return tel.numero; }).filter(Boolean).join(', ');
+      var latVal = (b && coordenadasValidas(b)) ? b.lat : '';
+      var lngVal = (b && coordenadasValidas(b)) ? b.lng : '';
+      var zonaVal = (b && b.zona) ? b.zona : '';
+      var dirVal = (b && b.direccion) ? b.direccion : '';
+
+      acciones += '<button type="button" class="btn-compartir" onclick=\'compartirTransportista(' +
+        JSON.stringify(t.nombre) + ',' +
+        JSON.stringify(zonaVal) + ',' +
+        JSON.stringify(dirVal) + ',' +
+        JSON.stringify(latVal) + ',' +
+        JSON.stringify(lngVal) + ',' +
+        JSON.stringify(telefonosTexto) + ')\'>📤 Compartir</button>';
+
       var sello = item.distancia !== null
         ? '<div class="sello"><b>' + item.distancia.toFixed(1) + '</b>km</div>'
         : '';
@@ -1131,10 +1319,10 @@
           '<div class="divisor"></div>' +
           '<div class="info-col">' +
             sello +
-            (item.bodega && item.bodega.zona ? '<span class="zona-tag">' + escapeHtml(item.bodega.zona) + '</span><br>' : '') +
+            (b && b.zona ? '<span class="zona-tag">' + escapeHtml(b.zona) + '</span><br>' : '') +
             '<h3>' + escapeHtml(t.nombre) + '</h3>' +
-            (t.horario ? '<p><strong>Horario:</strong> ' + escapeHtml(t.horario) + '</p>' : '') +
-            (item.bodega ? '<p><strong>Bodega:</strong> ' + escapeHtml(item.bodega.direccion || item.bodega.zona || 'Sin dirección registrada') + '</p>' : '<p><em>Sin coordenadas de bodega registradas</em></p>') +
+            (t.horario ? '<p><strong>HORARIO:</strong> ' + escapeHtml(t.horario) + '</p>' : '') +
+            (b ? '<p><strong>BODEGA:</strong> ' + escapeHtml(b.direccion || b.zona || 'SIN DIRECCIÓN REGISTRADA') + '</p>' : '<p><em>Sin coordenadas de bodega registradas</em></p>') +
             '<div class="acciones">' + acciones + '</div>' +
           '</div>' +
         '</div>';
@@ -1159,7 +1347,9 @@
 
     var todasLasBodegas = [];
     coincidencias.forEach(function (t) {
-      (Array.isArray(t.bodegas) ? t.bodegas : []).forEach(function (b) { if (coordenadasValidas(b)) todasLasBodegas.push(b); });
+      (Array.isArray(t.bodegas) ? t.bodegas : []).forEach(function (b) {
+        if (coordenadasValidas(b)) todasLasBodegas.push(Object.assign({}, b, { transportista: t }));
+      });
     });
     renderMarcadores(todasLasBodegas);
   }
@@ -1185,11 +1375,22 @@
     var cont = document.getElementById('resultados');
 
     cont.innerHTML = lista.map(function (t) {
+      var telefonosTexto = (Array.isArray(t.telefonos) ? t.telefonos : []).map(function(tel){ return tel.numero; }).filter(Boolean).join(', ');
+
       var bodegasHtml = (Array.isArray(t.bodegas) ? t.bodegas : []).map(function (b) {
         var acciones = '';
         if (coordenadasValidas(b)) {
-          acciones = botonesNavegacionHtml(b.lat, b.lng);
+          acciones = botonesNavegacionHtml(b.lat, b.lng) +
+            '<a href="#mapa" class="btn-ver-mapa" onclick="centrarEnMapa(' + b.lat + ',' + b.lng + '); return false;">🗺️ Ver mapa</a>';
         }
+        acciones += '<button type="button" class="btn-compartir" onclick=\'compartirTransportista(' +
+          JSON.stringify(t.nombre) + ',' +
+          JSON.stringify(b.zona || '') + ',' +
+          JSON.stringify(b.direccion || '') + ',' +
+          JSON.stringify(b.lat || '') + ',' +
+          JSON.stringify(b.lng || '') + ',' +
+          JSON.stringify(telefonosTexto) + ')\'>📤 Compartir</button>';
+
         var distanciaTxt = '';
         if (ubicacionUsuario && coordenadasValidas(b)) {
           var d = distanciaKm(ubicacionUsuario.lat, ubicacionUsuario.lng, b.lat, b.lng);
@@ -1198,13 +1399,13 @@
         return '' +
           '<div class="bodega-item">' +
             (b.zona ? '<span class="zona-tag">' + escapeHtml(b.zona) + '</span><br>' : '') +
-            '<p><strong>Bodega:</strong> ' + escapeHtml(b.direccion || 'Sin dirección registrada') + distanciaTxt + '</p>' +
+            '<p><strong>BODEGA:</strong> ' + escapeHtml(b.direccion || 'SIN DIRECCIÓN REGISTRADA') + distanciaTxt + '</p>' +
             (acciones ? '<div class="acciones">' + acciones + '</div>' : '<p><em>Sin coordenadas registradas</em></p>') +
           '</div>';
       }).join('') || '<p><em>Sin bodegas registradas</em></p>';
 
       var destinosHtml = (t.destinos && t.destinos.length)
-        ? '<p class="destinos-lista"><strong>Destinos que cubre:</strong> ' + t.destinos.map(escapeHtml).join(', ') + '</p>'
+        ? '<p class="destinos-lista"><strong>DESTINOS QUE CUBRE:</strong> ' + t.destinos.map(escapeHtml).join(', ') + '</p>'
         : '';
 
       return '' +
@@ -1213,7 +1414,7 @@
           '<div class="divisor"></div>' +
           '<div class="info-col">' +
             '<h3>' + escapeHtml(t.nombre) + '</h3>' +
-            (t.horario ? '<p><strong>Horario:</strong> ' + escapeHtml(t.horario) + '</p>' : '') +
+            (t.horario ? '<p><strong>HORARIO:</strong> ' + escapeHtml(t.horario) + '</p>' : '') +
             '<div class="acciones">' + telefonosHtml(t) + '</div>' +
             bodegasHtml +
             destinosHtml +
@@ -1228,18 +1429,18 @@
     var todasLasBodegas = [];
     transportistas.forEach(function (t) {
       (Array.isArray(t.bodegas) ? t.bodegas : []).forEach(function (b) {
-        if (coordenadasValidas(b)) todasLasBodegas.push(b);
+        if (coordenadasValidas(b)) todasLasBodegas.push(Object.assign({}, b, { transportista: t }));
       });
     });
     renderMarcadores(todasLasBodegas);
     var cont = document.getElementById('resultados');
     var headerH2 = document.createElement('h2');
-    headerH2.style.cssText = 'font-size:18px; color:var(--navy); margin:10px 0 16px; text-align:center;';
+    headerH2.style.cssText = 'font-size:18px; color:var(--navy); margin:10px 0 16px; text-align:center; text-transform:uppercase;';
     headerH2.textContent = 'Mostrando las ' + transportistas.length + ' empresas registradas';
     cont.prepend(headerH2);
   }
 
-  // Renderiza marcadores con Leaflet
+  // Renderiza marcadores con Leaflet agrupando bodegas compartidas en una misma ubicación física
   function renderMarcadores(bodegas) {
     if (!map) return;
     marcadores.forEach(function (m) { map.removeLayer(m); });
@@ -1247,23 +1448,114 @@
 
     if (!Array.isArray(bodegas) || bodegas.length === 0) return;
 
-    var latlngs = [];
+    // Agrupar por coordenadas (4 decimales = ~11 metros de margen, misma nave/predio)
+    var grupos = {};
     bodegas.forEach(function (b) {
       if (!coordenadasValidas(b)) return;
       var lat = Number(b.lat);
       var lng = Number(b.lng);
-      var marker = L.marker([lat, lng]).addTo(map);
+      var key = lat.toFixed(4) + ',' + lng.toFixed(4);
+
+      if (!grupos[key]) {
+        grupos[key] = {
+          lat: lat,
+          lng: lng,
+          zona: b.zona || '',
+          direccion: b.direccion || '',
+          empresas: []
+        };
+      }
+
+      var transportistaObj = b.transportista;
+      if (transportistaObj && transportistaObj.nombre) {
+        var yaExiste = grupos[key].empresas.some(function (e) {
+          return e.nombre === transportistaObj.nombre;
+        });
+        if (!yaExiste) {
+          grupos[key].empresas.push(transportistaObj);
+        }
+      }
+    });
+
+    var latlngs = [];
+
+    Object.keys(grupos).forEach(function (key) {
+      var g = grupos[key];
+      var cantidad = g.empresas.length;
+
+      var pinHtml = '';
+      if (cantidad > 1) {
+        pinHtml = '<div style="background:#0B2545; color:#F2A93B; border-radius:12px; padding:3px 8px; border:2px solid #F2A93B; font-weight:700; font-size:11px; box-shadow:0 3px 10px rgba(0,0,0,0.35); white-space:nowrap;">' +
+                  '🏢 BODEGA (' + cantidad + ' EMPRESAS)' +
+                  '</div>';
+      } else {
+        var nombreEmp = (cantidad === 1) ? g.empresas[0].nombre : 'BODEGA';
+        pinHtml = '<div style="background:#0B2545; color:#ffffff; border-radius:10px; padding:3px 7px; border:1.5px solid #F2A93B; font-weight:600; font-size:11px; box-shadow:0 2px 7px rgba(0,0,0,0.3); white-space:nowrap; max-width:180px; overflow:hidden; text-overflow:ellipsis;">' +
+                  '📦 ' + escapeHtml(nombreEmp) +
+                  '</div>';
+      }
+
+      var customPin = L.divIcon({
+        className: 'leaflet-pin-bodega',
+        html: pinHtml,
+        iconSize: [120, 26],
+        iconAnchor: [60, 13]
+      });
+
+      var marker = L.marker([g.lat, g.lng], { icon: customPin }).addTo(map);
+
+      var empresasHtml = '';
+      if (cantidad > 1) {
+        empresasHtml = '' +
+          '<div style="margin:8px 0; border-top:1px dashed #DFDAD0; padding-top:6px;">' +
+            '<div style="font-size:11px; font-weight:700; color:#12325E; margin-bottom:4px; text-transform:uppercase;">' +
+              '🏢 TRANSPORTISTAS EN ESTA BODEGA (' + cantidad + '):' +
+            '</div>' +
+            '<div style="max-height:160px; overflow-y:auto;">' +
+              g.empresas.map(function (emp) {
+                var infoTel = (emp.telefonos && emp.telefonos[0]) ? procesarTelefono(emp.telefonos[0].numero, emp.nombre) : null;
+                var telBadge = '';
+                if (infoTel) {
+                  if (infoTel.esCelular) {
+                    telBadge = '<a href="' + infoTel.waUrl + '" target="_blank" rel="noopener" style="font-size:10px; background:#25D366; color:white; padding:2px 5px; border-radius:4px; text-decoration:none; margin-right:4px; font-weight:600;">WA</a> ';
+                  }
+                  telBadge += '<a href="' + infoTel.telUrl + '" style="font-size:10.5px; background:#FAF8F3; color:#12325E; padding:2px 5px; border-radius:4px; border:1px solid #DFDAD0; text-decoration:none;">☎ ' + escapeHtml(infoTel.formatoVisible) + '</a>';
+                }
+                return '<div style="margin:4px 0; font-size:11.5px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f1f5f9; padding-bottom:3px;">' +
+                  '<b>📦 ' + escapeHtml(emp.nombre) + '</b>' +
+                  '<div>' + telBadge + '</div>' +
+                '</div>';
+              }).join('') +
+            '</div>' +
+          '</div>';
+      } else if (cantidad === 1) {
+        var empUnica = g.empresas[0];
+        var infoTelU = (empUnica.telefonos && empUnica.telefonos[0]) ? procesarTelefono(empUnica.telefonos[0].numero, empUnica.nombre) : null;
+        empresasHtml = '' +
+          '<div style="margin:6px 0 8px; font-size:12px; color:#0B2545;">' +
+            '<b>EMPRESA: ' + escapeHtml(empUnica.nombre) + '</b>' +
+            (infoTelU ? '<div style="margin-top:4px;">' +
+              (infoTelU.esCelular ? '<a class="btn-wa" style="display:inline-flex; padding:3px 7px; font-size:11px; margin-right:4px;" href="' + infoTelU.waUrl + '" target="_blank">' + SVG_WA + ' WhatsApp</a>' : '') +
+              '<a class="btn-tel" style="display:inline-flex; padding:3px 7px; font-size:11px;" href="' + infoTelU.telUrl + '">☎ ' + escapeHtml(infoTelU.formatoVisible) + '</a>' +
+            '</div>' : '') +
+          '</div>';
+      }
+
       var popupContent = '' +
-        '<div style="font-family:Inter,sans-serif; min-width:180px;">' +
-          '<b style="font-size:13.5px;color:#0B2545;">' + escapeHtml(b.zona || 'Bodega') + '</b><br>' +
-          '<span style="font-size:12px;color:#6B7785;">' + escapeHtml(b.direccion || 'Sin dirección registrada') + '</span>' +
-          '<div style="margin-top:8px;display:flex;gap:6px;">' +
-            botonesNavegacionHtml(lat, lng) +
+        '<div style="font-family:Inter,sans-serif; min-width:210px; max-width:320px;">' +
+          (cantidad > 1 ? '<div style="background:#FFF6E6; border:1px solid #F2A93B; border-radius:5px; padding:3px 6px; margin-bottom:6px; font-size:11px; font-weight:700; color:#0B2545;">🏢 BODEGA COMPARTIDA</div>' : '') +
+          '<b style="font-size:13.5px; color:#0B2545; text-transform:uppercase;">' + escapeHtml(g.zona || 'BODEGA') + '</b><br>' +
+          '<span style="font-size:11.5px; color:#6B7785; text-transform:uppercase;">' + escapeHtml(g.direccion || 'SIN DIRECCIÓN REGISTRADA') + '</span>' +
+          empresasHtml +
+          '<div style="margin-top:8px; display:flex; gap:6px;">' +
+            botonesNavegacionHtml(g.lat, g.lng) +
           '</div>' +
         '</div>';
+
       marker.bindPopup(popupContent);
+      marker.grupoBodega = g;
       marcadores.push(marker);
-      latlngs.push([lat, lng]);
+      latlngs.push([g.lat, g.lng]);
     });
 
     if (ubicacionUsuario && typeof ubicacionUsuario.lat === 'number' && typeof ubicacionUsuario.lng === 'number') {
