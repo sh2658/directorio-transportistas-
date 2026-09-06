@@ -1199,23 +1199,40 @@
     }, 450);
   }
 
-  function compartirTransportista(nombre, zona, direccion, lat, lng, telefonosStr) {
-    var wazeLink = 'https://waze.com/ul?ll=' + lat + ',' + lng + '&navigate=yes';
-    var mapsLink = 'https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng;
+  function compartirTransportista(nombre, zona, direccion, lat, lng, telefonosStr, horario, destinosStr) {
+    nombre = (nombre || '').toUpperCase().trim();
+    zona = (zona || '').toUpperCase().trim();
+    direccion = (direccion || '').toUpperCase().trim();
+    horario = (horario || '').toUpperCase().trim();
+    destinosStr = (destinosStr || '').toUpperCase().trim();
 
-    var texto = '📦 *' + (nombre || '').toUpperCase() + '*\n' +
-      (zona ? '📍 BODEGA: ' + zona.toUpperCase() + '\n' : '') +
-      (direccion ? '🏢 DIRECCIÓN: ' + direccion.toUpperCase() + '\n' : '') +
-      (telefonosStr ? '☎ CONTACTO: ' + telefonosStr + '\n' : '') +
-      '🚗 WAZE: ' + wazeLink + '\n' +
-      '📍 GOOGLE MAPS: ' + mapsLink + '\n' +
-      'ℹ️ RUTAS CR: https://sh2658.github.io/directorio-transportistas-/';
+    var lineas = ['📦 *' + nombre + '*'];
+    if (zona) lineas.push('📍 ZONA / BODEGA: ' + zona);
+    if (direccion) lineas.push('🏢 DIRECCIÓN: ' + direccion);
+    if (horario) lineas.push('⏰ HORARIO: ' + horario);
+    if (destinosStr) lineas.push('🚚 RUTAS / DESTINOS: ' + destinosStr);
+    if (telefonosStr) lineas.push('☎ CONTACTO: ' + telefonosStr);
+
+    var tieneCoords = (lat && lng && !isNaN(Number(lat)) && !isNaN(Number(lng)) && Number(lat) !== 0);
+    if (tieneCoords) {
+      lineas.push('🚗 WAZE: https://waze.com/ul?ll=' + lat + ',' + lng + '&navigate=yes');
+      lineas.push('📍 GOOGLE MAPS: https://www.google.com/maps/dir/?api=1&destination=' + lat + ',' + lng);
+    } else if (direccion || zona) {
+      var query = encodeURIComponent(nombre + ' ' + (direccion || zona) + ' Costa Rica');
+      lineas.push('📍 BUSCAR EN MAPAS: https://www.google.com/maps/search/?api=1&query=' + query);
+    }
+
+    lineas.push('ℹ️ RUTAS CR: https://sh2658.github.io/directorio-transportistas-/');
+    var texto = lineas.join('\n');
+    var asunto = '🚚 ' + nombre + ' - Directorio Rutas CR';
 
     if (navigator.share) {
       navigator.share({
-        title: nombre,
+        title: asunto,
         text: texto
-      }).catch(function(e){ console.log('Share cancelado:', e); });
+      }).catch(function (e) {
+        console.log('Share cancelado:', e);
+      });
     } else {
       copiarAlPortapapeles(texto);
     }
@@ -1334,13 +1351,16 @@
       var zonaVal = (b && b.zona) ? b.zona : '';
       var dirVal = (b && b.direccion) ? b.direccion : '';
 
+      var destinosTexto = (Array.isArray(t.destinos) ? t.destinos : []).join(', ');
       acciones += '<button type="button" class="btn-compartir" onclick=\'compartirTransportista(' +
         JSON.stringify(t.nombre) + ',' +
         JSON.stringify(zonaVal) + ',' +
         JSON.stringify(dirVal) + ',' +
         JSON.stringify(latVal) + ',' +
         JSON.stringify(lngVal) + ',' +
-        JSON.stringify(telefonosTexto) + ')\'>📤 Compartir</button>';
+        JSON.stringify(telefonosTexto) + ',' +
+        JSON.stringify(t.horario || '') + ',' +
+        JSON.stringify(destinosTexto) + ')\'>📤 Compartir</button>';
 
       var sello = item.distancia !== null
         ? '<div class="sello"><b>' + item.distancia.toFixed(1) + '</b>km</div>'
@@ -1416,13 +1436,16 @@
           acciones = botonesNavegacionHtml(b.lat, b.lng) +
             '<a href="#mapa" class="btn-ver-mapa" onclick="centrarEnMapa(' + b.lat + ',' + b.lng + '); return false;">🗺️ Ver mapa</a>';
         }
+        var destinosTexto = (Array.isArray(t.destinos) ? t.destinos : []).join(', ');
         acciones += '<button type="button" class="btn-compartir" onclick=\'compartirTransportista(' +
           JSON.stringify(t.nombre) + ',' +
           JSON.stringify(b.zona || '') + ',' +
           JSON.stringify(b.direccion || '') + ',' +
           JSON.stringify(b.lat || '') + ',' +
           JSON.stringify(b.lng || '') + ',' +
-          JSON.stringify(telefonosTexto) + ')\'>📤 Compartir</button>';
+          JSON.stringify(telefonosTexto) + ',' +
+          JSON.stringify(t.horario || '') + ',' +
+          JSON.stringify(destinosTexto) + ')\'>📤 Compartir</button>';
 
         var distanciaTxt = '';
         if (ubicacionUsuario && coordenadasValidas(b)) {
