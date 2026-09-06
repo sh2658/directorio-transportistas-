@@ -1618,6 +1618,177 @@
     cursor: pointer;
   }
 
+
+  /* Estilos para enlaces clickeables de la etiqueta */
+  .promo-rutas-link {
+    color: var(--navy);
+    text-decoration: underline;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-block;
+  }
+  .promo-rutas-link:hover {
+    color: var(--amber-dark);
+  }
+  .promo-qr-link, .dest-qr-link {
+    display: block;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .promo-qr-link:hover, .dest-qr-link:hover {
+    transform: scale(1.03);
+  }
+  .etiqueta-qr-img {
+    background: #ffffff;
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid #E2E8F0;
+    display: inline-block;
+  }
+  .promo-qr-canvas {
+    background: #ffffff;
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid #E2E8F0;
+    display: inline-block;
+  }
+  .btn-ver-destinos-modal {
+    background: #F1F5F9;
+    border: 1.5px solid #CBD5E1;
+    color: var(--navy);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-ver-destinos-modal:hover {
+    background: #E2E8F0;
+    border-color: var(--navy);
+    transform: translateY(-1px);
+  }
+
+  /* Modal de Destinos de la Empresa (Solo Consulta) */
+  .modal-destinos-empresa {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .modal-destinos-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(11, 37, 69, 0.7);
+    backdrop-filter: blur(4px);
+  }
+  .modal-destinos-card {
+    position: relative;
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 750px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    z-index: 10;
+  }
+  .modal-destinos-header {
+    padding: 20px 24px;
+    background: var(--navy);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .modal-destinos-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: white;
+  }
+  .zonas-modal-empresa {
+    margin-top: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .modal-destinos-buscador {
+    padding: 14px 24px;
+    background: #F8FAFC;
+    border-bottom: 1px solid #E2E8F0;
+  }
+  .modal-destinos-buscador input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #CBD5E1;
+    font-size: 14px;
+  }
+  .modal-destinos-lista {
+    padding: 20px 24px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-content: flex-start;
+  }
+  .pill-destino-empresa {
+    background: #F8FAFC;
+    border: 1px solid #CBD5E1;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #1E293B;
+  }
+  .modal-destinos-footer {
+    padding: 14px 24px;
+    border-top: 1px solid #E2E8F0;
+    background: #F8FAFC;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .contador-destinos-nota {
+    font-size: 12px;
+    color: #64748B;
+    font-weight: 500;
+  }
+  .acciones-destinos-footer {
+    display: flex;
+    gap: 8px;
+  }
+  .btn-rotular-desde-modal {
+    background: var(--green);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .btn-cerrar-destinos {
+    background: #E2E8F0;
+    color: #334155;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
 </style>
 
 <!-- Google Analytics -->
@@ -3089,6 +3260,90 @@
   // =========================================================================
   // CONTROLADOR DEL MODAL DE CONSULTA DE HOMÓNIMOS
   // =========================================================================
+
+  // =========================================================================
+  // MODAL DE DESTINOS COMPLETOS DEL TRANSPORTISTA (SOLO CONSULTA CON BUSCADOR)
+  // =========================================================================
+  var empresaActualDestinos = null;
+
+  function abrirModalDestinosTransportista(transportistaId) {
+    if (!transportistas) return;
+    var t = transportistas.find(function(item) { return item.id === transportistaId; });
+    if (!t) return;
+    empresaActualDestinos = t;
+
+    var modal = document.getElementById('modalDestinosTransportista');
+    if (!modal) return;
+
+    var titulo = document.getElementById('tituloModalDestinosEmpresa');
+    if (titulo) titulo.textContent = '📍 Destinos de ' + t.nombre;
+
+    var subtitulo = document.getElementById('subtituloModalDestinosEmpresa');
+    if (subtitulo) subtitulo.textContent = 'Cobertura oficial adscrita (' + (t.destinos ? t.destinos.length : 0) + ' lugares) · Solo consulta';
+
+    var zonasCont = document.getElementById('zonasModalDestinosEmpresa');
+    if (zonasCont) zonasCont.innerHTML = renderZonasBadges(t);
+
+    var input = document.getElementById('inputBuscarDestinoEmpresa');
+    if (input) {
+      input.value = '';
+      setTimeout(function() { input.focus(); }, 100);
+    }
+
+    var btnRotular = document.getElementById('btnRotularDesdeDestinos');
+    if (btnRotular) {
+      btnRotular.onclick = function() {
+        cerrarModalDestinosEmpresa();
+        abrirRotuladorConTransportista(t.nombre, '');
+      };
+    }
+
+    renderListaDestinosEmpresa(t.destinos || []);
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function cerrarModalDestinosEmpresa() {
+    var modal = document.getElementById('modalDestinosTransportista');
+    if (!modal) return;
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+    empresaActualDestinos = null;
+  }
+
+  function filtrarDestinosEmpresaActual(texto) {
+    if (!empresaActualDestinos || !empresaActualDestinos.destinos) return;
+    var tNorm = normalizar(texto);
+    if (!tNorm) {
+      renderListaDestinosEmpresa(empresaActualDestinos.destinos);
+      return;
+    }
+    var filtrados = empresaActualDestinos.destinos.filter(function(d) {
+      return normalizar(d).indexOf(tNorm) !== -1;
+    });
+    renderListaDestinosEmpresa(filtrados);
+  }
+
+  function renderListaDestinosEmpresa(lista) {
+    var cont = document.getElementById('listaDestinosEmpresaContenedor');
+    var contador = document.getElementById('contadorDestinosEmpresa');
+    if (!cont) return;
+
+    if (contador) {
+      contador.textContent = 'Mostrando ' + lista.length + ' de ' + (empresaActualDestinos && empresaActualDestinos.destinos ? empresaActualDestinos.destinos.length : 0) + ' destinos';
+    }
+
+    if (lista.length === 0) {
+      cont.innerHTML = '<p class="vacio" style="width:100%; text-align:center; padding:24px;">No encontramos ese lugar en las rutas adscritas a esta empresa.</p>';
+      return;
+    }
+
+    cont.innerHTML = lista.map(function(d) {
+      return '<div class="pill-destino-empresa">📍 ' + formatearDestinoConZona(d, empresaActualDestinos) + '</div>';
+    }).join('');
+  }
+
+
   function abrirModalHomonimos() {
     var modal = document.getElementById('modalHomonimos');
     if (!modal) return;
@@ -3215,7 +3470,7 @@
             renderZonasBadges(t) +
             (t.horario ? '<p><strong>HORARIO:</strong> ' + escapeHtml(t.horario) + '</p>' : '') +
             (b ? '<p><strong>BODEGA:</strong> ' + escapeHtml(b.direccion || b.zona || 'SIN DIRECCIÓN REGISTRADA') + '</p>' : '<p><em>Sin coordenadas de bodega registradas</em></p>') +
-            (t.destinos && t.destinos.length ? '<p class="destinos-lista"><strong>DESTINOS QUE CUBRE:</strong> ' + t.destinos.map(function(d){ return formatearDestinoConZona(d, t); }).join(', ') + '</p>' : '') +
+            (t.destinos && t.destinos.length ? '<div class="destinos-contenedor-card"><p class="destinos-lista"><strong>DESTINOS QUE CUBRE (' + t.destinos.length + '):</strong> ' + t.destinos.slice(0, 10).map(function(d){ return formatearDestinoConZona(d, t); }).join(', ') + (t.destinos.length > 10 ? ' <em style="color:var(--muted); font-size:12px;">(+ ' + (t.destinos.length - 10) + ' más...)</em>' : '') + '</p><button type="button" class="btn-ver-destinos-modal" onclick=\'abrirModalDestinosTransportista(' + JSON.stringify(t.id) + ')\'>📋 Ver lista completa (' + t.destinos.length + ') y buscar</button></div>' : '') +
             '<div class="acciones">' + acciones + '</div>' +
           '</div>' +
         '</div>';
@@ -3317,7 +3572,7 @@
             (t.horario ? '<p><strong>HORARIO:</strong> ' + escapeHtml(t.horario) + '</p>' : '') +
             '<div class="acciones">' + telefonosHtml(t) + '</div>' +
             bodegasHtml +
-            (t.destinos && t.destinos.length ? '<p class="destinos-lista"><strong>DESTINOS QUE CUBRE:</strong> ' + t.destinos.map(function(d){ return formatearDestinoConZona(d, t); }).join(', ') + '</p>' : '') +
+            (t.destinos && t.destinos.length ? '<div class="destinos-contenedor-card"><p class="destinos-lista"><strong>DESTINOS QUE CUBRE (' + t.destinos.length + '):</strong> ' + t.destinos.slice(0, 10).map(function(d){ return formatearDestinoConZona(d, t); }).join(', ') + (t.destinos.length > 10 ? ' <em style="color:var(--muted); font-size:12px;">(+ ' + (t.destinos.length - 10) + ' más...)</em>' : '') + '</p><button type="button" class="btn-ver-destinos-modal" onclick=\'abrirModalDestinosTransportista(' + JSON.stringify(t.id) + ')\'>📋 Ver lista completa (' + t.destinos.length + ') y buscar</button></div>' : '') +
           '</div>' +
         '</div>';
     }).join('');
@@ -3554,6 +3809,11 @@
   function abrirRotulador() {
     var modal = document.getElementById('modalRotulador');
     if (!modal) return;
+    // Botón superior: NO asigna transportista (deja el campo en blanco y opcional)
+    var inpEmpresa = document.getElementById('rotEmpresa');
+    if (inpEmpresa) {
+      inpEmpresa.value = '';
+    }
     modal.classList.add('abierto');
     document.body.style.overflow = 'hidden';
     actualizarVistaPreviaEtiqueta();
@@ -3723,13 +3983,14 @@
     if (!contenedor || typeof QRCode === 'undefined') return;
     contenedor.innerHTML = '';
 
+    // QR Web de alta definición y contraste óptimo para iPhone/Android
     new QRCode(contenedor, {
       text: obtenerUrlWebOficial(),
-      width: 60,
-      height: 60,
+      width: 96,
+      height: 96,
       colorDark: '#0B2545',
       colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.M
+      correctLevel: QRCode.CorrectLevel.H
     });
   }
 
@@ -3742,19 +4003,54 @@
     var destTel = (document.getElementById('rotTelDest').value || '').replace(/[^0-9]/g, '');
     var destDir = (document.getElementById('rotDireccionDest').value || '').trim();
     var destUbic = (document.getElementById('rotUbicacionDest').value || '').trim();
+    var tipoQrElem = document.getElementById('rotTipoQrDest');
+    var tipoQr = tipoQrElem ? tipoQrElem.value : 'whatsapp';
 
-    var qrPayload = 'DESTINATARIO: ' + destNombre + '\nTEL: ' + destTel + '\nLUGAR: ' + destUbic + '\nDIRECCION: ' + destDir;
-    if (destTel.length >= 8) {
-      qrPayload = 'https://wa.me/506' + destTel + '?text=' + encodeURIComponent('Hola ' + destNombre + ', de la empresa de encomiendas con su paquete.');
+    var qrPayload = '';
+    var linkHref = '#';
+    var captionTexto = '📱 Escanea para contactar';
+
+    if (tipoQr === 'tel' && destTel.length >= 8) {
+      qrPayload = 'tel:+506' + destTel;
+      linkHref = qrPayload;
+      captionTexto = '📞 Toca o escanea para llamar';
+    } else if (tipoQr === 'vcard' && destNombre) {
+      qrPayload = 'BEGIN:VCARD\nVERSION:3.0\nFN:' + destNombre + '\nTEL:+506' + destTel + '\nADR:;;' + destDir + ';' + destUbic + ';;;Costa Rica\nNOTE:Destinatario Encomienda Rutas CR\nEND:VCARD';
+      linkHref = 'tel:+506' + destTel;
+      captionTexto = '📇 Toca o escanea para guardar contacto';
+    } else {
+      // Por defecto WhatsApp
+      if (destTel.length >= 8) {
+        linkHref = 'https://wa.me/506' + destTel + '?text=' + encodeURIComponent('Hola ' + destNombre + ', le contactamos de la empresa de encomiendas respecto a su paquete en ' + destUbic + '.');
+        qrPayload = linkHref;
+        captionTexto = '💬 Toca o escanea para abrir WhatsApp';
+      } else {
+        qrPayload = 'DESTINATARIO: ' + destNombre + '\nTEL: ' + destTel + '\nLUGAR: ' + destUbic + '\nDIRECCION: ' + destDir;
+        linkHref = '#';
+        captionTexto = '📦 Datos de Entrega';
+      }
     }
 
+    // Actualizar enlace clickeable en pantalla
+    var linkId = 'link_' + elementId;
+    var linkElem = document.getElementById(linkId);
+    if (linkElem) {
+      linkElem.href = linkHref;
+    }
+    var capId = 'caption_' + elementId;
+    var capElem = document.getElementById(capId);
+    if (capElem) {
+      capElem.textContent = captionTexto;
+    }
+
+    // Código QR de gran tamaño y corrección de error H para lectura instantánea en iPhone
     new QRCode(contenedor, {
       text: qrPayload,
-      width: 96,
-      height: 96,
+      width: 140,
+      height: 140,
       colorDark: '#000000',
       colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.M
+      correctLevel: QRCode.CorrectLevel.H
     });
   }
 
@@ -3833,6 +4129,15 @@
         <div class="campo-grupo">
           <label for="rotDireccionDest">Dirección exacta / Señas a la tica</label>
           <textarea id="rotDireccionDest" rows="2" placeholder="EJ: DEL MUSMANNI 200M NORTE, CASA PORTÓN NEGRO..." oninput="actualizarVistaPreviaEtiqueta()"></textarea>
+        </div>
+
+        <div class="campo-grupo" style="margin-top:8px;">
+          <label for="rotTipoQrDest">Acción del Código QR de Entrega (para quien escanee)</label>
+          <select id="rotTipoQrDest" onchange="actualizarVistaPreviaEtiqueta()" style="width:100%; padding:9px 12px; border-radius:8px; border:1.5px solid #CBD5E1; font-weight:600; color:var(--navy); background:#F8FAFC;">
+            <option value="whatsapp" selected>💬 Abrir WhatsApp con mensaje directo (Chat o llamada WhatsApp)</option>
+            <option value="tel">📞 Llamada telefónica directa (Llamar al cliente con 1 toque)</option>
+            <option value="vcard">📇 Tarjeta de contacto completa (Nombre, teléfono y dirección)</option>
+          </select>
         </div>
 
         <!-- SECCIÓN REMITENTE -->
@@ -3942,6 +4247,35 @@
         💡 <em>Cada transportista en Rutas CR está verificado con sus zonas oficiales de operación para evitar que pueblos repetidos generen resultados erróneos.</em>
       </div>
       <button type="button" class="btn-cerrar-homonimos" onclick="cerrarModalHomonimos()">Entendido / Cerrar</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal de Destinos Completos del Transportista (Solo Consulta) -->
+<div id="modalDestinosTransportista" class="modal-destinos-empresa" role="dialog" aria-modal="true" aria-labelledby="tituloModalDestinosEmpresa" style="display:none;">
+  <div class="modal-destinos-overlay" onclick="cerrarModalDestinosEmpresa()"></div>
+  <div class="modal-destinos-card">
+    <div class="modal-destinos-header">
+      <div>
+        <h2 id="tituloModalDestinosEmpresa">📍 Destinos y Cobertura</h2>
+        <p id="subtituloModalDestinosEmpresa" class="modal-subtitulo">Lista oficial de cobertura · Solo consulta</p>
+        <div id="zonasModalDestinosEmpresa" class="zonas-modal-empresa"></div>
+      </div>
+      <button type="button" class="modal-cerrar-btn" onclick="cerrarModalDestinosEmpresa()" aria-label="Cerrar modal">&times;</button>
+    </div>
+    <div class="modal-destinos-buscador">
+      <input type="text" id="inputBuscarDestinoEmpresa" placeholder="🔍 Buscar un pueblo, caserío o cantón en esta empresa..." oninput="filtrarDestinosEmpresaActual(this.value)">
+    </div>
+    <div id="listaDestinosEmpresaContenedor" class="modal-destinos-lista">
+      <!-- Se inyecta dinámicamente -->
+    </div>
+    <div class="modal-destinos-footer">
+      <span id="contadorDestinosEmpresa" class="contador-destinos-nota"></span>
+      <div class="acciones-destinos-footer">
+        <button type="button" id="btnRotularDesdeDestinos" class="btn-rotular-desde-modal">📦 Rotular con esta empresa</button>
+        <button type="button" class="btn-cerrar-destinos" onclick="cerrarModalDestinosEmpresa()">Cerrar</button>
+      </div>
     </div>
   </div>
 </div>
