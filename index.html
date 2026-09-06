@@ -1408,6 +1408,216 @@
     }
   }
 
+
+  /* Estilos para badges de zonas y desambiguación */
+  .zonas-oficiales-wrapper {
+    margin: 6px 0 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+  }
+  .zonas-oficiales-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+  .badge-zona-card {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: rgba(11, 37, 69, 0.08);
+    color: var(--navy);
+    border: 1px solid rgba(11, 37, 69, 0.15);
+  }
+  .tag-homonimo {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    color: #b45309;
+    background: #fef3c7;
+    padding: 1px 5px;
+    border-radius: 4px;
+    border: 1px solid #fde68a;
+    margin-left: 2px;
+    vertical-align: baseline;
+  }
+  .banner-homonimos-acceso {
+    margin: 12px 0 8px;
+    text-align: center;
+  }
+  .btn-homonimos-modal {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    border: 1.5px solid #CBD5E1;
+    color: #1E293B;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .btn-homonimos-modal:hover {
+    border-color: var(--amber-dark);
+    background: #FFFBEB;
+    color: #92400E;
+    transform: translateY(-1px);
+  }
+  .btn-homonimos-modal span {
+    color: #64748B;
+    font-size: 12px;
+  }
+
+  /* Modal de Homónimos */
+  .modal-homonimos {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .modal-homonimos-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(11, 37, 69, 0.7);
+    backdrop-filter: blur(4px);
+  }
+  .modal-homonimos-card {
+    position: relative;
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    z-index: 10;
+  }
+  .modal-homonimos-header {
+    padding: 20px 24px;
+    background: var(--navy);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .modal-homonimos-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: white;
+  }
+  .modal-subtitulo {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #94A3B8;
+  }
+  .modal-homonimos-buscador {
+    padding: 14px 24px;
+    background: #F8FAFC;
+    border-bottom: 1px solid #E2E8F0;
+  }
+  .modal-homonimos-buscador input {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #CBD5E1;
+    font-size: 14px;
+  }
+  .modal-homonimos-lista {
+    padding: 20px 24px;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .item-homonimo-card {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .item-homonimo-titulo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .item-homonimo-nombre {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .item-homonimo-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .variantes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 10px;
+  }
+  .variante-box {
+    background: white;
+    border: 1px solid #CBD5E1;
+    border-left: 4px solid var(--amber-dark);
+    border-radius: 6px;
+    padding: 10px 12px;
+  }
+  .variante-zona-titulo {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 3px;
+  }
+  .variante-ubicacion {
+    font-size: 12px;
+    color: #475569;
+    margin-bottom: 5px;
+  }
+  .variante-empresas {
+    font-size: 11px;
+    color: #1E293B;
+    background: #F1F5F9;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  .modal-homonimos-footer {
+    padding: 14px 24px;
+    border-top: 1px solid #E2E8F0;
+    background: #F8FAFC;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .homonimos-info-nota {
+    font-size: 12px;
+    color: #64748B;
+    flex: 1;
+  }
+  .btn-cerrar-homonimos {
+    background: var(--navy);
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
 </style>
 
 <!-- Google Analytics -->
@@ -1467,6 +1677,14 @@
         <button type="button" class="tab-pill activa" id="tabBtnFrecuentes" onclick="cambiarPestanaExplorar('frecuentes')">📍 Populares</button>
         <button type="button" class="tab-pill" id="tabBtnZonas" onclick="cambiarPestanaExplorar('zonas')">🧭 Zonas y Regiones</button>
         <button type="button" class="tab-pill" id="tabBtnProvincias" onclick="cambiarPestanaExplorar('provincias')">🗺️ Provincias</button>
+        <button type="button" class="tab-pill" id="tabBtnHomonimos" onclick="abrirModalHomonimos()" style="background:#FEF3C7; border-color:#F59E0B; color:#92400E; font-weight:700;">🔍 Lugares Homónimos</button>
+      </div>
+
+      <!-- Banner de acceso rápido a consulta de homónimos -->
+      <div class="banner-homonimos-acceso">
+        <button type="button" class="btn-homonimos-modal" onclick="abrirModalHomonimos()">
+          🧭 <strong>Base de Consulta de Lugares Homónimos en Costa Rica</strong> <span>(Ver desambiguación de pueblos con el mismo nombre)</span>
+        </button>
       </div>
 
       <!-- Panel 1: Destinos Populares -->
@@ -2204,16 +2422,273 @@
     return null;
   }
 
+  // =========================================================================
+  // MATRIZ MAESTRA DE SECTORIZACIÓN OFICIAL Y DESAMBIGUACIÓN (100% FEACIENTE)
+  // =========================================================================
+  const ZONAS_OFICIALES_TRANSPORTISTA = {
+    "transp1": ["ZONA SUR"],
+    "transp2": ["SAN CARLOS", "OCCIDENTE", "GUANACASTE", "ZONA SUR", "TURRIALBA Y CARTAGO", "PACIFICO CENTRAL"],
+    "transp3": ["GUANACASTE"],
+    "transp4": ["GUANACASTE"],
+    "transp5": ["ZONA SUR", "PACIFICO CENTRAL"],
+    "c6e2dbc8": ["PACIFICO CENTRAL"],
+    "2f7a4685": ["GUANACASTE"],
+    "51b25c54": ["OCCIDENTE", "PACIFICO CENTRAL"],
+    "b8816262": ["ZONA SUR", "PACIFICO CENTRAL"],
+    "7ce69941": ["GUANACASTE"],
+    "24316d49": ["GUANACASTE"],
+    "991ac054": ["GUANACASTE"],
+    "9e7b30cc": ["PACIFICO CENTRAL"],
+    "956616fc": ["ZONA SUR"],
+    "0de57703": ["ZONA SUR", "PACIFICO CENTRAL"],
+    "b1cbf101": ["SAN CARLOS"],
+    "394551c8": ["GUANACASTE"],
+    "5ef18e57": ["LIMON"],
+    "2665d6d7": ["ZONA SUR"],
+    "88a21f93": ["GUANACASTE"],
+    "8d81a244": ["PACIFICO CENTRAL"],
+    "69833490": ["OCCIDENTE"],
+    "9e5c5c54": ["ZONA SUR"],
+    "534a5798": ["SAN CARLOS"],
+    "80479472": ["TURRIALBA Y CARTAGO", "VALLE CENTRAL"],
+    "c63da9f8": ["PACIFICO CENTRAL"],
+    "d285cb84": ["VALLE CENTRAL"],
+    "c425cd7b": ["VALLE CENTRAL"],
+    "402d5721": ["ZONA DE LOS SANTOS", "TURRIALBA Y CARTAGO", "VALLE CENTRAL"],
+    "6bde4f14": ["SAN CARLOS"],
+    "16ca56ce": ["ZONA SUR"],
+    "2afda9e1": ["ZONA SUR"],
+    "5acb8a47": ["GUANACASTE"],
+    "49d32ffe": ["SAN CARLOS", "GUANACASTE", "LIMON", "ZONA SUR", "PACIFICO CENTRAL"],
+    "TRP-0036": ["ZONA SUR"],
+    "TRP-0037": ["SAN CARLOS"],
+    "TRP-0038": ["PACIFICO CENTRAL"],
+    "TRP-0039": ["GUANACASTE"],
+    "TRP-0040": ["ZONA SUR"],
+    "TRP-3C53E761": ["LIMON"],
+    "TRP-A8FFEDEA": ["TURRIALBA Y CARTAGO"],
+    "TRP-A6326302": ["ZONA DE LOS SANTOS"],
+    "TRP-E27C5CF6": ["ZONA SUR"],
+    "TRP-E0C73E19": ["GUANACASTE"],
+    "TRP-0045": ["LIMON"],
+    "TRP-0046": ["PACIFICO CENTRAL", "TURRIALBA Y CARTAGO"],
+    "TRP-0047": ["PACIFICO CENTRAL"],
+    "TRP-0048": ["GUANACASTE", "PACIFICO CENTRAL"],
+    "TRP-0049": ["TURRIALBA Y CARTAGO"],
+    "TRP-0050": ["ZONA SUR"],
+    "TRP-0051": ["SAN CARLOS"],
+    "TRP-0052": ["TURRIALBA Y CARTAGO", "VALLE CENTRAL"],
+    "TRP-0053": ["OCCIDENTE"]
+  };
+
+  const PROVINCIAS_A_ZONAS = {
+    "PROVINCIA GUANACASTE": ["GUANACASTE"],
+    "PROVINCIA ALAJUELA": ["SAN CARLOS", "OCCIDENTE"],
+    "PROVINCIA PUNTARENAS": ["PACIFICO CENTRAL", "ZONA SUR"],
+    "PROVINCIA SAN JOSE": ["VALLE CENTRAL", "ZONA SUR", "ZONA DE LOS SANTOS"],
+    "PROVINCIA CARTAGO": ["TURRIALBA Y CARTAGO", "VALLE CENTRAL"],
+    "PROVINCIA HEREDIA": ["VALLE CENTRAL", "SAN CARLOS"],
+    "PROVINCIA LIMON": ["LIMON"]
+  };
+
+  const HOMONIMOS_CR = [
+    {
+      "lugar": "Playa Hermosa",
+      "descripcion": "Existe en el Pacífico Central (Garabito) y en el Golfo de Papagayo (Carrillo, Guanacaste).",
+      "variantes": [
+        { "zona": "PACIFICO CENTRAL", "provincia": "Puntarenas", "canton": "Garabito (Jacó)", "transportistas": "Transur, Pacífico Central, Transportes 2021" },
+        { "zona": "GUANACASTE", "provincia": "Guanacaste", "canton": "Carrillo", "transportistas": "Curubandé Express, Pacífico Express, Metros y Segundo" }
+      ]
+    },
+    {
+      "lugar": "Matapalo",
+      "descripcion": "Existe en la costa de Quepos/Dominical y en Santa Cruz de Guanacaste.",
+      "variantes": [
+        { "zona": "PACIFICO CENTRAL / ZONA SUR", "provincia": "Puntarenas", "canton": "Quepos / Dominical", "transportistas": "Transur, Tempisque Express" },
+        { "zona": "GUANACASTE", "provincia": "Guanacaste", "canton": "Santa Cruz", "transportistas": "Encomiendas Tempisque, Pacífico Express, Encomiendas Manzano" }
+      ]
+    },
+    {
+      "lugar": "Santa Cruz",
+      "descripcion": "Ciudad folclórica de Guanacaste vs Santa Cruz de Turrialba (cuna del Queso Turrialba).",
+      "variantes": [
+        { "zona": "GUANACASTE", "provincia": "Guanacaste", "canton": "Santa Cruz (Centro)", "transportistas": "Encomiendas Tempisque, Transportes Miravalles, Curubandé, Vega del Norte, AMM, MYM" },
+        { "zona": "TURRIALBA Y CARTAGO", "provincia": "Cartago", "canton": "Turrialba", "transportistas": "Mudanzas Pedrito, Encomiendas y Mudanzas Centeno Junior" }
+      ]
+    },
+    {
+      "lugar": "Peñas Blancas",
+      "descripcion": "Distrito de San Ramón/San Carlos, barrio en Pérez Zeledón (PZ), o puesto fronterizo con Nicaragua en La Cruz.",
+      "variantes": [
+        { "zona": "SAN CARLOS / OCCIDENTE", "provincia": "Alajuela", "canton": "San Ramón / San Carlos", "transportistas": "Los Toros de San Carlos, Sancarleños, Barquero, Bodega Anay" },
+        { "zona": "ZONA SUR", "provincia": "San José", "canton": "Pérez Zeledón", "transportistas": "Bava Logística y Distribución" },
+        { "zona": "FRONTERA NORTE / LIMON", "provincia": "Guanacaste / Frontera", "canton": "La Cruz", "transportistas": "Encomiendas Tavo" }
+      ]
+    },
+    {
+      "lugar": "Fortuna",
+      "descripcion": "La Fortuna de San Carlos (Arenal), Fortuna de Bagaces (Miravalles), o Fortuna de Corredores (Zona Sur).",
+      "variantes": [
+        { "zona": "SAN CARLOS", "provincia": "Alajuela", "canton": "San Carlos", "transportistas": "Los Toros de San Carlos, Sancarleños, Barquero, Bodega Anay, Metros y Segundo" },
+        { "zona": "GUANACASTE", "provincia": "Guanacaste", "canton": "Bagaces", "transportistas": "Transportes Miravalles, Bodega Anay" },
+        { "zona": "ZONA SUR", "provincia": "Puntarenas", "canton": "Corredores", "transportistas": "Transcama" }
+      ]
+    },
+    {
+      "lugar": "Venado",
+      "descripcion": "Venado de Santa Cruz de Guanacaste vs Venado de San Carlos (Cavernas de Venado).",
+      "variantes": [
+        { "zona": "GUANACASTE", "provincia": "Guanacaste", "canton": "Santa Cruz", "transportistas": "Transportes MYM Express, AMM Express" },
+        { "zona": "SAN CARLOS", "provincia": "Alajuela", "canton": "San Carlos", "transportistas": "Bodega Anay" }
+      ]
+    },
+    {
+      "lugar": "Jabillos",
+      "descripcion": "Jabillos de Turrialba (Cartago) vs Jabillos de Florencia (San Carlos).",
+      "variantes": [
+        { "zona": "TURRIALBA Y CARTAGO", "provincia": "Cartago", "canton": "Turrialba", "transportistas": "Encomiendas y Mudanzas Centeno" },
+        { "zona": "SAN CARLOS", "provincia": "Alajuela", "canton": "San Carlos", "transportistas": "Bodega Anay, Transcama" }
+      ]
+    },
+    {
+      "lugar": "Río Frío",
+      "descripcion": "Río Frío de Pococí (Limón) vs Río Frío de Sarapiquí (Heredia).",
+      "variantes": [
+        { "zona": "LIMON", "provincia": "Limón", "canton": "Pococí", "transportistas": "Encomiendas Tavo, Transportes Barse Barquero" },
+        { "zona": "SAN CARLOS / HEREDIA", "provincia": "Heredia", "canton": "Sarapiquí", "transportistas": "Bodega Anay, Metros y Segundo" }
+      ]
+    },
+    {
+      "lugar": "Buenos Aires",
+      "descripcion": "Cantón Buenos Aires de Puntarenas (Zona Sur) vs Buenos Aires de Cutris (San Carlos).",
+      "variantes": [
+        { "zona": "ZONA SUR", "provincia": "Puntarenas", "canton": "Buenos Aires", "transportistas": "Transcama, Transroden, Transportes Villalobos, Trans Saco" },
+        { "zona": "SAN CARLOS", "provincia": "Alajuela", "canton": "San Carlos", "transportistas": "Bodega Anay, Transportes Sancarleños" }
+      ]
+    },
+    {
+      "lugar": "Río Naranjo",
+      "descripcion": "Río Naranjo (Upala/Bagaces) vs Cantón de Naranjo (Occidente, Alajuela).",
+      "variantes": [
+        { "zona": "ZONA NORTE / GUANACASTE", "provincia": "Alajuela / Guanacaste", "canton": "Upala / Bagaces", "transportistas": "Transportes Upala Express, Bodega Golfo Express" },
+        { "zona": "OCCIDENTE", "provincia": "Alajuela", "canton": "Naranjo", "transportistas": "Transportes Mau Jimenez, Damaka, Encomiendas Damaka, Bodega Anay" }
+      ]
+    },
+    {
+      "lugar": "Paraíso",
+      "descripcion": "Cantón de Paraíso de Cartago vs Paraíso de Santa Cruz de Guanacaste.",
+      "variantes": [
+        { "zona": "TURRIALBA Y CARTAGO", "provincia": "Cartago", "canton": "Paraíso", "transportistas": "Faba, Encomiendas y Mudanzas Centeno Junior, Bodega Golfo Express" },
+        { "zona": "GUANACASTE", "provincia": "Guanacaste", "canton": "Santa Cruz", "transportistas": "Transportes MYM Express, AMM Express" }
+      ]
+    }
+  ];
+
+  function formatearDestinoConZona(dest, transportista) {
+    if (!dest) return '';
+    var dNorm = normalizar(dest);
+    var tId = transportista ? transportista.id : '';
+    var zonasT = (typeof ZONAS_OFICIALES_TRANSPORTISTA !== 'undefined' && ZONAS_OFICIALES_TRANSPORTISTA[tId]) ? ZONAS_OFICIALES_TRANSPORTISTA[tId] : [];
+
+    // Homónimos conocidos
+    if (dNorm === 'playa hermosa') {
+      if (zonasT.indexOf('GUANACASTE') !== -1) return dest + ' <span class="tag-homonimo">(Carrillo, Guanacaste)</span>';
+      if (zonasT.indexOf('PACIFICO CENTRAL') !== -1 || zonasT.indexOf('ZONA SUR') !== -1) return dest + ' <span class="tag-homonimo">(Garabito, Puntarenas)</span>';
+    }
+    if (dNorm === 'matapalo') {
+      if (zonasT.indexOf('GUANACASTE') !== -1) return dest + ' <span class="tag-homonimo">(Santa Cruz, Guanacaste)</span>';
+      if (zonasT.indexOf('PACIFICO CENTRAL') !== -1 || zonasT.indexOf('ZONA SUR') !== -1) return dest + ' <span class="tag-homonimo">(Quepos / Osa)</span>';
+    }
+    if (dNorm === 'santa cruz') {
+      if (zonasT.indexOf('TURRIALBA Y CARTAGO') !== -1) return dest + ' <span class="tag-homonimo">(Turrialba, Cartago)</span>';
+      if (zonasT.indexOf('GUANACASTE') !== -1) return dest + ' <span class="tag-homonimo">(Guanacaste)</span>';
+    }
+    if (dNorm === 'penas blancas') {
+      if (zonasT.indexOf('SAN CARLOS') !== -1 || zonasT.indexOf('OCCIDENTE') !== -1) return dest + ' <span class="tag-homonimo">(San Ramón / San Carlos)</span>';
+      if (zonasT.indexOf('ZONA SUR') !== -1) return dest + ' <span class="tag-homonimo">(Pérez Zeledón)</span>';
+      if (zonasT.indexOf('LIMON') !== -1) return dest + ' <span class="tag-homonimo">(La Cruz, Frontera)</span>';
+    }
+    if (dNorm === 'fortuna') {
+      if (zonasT.indexOf('SAN CARLOS') !== -1) return dest + ' <span class="tag-homonimo">(San Carlos)</span>';
+      if (zonasT.indexOf('GUANACASTE') !== -1) return dest + ' <span class="tag-homonimo">(Bagaces, Guanacaste)</span>';
+      if (zonasT.indexOf('ZONA SUR') !== -1) return dest + ' <span class="tag-homonimo">(Corredores, Zona Sur)</span>';
+    }
+    if (dNorm === 'venado') {
+      if (zonasT.indexOf('GUANACASTE') !== -1) return dest + ' <span class="tag-homonimo">(Santa Cruz, Guanacaste)</span>';
+      if (zonasT.indexOf('SAN CARLOS') !== -1) return dest + ' <span class="tag-homonimo">(San Carlos)</span>';
+    }
+    if (dNorm === 'jabillos') {
+      if (zonasT.indexOf('TURRIALBA Y CARTAGO') !== -1) return dest + ' <span class="tag-homonimo">(Turrialba, Cartago)</span>';
+      if (zonasT.indexOf('SAN CARLOS') !== -1) return dest + ' <span class="tag-homonimo">(San Carlos)</span>';
+    }
+    if (dNorm === 'rio frio') {
+      if (zonasT.indexOf('LIMON') !== -1) return dest + ' <span class="tag-homonimo">(Pococí, Limón)</span>';
+      if (zonasT.indexOf('SAN CARLOS') !== -1) return dest + ' <span class="tag-homonimo">(Sarapiquí, Heredia)</span>';
+    }
+    if (dNorm === 'buenos aires') {
+      if (zonasT.indexOf('ZONA SUR') !== -1) return dest + ' <span class="tag-homonimo">(Puntarenas)</span>';
+      if (zonasT.indexOf('SAN CARLOS') !== -1) return dest + ' <span class="tag-homonimo">(Cutris, San Carlos)</span>';
+    }
+    if (dNorm === 'rio naranjo') {
+      return dest + ' <span class="tag-homonimo">(Upala / Bagaces)</span>';
+    }
+    if (dNorm === 'paraiso') {
+      if (zonasT.indexOf('TURRIALBA Y CARTAGO') !== -1) return dest + ' <span class="tag-homonimo">(Cartago)</span>';
+      if (zonasT.indexOf('GUANACASTE') !== -1) return dest + ' <span class="tag-homonimo">(Santa Cruz, Guanacaste)</span>';
+    }
+
+    return escapeHtml(dest);
+  }
+
+  function renderZonasBadges(t) {
+    if (!t || !t.id) return '';
+    var zonas = ZONAS_OFICIALES_TRANSPORTISTA[t.id] || [];
+    if (!zonas.length) return '';
+
+    var emojis = {
+      'GUANACASTE': '🌊',
+      'SAN CARLOS': '🌋',
+      'OCCIDENTE': '🌿',
+      'PACIFICO CENTRAL': '🌴',
+      'ZONA SUR': '🐋',
+      'LIMON': '🚢',
+      'VALLE CENTRAL': '☕',
+      'ZONA DE LOS SANTOS': '⛰️',
+      'TURRIALBA Y CARTAGO': '🏰'
+    };
+
+    return '<div class="zonas-oficiales-wrapper">' +
+      '<span class="zonas-oficiales-label">ZONAS OFICIALES:</span> ' +
+      zonas.map(function(z) {
+        var e = emojis[z] || '📍';
+        return '<span class="badge-zona-card">' + e + ' ' + escapeHtml(z) + '</span>';
+      }).join(' ') +
+    '</div>';
+  }
+
+
   function coincideDestino(t, destinoBuscado, infoRegion) {
     var bNorm = normalizar(destinoBuscado);
     if (!bNorm) return false;
 
     var destinos = Array.isArray(t.destinos) ? t.destinos : [];
     var nomNorm = normalizar(t.nombre || '');
+    var zonasT = (typeof ZONAS_OFICIALES_TRANSPORTISTA !== 'undefined' && ZONAS_OFICIALES_TRANSPORTISTA[t.id]) ? ZONAS_OFICIALES_TRANSPORTISTA[t.id] : null;
 
-    // Caso 1: Búsqueda regional expandida (ej: "San Carlos", "Guanacaste")
+    // Caso 1: Búsqueda regional expandida (ej: "San Carlos", "Guanacaste", "Provincia Guanacaste")
     if (infoRegion) {
       var regKey = infoRegion.clave || '';
+
+      // Si el transportista tiene ZONAS OFICIALES asignadas (100% FEACIENTE)
+      if (zonasT) {
+        // Si busca una provincia
+        if (regKey.startsWith('PROVINCIA ')) {
+          var zonasProv = PROVINCIAS_A_ZONAS[regKey] || [];
+          return zonasT.some(function(z) { return zonasProv.indexOf(z) !== -1; });
+        }
+        // Si busca una zona específica (ej: "GUANACASTE", "SAN CARLOS", etc.)
+        return zonasT.indexOf(regKey) !== -1;
+      }
 
       // 1. Exclusión explícita de empresas que no viajan a esta región (previene homónimos falsos)
       if (infoRegion.excluirEmpresas && infoRegion.excluirEmpresas.some(function(exc) {
@@ -2236,7 +2711,7 @@
         // Desambiguación PZ / Pérez Zeledón
         var esPz = dNorm.indexOf(' pz') !== -1 || dNorm.indexOf(' p.z.') !== -1 || dNorm.indexOf('perez zeledon') !== -1;
         if (esPz && regKey !== 'ZONA SUR' && regKey !== 'PROVINCIA SAN JOSE') {
-          continue; // Destinos como "PEÑAS BLANCAS PZ" nunca coinciden con San Carlos
+          continue;
         }
 
         // Desambiguación Guanacaste vs Cartago/San Carlos
@@ -2244,7 +2719,7 @@
         if (dNorm.indexOf('turrialba') !== -1 && esGte) {
           if (regKey === 'GUANACASTE' || regKey === 'PROVINCIA GUANACASTE') continue;
         } else if (esGte && (regKey === 'SAN CARLOS' || regKey === 'TURRIALBA Y CARTAGO' || regKey === 'OCCIDENTE')) {
-          continue; // "FORTUNA BAGACES" o "PARAISO STA. CRUZ" nunca coinciden con San Carlos ni Cartago
+          continue;
         }
 
         // Desambiguación Río Naranjo vs Naranjo de Alajuela
@@ -2267,7 +2742,7 @@
       return false;
     }
 
-    // Caso 2: Búsqueda directa (ej: "Liberia", "Ciudad Quesada", "Aguas Zarcas")
+    // Caso 2: Búsqueda directa por pueblo o ciudad (ej: "Liberia", "Ciudad Quesada", "Aguas Zarcas")
     for (var k = 0; k < destinos.length; k++) {
       var d = normalizar(destinos[k]);
       if (d === bNorm || (' ' + d + ' ').indexOf(' ' + bNorm + ' ') !== -1 || (d.length > 4 && bNorm.indexOf(d) !== -1)) {
@@ -2282,7 +2757,7 @@
     return false;
   }
 
-    function fotoHtml(t) {
+  function fotoHtml(t) {
     var imagen = urlHttpSegura(t.imagen);
     if (imagen) {
       return '<img src="' + escapeHtml(imagen) + '" alt="Imagen de ' + escapeHtml(t.nombre) + '" loading="lazy" title="Toca para ampliar" onclick="abrirVisor(this)" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'), {className:\'placeholder\', textContent:\'📦\'}))">';
@@ -2610,6 +3085,78 @@
       '</div>';
   }
 
+
+  // =========================================================================
+  // CONTROLADOR DEL MODAL DE CONSULTA DE HOMÓNIMOS
+  // =========================================================================
+  function abrirModalHomonimos() {
+    var modal = document.getElementById('modalHomonimos');
+    if (!modal) return;
+    renderCatalogoHomonimos(HOMONIMOS_CR);
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    var input = document.getElementById('inputBuscarHomonimo');
+    if (input) {
+      input.value = '';
+      setTimeout(function() { input.focus(); }, 100);
+    }
+  }
+
+  function cerrarModalHomonimos() {
+    var modal = document.getElementById('modalHomonimos');
+    if (!modal) return;
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  function filtrarCatalogoHomonimos(texto) {
+    var tNorm = normalizar(texto);
+    if (!tNorm) {
+      renderCatalogoHomonimos(HOMONIMOS_CR);
+      return;
+    }
+    var filtrados = HOMONIMOS_CR.filter(function(item) {
+      if (normalizar(item.lugar).indexOf(tNorm) !== -1) return true;
+      if (normalizar(item.descripcion).indexOf(tNorm) !== -1) return true;
+      return item.variantes.some(function(v) {
+        return normalizar(v.zona).indexOf(tNorm) !== -1 ||
+               normalizar(v.canton).indexOf(tNorm) !== -1 ||
+               normalizar(v.provincia).indexOf(tNorm) !== -1 ||
+               normalizar(v.transportistas).indexOf(tNorm) !== -1;
+      });
+    });
+    renderCatalogoHomonimos(filtrados);
+  }
+
+  function renderCatalogoHomonimos(lista) {
+    var cont = document.getElementById('listaHomonimosContenedor');
+    if (!cont) return;
+    if (lista.length === 0) {
+      cont.innerHTML = '<p class="vacio" style="text-align:center;padding:24px;">No encontramos coincidencias para esa búsqueda. Prueba con otro nombre o revisa la ortografía.</p>';
+      return;
+    }
+
+    cont.innerHTML = lista.map(function(item) {
+      var variantesHtml = item.variantes.map(function(v) {
+        return '<div class="variante-box">' +
+          '<div class="variante-zona-titulo">📍 ' + escapeHtml(v.zona) + '</div>' +
+          '<div class="variante-ubicacion"><strong>Cantón / Provincia:</strong> ' + escapeHtml(v.canton) + ', ' + escapeHtml(v.provincia) + '</div>' +
+          '<div class="variante-empresas"><strong>Transportistas:</strong> ' + escapeHtml(v.transportistas) + '</div>' +
+        '</div>';
+      }).join('');
+
+      return '<div class="item-homonimo-card">' +
+        '<div class="item-homonimo-titulo">' +
+          '<span class="item-homonimo-nombre">📌 ' + escapeHtml(item.lugar) + '</span>' +
+          '<span class="badge-zona-card">' + item.variantes.length + ' ubicaciones</span>' +
+        '</div>' +
+        '<div class="item-homonimo-desc">' + escapeHtml(item.descripcion) + '</div>' +
+        '<div class="variantes-grid">' + variantesHtml + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+
   function renderResultadosDestino(lista, infoRegion, destinoBuscado) {
     var cont = document.getElementById('resultados');
     if (lista.length === 0) {
@@ -2665,8 +3212,10 @@
             sello +
             (b && b.zona ? '<span class="zona-tag">' + escapeHtml(b.zona) + '</span><br>' : '') +
             '<h3>' + escapeHtml(t.nombre) + '</h3>' +
+            renderZonasBadges(t) +
             (t.horario ? '<p><strong>HORARIO:</strong> ' + escapeHtml(t.horario) + '</p>' : '') +
             (b ? '<p><strong>BODEGA:</strong> ' + escapeHtml(b.direccion || b.zona || 'SIN DIRECCIÓN REGISTRADA') + '</p>' : '<p><em>Sin coordenadas de bodega registradas</em></p>') +
+            (t.destinos && t.destinos.length ? '<p class="destinos-lista"><strong>DESTINOS QUE CUBRE:</strong> ' + t.destinos.map(function(d){ return formatearDestinoConZona(d, t); }).join(', ') + '</p>' : '') +
             '<div class="acciones">' + acciones + '</div>' +
           '</div>' +
         '</div>';
@@ -2764,10 +3313,11 @@
           '<div class="divisor"></div>' +
           '<div class="info-col">' +
             '<h3>' + escapeHtml(t.nombre) + '</h3>' +
+            renderZonasBadges(t) +
             (t.horario ? '<p><strong>HORARIO:</strong> ' + escapeHtml(t.horario) + '</p>' : '') +
             '<div class="acciones">' + telefonosHtml(t) + '</div>' +
             bodegasHtml +
-            destinosHtml +
+            (t.destinos && t.destinos.length ? '<p class="destinos-lista"><strong>DESTINOS QUE CUBRE:</strong> ' + t.destinos.map(function(d){ return formatearDestinoConZona(d, t); }).join(', ') + '</p>' : '') +
           '</div>' +
         '</div>';
     }).join('');
@@ -3365,6 +3915,33 @@
       <button type="button" class="btn-modal-print" onclick="imprimirEtiquetas()">
         🖨️ Imprimir Etiquetas
       </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal de Base de Consulta de Lugares Homónimos -->
+<div id="modalHomonimos" class="modal-homonimos" role="dialog" aria-modal="true" aria-labelledby="tituloModalHomonimos" style="display:none;">
+  <div class="modal-homonimos-overlay" onclick="cerrarModalHomonimos()"></div>
+  <div class="modal-homonimos-card">
+    <div class="modal-homonimos-header">
+      <div>
+        <h2 id="tituloModalHomonimos">🧭 Base de Consulta de Lugares Homónimos en Costa Rica</h2>
+        <p class="modal-subtitulo">Lugares con el mismo nombre en diferentes cantones y provincias, y qué transportistas cubren cada uno.</p>
+      </div>
+      <button type="button" class="modal-cerrar-btn" onclick="cerrarModalHomonimos()" aria-label="Cerrar modal">&times;</button>
+    </div>
+    <div class="modal-homonimos-buscador">
+      <input type="text" id="inputBuscarHomonimo" placeholder="🔍 Buscar lugar (ej: Playa Hermosa, Peñas Blancas, Santa Cruz, Fortuna, Matapalo...)" oninput="filtrarCatalogoHomonimos(this.value)">
+    </div>
+    <div id="listaHomonimosContenedor" class="modal-homonimos-lista">
+      <!-- Se inyecta dinámicamente -->
+    </div>
+    <div class="modal-homonimos-footer">
+      <div class="homonimos-info-nota">
+        💡 <em>Cada transportista en Rutas CR está verificado con sus zonas oficiales de operación para evitar que pueblos repetidos generen resultados erróneos.</em>
+      </div>
+      <button type="button" class="btn-cerrar-homonimos" onclick="cerrarModalHomonimos()">Entendido / Cerrar</button>
     </div>
   </div>
 </div>
