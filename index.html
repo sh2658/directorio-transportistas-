@@ -1262,28 +1262,49 @@
     text-decoration: line-through;
     opacity: 0.6;
   }
-  .etiqueta-barcode-footer {
+  /* Pie de Control de Entrega y Firma de Recibido (Neutral y Seguro) */
+  .etiqueta-control-entrega {
     border: 1.5px solid #222222;
     border-radius: 6px;
-    padding: 8px;
-    text-align: center;
+    padding: 9px 12px;
     background: #FFFFFF;
-  }
-  .barcode-svg {
-    max-width: 100%;
-    height: 44px;
-  }
-  .barcode-texto {
-    font-family: 'JetBrains Mono', monospace;
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    margin: 3px 0 1px;
   }
-  .barcode-empresa {
+  .control-entrega-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: center;
+  }
+  .control-box-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .control-box-campo span {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #222222;
+  }
+  .control-linea-firma {
+    border-bottom: 1.5px dashed #555555;
+    height: 22px;
+    display: flex;
+    align-items: flex-end;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: #444444;
+  }
+  .control-pie-nota {
+    margin-top: 6px;
+    padding-top: 5px;
+    border-top: 1px solid #E2E8F0;
     font-size: 9.5px;
     font-weight: 700;
-    color: #555555;
+    color: #666666;
+    text-align: center;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
   }
 
@@ -3321,17 +3342,6 @@
     document.body.style.overflow = '';
   }
 
-  function generarBarcodeSvg(codigo) {
-    var cleanCode = (codigo || '744100010001').replace(/[^0-9A-Z]/g, '');
-    var bars = '';
-    var x = 10;
-    for (var i = 0; i < 46; i++) {
-      var w = (i % 3 === 0 || i % 7 === 0) ? 3 : 1.5;
-      bars += '<rect x="' + x + '" y="0" width="' + w + '" height="38" fill="#111111" />';
-      x += w + 2;
-    }
-    return '<svg class="barcode-svg" viewBox="0 0 ' + (x + 10) + ' 40" preserveAspectRatio="none">' + bars + '</svg>';
-  }
 
   function generarEtiquetaHtml(indice, totalBultos, esParaImprimir) {
     var destNombre = (document.getElementById('rotNombreDest').value || 'JUAN CARLOS ARIAS GÓMEZ').toUpperCase().trim();
@@ -3360,7 +3370,6 @@
     // Distintivo de Bulto: Si es 1 = BULTO ÚNICO, si es > 1 = BULTO 1/3, 2/3, etc.
     var bultoBadgeTexto = totalBultos <= 1 ? 'BULTO ÚNICO' : 'BULTO ' + indice + '/' + totalBultos;
     var trackingTexto = tracking ? tracking + (totalBultos > 1 ? '-' + String(indice).padStart(2, '0') : '') : '[ESPACIO EN BLANCO PARA CÓDIGO]';
-    var barcodeNum = (tracking ? tracking.replace(/[^0-9]/g, '') : '744123456789') + (totalBultos > 1 ? String(indice) : '0');
 
     // Identificador único para el contenedor del QR
     var qrId = (esParaImprimir ? 'qr_print_' : 'qr_preview_') + indice;
@@ -3372,13 +3381,12 @@
       (cod ? '<span class="activo">☑ Cobro Contra Entrega (C.O.D.)</span>' : '');
 
     // Sublínea: Solo muestra TRANSPORTE si el usuario especificó uno
-    var sublineaHtml = '<span><strong>Nº TRACKING:</strong> ' + escapeHtml(trackingTexto) + '</span>';
+    var sublineaHtml = '<span><strong>Nº TRACKING / GUÍA:</strong> ' + escapeHtml(trackingTexto) + '</span>';
     if (empresa) {
       sublineaHtml += '<span><strong>TRANSPORTE:</strong> ' + escapeHtml(empresa) + '</span>';
     }
 
-    // Pie de código de barras: muestra la empresa si existe, o el estándar 'CORREOS DE COSTA RICA / SERVICIO NACIONAL'
-    var footerBarcodeTexto = empresa ? escapeHtml(empresa) + ' · SERVICIO NACIONAL' : 'CORREOS DE COSTA RICA / SERVICIO NACIONAL';
+    var pieNotaTexto = (empresa ? 'TRANSPORTE: ' + escapeHtml(empresa) + ' · ' : '') + 'PLANTILLA DE EMBALAJE ESTANDARIZADA · RUTAS CR';
 
     return '' +
       '<div class="etiqueta-caja">' +
@@ -3424,11 +3432,19 @@
           '<div style="margin-top:4px;"><strong>Contenido:</strong> ' + escapeHtml(contenido) + '</div>' +
         '</div>' +
 
-        '<!-- CÓDIGO DE BARRAS FOOTER -->' +
-        '<div class="etiqueta-barcode-footer">' +
-          generarBarcodeSvg(barcodeNum) +
-          '<div class="barcode-texto">' + escapeHtml(barcodeNum) + '</div>' +
-          '<div class="barcode-empresa">' + footerBarcodeTexto + '</div>' +
+        '<!-- CONTROL DE ENTREGA / FIRMA DE RECIBIDO (NEUTRAL Y 100% SEGURO) -->' +
+        '<div class="etiqueta-control-entrega">' +
+          '<div class="control-entrega-grid">' +
+            '<div class="control-box-campo">' +
+              '<span>📅 FECHA DE ENVÍO:</span>' +
+              '<div class="control-linea-firma">____ / ____ / 202___</div>' +
+            '</div>' +
+            '<div class="control-box-campo">' +
+              '<span>✍️ FIRMA / SELLO DE RECIBIDO:</span>' +
+              '<div class="control-linea-firma"></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="control-pie-nota">' + pieNotaTexto + '</div>' +
         '</div>' +
       '</div>';
   }
