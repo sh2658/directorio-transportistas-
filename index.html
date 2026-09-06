@@ -442,18 +442,19 @@
     box-shadow: 0 4px 14px rgba(37,211,102,0.5) !important;
   }
 
-  /* Waze: Celeste cian oficial con contraste azul marino profundo */
+  /* Waze: Azul Waze oficial con icono y texto blanco de alto contraste */
   .btn-waze {
-    background: linear-gradient(135deg, #33CCFF, #00B5E2) !important;
-    color: #002B49 !important;
+    background: linear-gradient(135deg, #00B4D8, #0077B6) !important;
+    color: #FFFFFF !important;
     font-weight: 800 !important;
-    box-shadow: 0 2px 8px rgba(0,181,226,0.35) !important;
-    border: 1.5px solid rgba(0,43,73,0.15) !important;
+    box-shadow: 0 2px 8px rgba(0,180,216,0.38) !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
+    border: 1px solid rgba(255,255,255,0.25) !important;
   }
   .btn-waze:hover {
-    background: linear-gradient(135deg, #00D8FF, #0099CC) !important;
-    color: #001A30 !important;
-    box-shadow: 0 4px 14px rgba(0,181,226,0.5) !important;
+    background: linear-gradient(135deg, #00C3EB, #0088CC) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 14px rgba(0,180,216,0.5) !important;
   }
 
   /* Google Maps: Blanco nítido con borde sutil e icono 4 colores oficial */
@@ -640,35 +641,98 @@
   }
   .btn-clear:hover { background: #cbd5e1; color: #0f172a; }
 
-  .pin-label-empresa {
-    background: #0B2545;
-    color: #ffffff;
-    border-radius: 12px;
-    padding: 3px 8px;
-    border: 1.5px solid #F2A93B;
-    font-weight: 700;
-    font-size: 11px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.35);
-    white-space: nowrap;
+  /* Rótulos y Pines Modernos para el Mapa Leaflet */
+  .leaflet-pin-bodega {
+    background: transparent !important;
+    border: none !important;
+  }
+  .pin-bodega-wrapper {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    filter: drop-shadow(0 4px 8px rgba(11,37,69,0.32));
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    pointer-events: auto;
+  }
+  .pin-bodega-wrapper:hover {
+    transform: scale(1.15) translateY(-4px);
+    filter: drop-shadow(0 8px 18px rgba(11,37,69,0.5));
+    z-index: 99999 !important;
+  }
+  .pin-bodega-card {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
+    padding: 4px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    font-family: 'Space Grotesk', -apple-system, sans-serif;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
     text-transform: uppercase;
+    box-sizing: border-box;
+    max-width: 155px;
   }
-  .pin-label-compartida {
+  .pin-bodega-card .pin-texto {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 120px;
+  }
+  .pin-bodega-card.individual {
+    background: #0B2545;
+    color: #FFFFFF;
+    border: 1.5px solid #F2A93B;
+  }
+  .pin-bodega-card.compartida {
+    background: #F2A93B;
+    color: #0B2545;
+    border: 1.5px solid #0B2545;
+  }
+  .pin-bodega-card.compartida .badge-conteo {
     background: #0B2545;
     color: #F2A93B;
-    border-radius: 12px;
-    padding: 3px 8px;
-    border: 2px solid #F2A93B;
-    font-weight: 700;
-    font-size: 11px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    white-space: nowrap;
-    display: inline-flex;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+  }
+  .pin-bodega-flecha {
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    margin-top: -1px;
+  }
+  .pin-bodega-flecha.individual {
+    border-top: 6px solid #F2A93B;
+  }
+  .pin-bodega-flecha.compartida {
+    border-top: 6px solid #0B2545;
+  }
+
+  /* Banner informativo de búsqueda regional */
+  .banner-zona {
+    background: #EEF4FB;
+    border: 1.5px solid #BACFE6;
+    color: #0B2545;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    line-height: 1.4;
+    display: flex;
     align-items: center;
-    gap: 4px;
-    text-transform: uppercase;
+    gap: 8px;
+    box-shadow: 0 2px 6px rgba(11,37,69,0.04);
+  }
+  .banner-zona strong {
+    color: #12325E;
   }
 
   .toast-aviso {
@@ -1045,6 +1109,18 @@
 
   function construirListaDestinos(data) {
     var set = new Set();
+    // Cabeceras y zonas regionales clave
+    set.add('SAN CARLOS');
+    set.add('PÉREZ ZELEDÓN');
+    set.add('ZONA SUR');
+    set.add('GUANACASTE');
+    set.add('LIMÓN');
+    set.add('PUNTARENAS');
+    set.add('SARAPIQUÍ');
+    set.add('UPALA');
+    set.add('LOS CHILES');
+    set.add('GUATUSO');
+
     data.forEach(function (t) {
       (Array.isArray(t.destinos) ? t.destinos : []).forEach(function (d) {
         if (typeof d === 'string' && d.trim()) set.add(d.trim());
@@ -1198,8 +1274,134 @@
     return distancia <= umbral;
   }
 
-  function coincideDestinoExacto(candidato, buscado) {
-    return normalizar(candidato) === normalizar(buscado);
+  // Zonas y cantones clave de Costa Rica con sus distritos y localidades asociadas
+  const REGIONES_CR = {
+    'SAN CARLOS': {
+      titulo: 'SAN CARLOS',
+      descripcion: 'Ciudad Quesada, La Fortuna, Aguas Zarcas, Pital, Florencia, Venecia, El Tanque, Pocosol, Muelle, etc.',
+      terminos: [
+        'san carlos', 'ciudad quesada', 'quesada', 'la fortuna', 'fortuna', 'aguas zarcas',
+        'pital', 'florencia', 'venecia', 'el tanque', 'tanque', 'santa rosa de pocosol',
+        'pocosol', 'la tigra', 'muelle', 'boca arenal', 'monterrey', 'la palmera',
+        'platanar', 'chachagua', 'penas blancas', 'valle azul', 'bajo los rodriguez',
+        'santa clara', 'los angeles', 'cerro cortes', 'buenos aires de cutris', 'cutris',
+        'la marina', 'san isidro de penas blancas'
+      ],
+      terminosEmpresa: ['san carlos', 'sancarle']
+    },
+    'PEREZ ZELEDON': {
+      titulo: 'PÉREZ ZELEDÓN',
+      descripcion: 'San Isidro de El General, Daniel Flores, Rivas, Platanillo, Pejibaye, Cajón, etc.',
+      terminos: [
+        'perez zeledon', 'san isidro de el general', 'san isidro del general', 'san isidro',
+        'daniel flores', 'rivas', 'platanillo', 'pejibaye', 'cajon', 'palmares p.z.',
+        'platanares', 'la palma', 'pacuar', 'san pedro'
+      ],
+      terminosEmpresa: ['perez zeledon', 'zeledon']
+    },
+    'ZONA SUR': {
+      titulo: 'ZONA SUR / GOLFITO / CORREDORES',
+      descripcion: 'Golfito, Paso Canoas, Ciudad Neilly, Río Claro, Palmar Norte/Sur, San Vito, etc.',
+      terminos: [
+        'zona sur', 'golfito', 'paso canoas', 'ciudad neilly', 'rio claro', 'palmar norte',
+        'palmar sur', 'san vito', 'san vito de coto brus', 'coto brus', 'sabalito',
+        'agua buena', 'la cuesta', 'corredores', 'laurel', 'ciudad cortes', 'puerto jimenez',
+        'uvita', 'dominical', 'ojochal'
+      ],
+      terminosEmpresa: ['zona sur', 'golfito']
+    },
+    'GUANACASTE': {
+      titulo: 'GUANACASTE',
+      descripcion: 'Liberia, Nicoya, Santa Cruz, Cañas, Bagaces, Filadelfia, Playas del Coco, Tamarindo, etc.',
+      terminos: [
+        'guanacaste', 'liberia', 'nicoya', 'santa cruz', 'canas', 'bagaces', 'filadelfia',
+        'playas del coco', 'el coco', 'tamarindo', 'samara', 'nosara', 'hojancha', 'la cruz',
+        'tilaran', 'mansion', 'sardinal', 'belen', 'huacas', 'flamingo', 'potrero'
+      ],
+      terminosEmpresa: ['guanacaste', 'liberia', 'nicoya']
+    },
+    'PUNTARENAS': {
+      titulo: 'PUNTARENAS / PACÍFICO CENTRAL',
+      descripcion: 'Puntarenas centro, Esparza, Barranca, El Roble, Jacó, Quepos, Parrita, Cóbano, etc.',
+      terminos: [
+        'puntarenas', 'esparza', 'barranca', 'el roble', 'chacarita', 'caldera', 'miramar',
+        'jaco', 'herradura', 'quepos', 'parrita', 'tarcoles', 'paquera', 'cobano', 'montezuma',
+        'santa teresa', 'mal pais', 'tambor', 'monteverde'
+      ],
+      terminosEmpresa: ['puntarenas', 'portena']
+    },
+    'LIMON': {
+      titulo: 'LIMÓN / CARIBE',
+      descripcion: 'Limón centro, Puerto Viejo, Cahuita, Sixaola, Siquirres, Guápiles, Pococí, etc.',
+      terminos: [
+        'limon', 'puerto viejo', 'puerto viejo de talamanca', 'cahuita', 'sixaola', 'talamanca',
+        'bribri', 'siquirres', 'guapiles', 'pococi', 'cariari', 'matina', 'bataan', 'guacimo'
+      ],
+      terminosEmpresa: ['limon', 'caribe']
+    }
+  };
+
+  function obtenerInfoRegion(buscado) {
+    var bNorm = normalizar(buscado);
+    if (!bNorm) return null;
+
+    // Búsqueda directa por nombre de región
+    for (var key in REGIONES_CR) {
+      if (normalizar(key) === bNorm || normalizar(REGIONES_CR[key].titulo) === bNorm) {
+        return REGIONES_CR[key];
+      }
+    }
+    // Si el término coincide con las cabeceras principales
+    for (var k in REGIONES_CR) {
+      var r = REGIONES_CR[k];
+      if (bNorm === 'san carlos' || bNorm === 'guanacaste' || bNorm === 'zona sur' || bNorm === 'limon' || bNorm === 'perez zeledon') {
+        if (r.terminos.some(function(t) { return normalizar(t) === bNorm; })) {
+          return r;
+        }
+      }
+    }
+    return null;
+  }
+
+  function coincideDestino(t, destinoBuscado, infoRegion) {
+    var bNorm = normalizar(destinoBuscado);
+    if (!bNorm) return false;
+
+    var destinos = Array.isArray(t.destinos) ? t.destinos : [];
+    var nomNorm = normalizar(t.nombre || '');
+
+    // Caso 1: Búsqueda regional expandida (ej: "San Carlos")
+    if (infoRegion) {
+      // Si el nombre de la empresa incluye la región (ej: "Los Toros de San Carlos", "Sancarleños")
+      if (infoRegion.terminosEmpresa && infoRegion.terminosEmpresa.some(function (te) { return nomNorm.indexOf(normalizar(te)) !== -1; })) {
+        return true;
+      }
+      // Si alguno de sus destinos coincide con cualquier término distrital de la región
+      for (var i = 0; i < destinos.length; i++) {
+        var dNorm = normalizar(destinos[i]);
+        for (var j = 0; j < infoRegion.terminos.length; j++) {
+          var term = normalizar(infoRegion.terminos[j]);
+          if (dNorm === term || (' ' + dNorm + ' ').indexOf(' ' + term + ' ') !== -1) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    // Caso 2: Búsqueda directa (ej: "Liberia", "Ciudad Quesada", "Aguas Zarcas")
+    for (var k = 0; k < destinos.length; k++) {
+      var d = normalizar(destinos[k]);
+      if (d === bNorm || (' ' + d + ' ').indexOf(' ' + bNorm + ' ') !== -1 || (d.length > 4 && bNorm.indexOf(d) !== -1)) {
+        return true;
+      }
+    }
+
+    if (nomNorm.indexOf(bNorm) !== -1) {
+      return true;
+    }
+
+    return false;
   }
 
   function fotoHtml(t) {
@@ -1233,7 +1435,7 @@
   // Iconos oficiales de alta definición (nítidos en PC, Mac, Retina y móviles)
   const SVG_WA = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:-3px;margin-right:5px;flex-shrink:0;"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm0 18.15c-1.48 0-2.93-.39-4.19-1.14l-.3-.18-3.12.82.83-3.04-.2-.32a8.04 8.04 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24 2.2 0 4.26.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23zm4.52-6.16c-.25-.13-1.47-.73-1.7-.81-.23-.08-.39-.12-.56.13-.16.25-.63.81-.78.97-.14.17-.29.19-.54.07-.24-.13-1.03-.38-1.97-1.22-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.51.11-.11.24-.29.37-.43.12-.15.16-.25.24-.42.08-.16.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.55-.43-.14-.01-.31-.01-.47-.01-.16 0-.42.06-.65.31-.23.25-.87.85-.87 2.07s.89 2.4 1.01 2.57c.13.16 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.53.6.19 1.14.16 1.57.1.48-.07 1.46-.6 1.67-1.18.21-.58.21-1.08.15-1.18-.06-.1-.22-.16-.48-.29z"/></svg>';
 
-  const SVG_WAZE = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#002B49" style="display:inline-block;vertical-align:-4px;margin-right:5px;flex-shrink:0;"><path d="M19.3 12.2c-.2-2-.1-3.6-1.5-4.9-1.4-1.3-3.4-1.8-5.3-1.8-2.6 0-5 1.1-6.7 3l-1.8-1.8c-.4-.4-1.1-.4-1.5 0-.4.4-.4 1.1 0 1.5l1.9 1.9c-.6.9-.9 2-.9 3.2 0 1.2.3 2.3.9 3.2-.3.4-.5.9-.5 1.4 0 1.7 1.3 3 3 3 .8 0 1.5-.3 2-.8 1.1.5 2.3.7 3.6.7 4.5 0 8.2-3.7 8.2-8.2 0-.2 0-.5-.1-.7.7-.7 1.2-1.6 1.2-2.7 0-.3-.1-.6-.2-.8zm-9.3 2.3c-.7 0-1.2-.5-1.2-1.2s.5-1.2 1.2-1.2 1.2.5 1.2 1.2-.5 1.2-1.2 1.2zm6 0c-.7 0-1.2-.5-1.2-1.2s.5-1.2 1.2-1.2 1.2.5 1.2 1.2-.5 1.2-1.2 1.2zm-3 2.7c-1.2 0-2.3-.6-2.9-1.6-.2-.3-.1-.6.2-.8.3-.2.6-.1.8.2.4.7 1.1 1.1 1.9 1.1s1.5-.4 1.9-1.1c.2-.3.5-.4.8-.2.3.2.4.5.2.8-.6 1-1.7 1.6-2.9 1.6z"/><circle cx="7.5" cy="18" r="1.6"/><circle cx="16.5" cy="18" r="1.6"/></svg>';
+  const SVG_WAZE = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#FFFFFF" style="display:inline-block;vertical-align:-4px;margin-right:6px;flex-shrink:0;"><path d="M19.3 12.2c-.2-2-.1-3.6-1.5-4.9-1.4-1.3-3.4-1.8-5.3-1.8-2.6 0-5 1.1-6.7 3l-1.8-1.8c-.4-.4-1.1-.4-1.5 0-.4.4-.4 1.1 0 1.5l1.9 1.9c-.6.9-.9 2-.9 3.2 0 1.2.3 2.3.9 3.2-.3.4-.5.9-.5 1.4 0 1.7 1.3 3 3 3 .8 0 1.5-.3 2-.8 1.1.5 2.3.7 3.6.7 4.5 0 8.2-3.7 8.2-8.2 0-.2 0-.5-.1-.7.7-.7 1.2-1.6 1.2-2.7 0-.3-.1-.6-.2-.8zm-9.3 2.3c-.7 0-1.2-.5-1.2-1.2s.5-1.2 1.2-1.2 1.2.5 1.2 1.2-.5 1.2-1.2 1.2zm6 0c-.7 0-1.2-.5-1.2-1.2s.5-1.2 1.2-1.2 1.2.5 1.2 1.2-.5 1.2-1.2 1.2zm-3 2.7c-1.2 0-2.3-.6-2.9-1.6-.2-.3-.1-.6.2-.8.3-.2.6-.1.8.2.4.7 1.1 1.1 1.9 1.1s1.5-.4 1.9-1.1c.2-.3.5-.4.8-.2.3.2.4.5.2.8-.6 1-1.7 1.6-2.9 1.6z"/><circle cx="7.5" cy="18" r="1.6"/><circle cx="16.5" cy="18" r="1.6"/></svg>';
 
   const SVG_MAPS = '<svg width="18" height="21" viewBox="0 0 92 120" style="display:inline-block;vertical-align:-4px;margin-right:5px;flex-shrink:0;"><path fill="#4285F4" d="M46 0C20.6 0 0 20.6 0 46c0 10.9 3.8 21 10.2 29L46 120l35.8-45C88.2 67 92 56.9 92 46 92 20.6 71.4 0 46 0z"/><path fill="#34A853" d="M10.2 75l35.8 45V75z"/><path fill="#FBBC04" d="M46 120l35.8-45H46z"/><path fill="#EA4335" d="M46 0v75h35.8C88.2 67 92 56.9 92 46 92 20.6 71.4 0 46 0z"/><circle fill="#FFFFFF" cx="46" cy="46" r="19"/><circle fill="#1A73E8" cx="46" cy="46" r="12"/></svg>';
 
@@ -1468,8 +1670,10 @@
     var destinoBuscado = document.getElementById('inputDestino').value.trim();
     if (!destinoBuscado) { alert('Escribe un destino primero.'); return; }
 
+    var infoRegion = obtenerInfoRegion(destinoBuscado);
+
     var coincidencias = transportistas.filter(function (t) {
-      return (t.destinos || []).some(function (d) { return coincideDestinoExacto(d, destinoBuscado); });
+      return coincideDestino(t, destinoBuscado, infoRegion);
     });
 
     if (coincidencias.length === 0) {
@@ -1500,7 +1704,7 @@
       return a.distancia - b.distancia;
     });
 
-    renderResultadosDestino(conDistancia);
+    renderResultadosDestino(conDistancia, infoRegion, destinoBuscado);
 
     var bodegasConContexto = conDistancia.map(function (item) {
       return item.bodega ? Object.assign({}, item.bodega, { transportista: item.transportista }) : null;
@@ -1528,14 +1732,22 @@
       '</div>';
   }
 
-  function renderResultadosDestino(lista) {
+  function renderResultadosDestino(lista, infoRegion, destinoBuscado) {
     var cont = document.getElementById('resultados');
     if (lista.length === 0) {
       cont.innerHTML = '<p class="vacio">No encontramos transportistas para ese destino. Revisa la ortografía o prueba con un lugar cercano.</p>';
       return;
     }
 
-    cont.innerHTML = lista.map(function (item) {
+    var bannerHtml = '';
+    if (infoRegion) {
+      bannerHtml = '<div class="banner-zona">' +
+        '<span style="font-size:20px;flex-shrink:0;">📍</span>' +
+        '<div>Mostrando <strong>' + lista.length + ' transportistas</strong> que viajan a la zona de <strong>' + escapeHtml(infoRegion.titulo) + '</strong> (' + escapeHtml(infoRegion.descripcion) + ')</div>' +
+      '</div>';
+    }
+
+    cont.innerHTML = bannerHtml + lista.map(function (item) {
       var t = item.transportista;
       var acciones = telefonosHtml(t);
       var b = item.bodega;
@@ -1759,21 +1971,45 @@
 
       var pinHtml = '';
       if (cantidad > 1) {
-        pinHtml = '<div class="pin-label-compartida">🏢 BODEGA (' + cantidad + ' EMPRESAS)</div>';
+        pinHtml = '' +
+          '<div class="pin-bodega-wrapper">' +
+            '<div class="pin-bodega-card compartida" title="Bodega compartida (' + cantidad + ' empresas)">' +
+              '<span>🏢</span>' +
+              '<span class="pin-texto">BODEGA</span>' +
+              '<span class="badge-conteo">' + cantidad + '</span>' +
+            '</div>' +
+            '<div class="pin-bodega-flecha compartida"></div>' +
+          '</div>';
       } else if (cantidad === 1) {
-        pinHtml = '<div class="pin-label-empresa">🚚 ' + escapeHtml(g.empresas[0].nombre) + '</div>';
+        var nomEmp = g.empresas[0].nombre;
+        pinHtml = '' +
+          '<div class="pin-bodega-wrapper">' +
+            '<div class="pin-bodega-card individual" title="' + escapeHtml(nomEmp) + '">' +
+              '<span>🚚</span>' +
+              '<span class="pin-texto">' + escapeHtml(nomEmp) + '</span>' +
+            '</div>' +
+            '<div class="pin-bodega-flecha individual"></div>' +
+          '</div>';
       } else {
-        pinHtml = '<div class="pin-label-empresa">📍 BODEGA</div>';
+        pinHtml = '' +
+          '<div class="pin-bodega-wrapper">' +
+            '<div class="pin-bodega-card individual">' +
+              '<span>📍</span>' +
+              '<span class="pin-texto">BODEGA</span>' +
+            '</div>' +
+            '<div class="pin-bodega-flecha individual"></div>' +
+          '</div>';
       }
 
       var customPin = L.divIcon({
         className: 'leaflet-pin-bodega',
         html: pinHtml,
-        iconSize: [140, 26],
-        iconAnchor: [70, 13]
+        iconSize: [155, 34],
+        iconAnchor: [77, 34],
+        popupAnchor: [0, -34]
       });
 
-      var marker = L.marker([g.lat, g.lng], { icon: customPin }).addTo(map);
+      var marker = L.marker([g.lat, g.lng], { icon: customPin, riseOnHover: true }).addTo(map);
 
       var popupContent = '';
 
