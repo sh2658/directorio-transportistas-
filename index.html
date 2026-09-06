@@ -1506,6 +1506,92 @@
     margin-left: 2px;
     vertical-align: baseline;
   }
+
+  /* Alerta clara e informativa para Lugares No Asignados a Transportistas */
+  .alerta-sin-cobertura {
+    background: #FFFFFF;
+    border: 2px solid #E2E8F0;
+    border-left: 6px solid #D97706;
+    border-radius: 12px;
+    padding: 22px 24px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    margin: 20px auto;
+    max-width: 820px;
+    text-align: left;
+    box-sizing: border-box;
+  }
+  .sin-cobertura-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  .sin-cobertura-icono {
+    font-size: 32px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .sin-cobertura-titulo {
+    font-family: 'Space Grotesk', Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--navy);
+    margin: 0 0 4px;
+  }
+  .sin-cobertura-subtitulo {
+    font-size: 13.5px;
+    color: #475569;
+    margin: 0;
+    line-height: 1.45;
+  }
+  .sin-cobertura-cuerpo {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 12px;
+  }
+  .sin-cobertura-consejo {
+    font-size: 13px;
+    color: #1E293B;
+    line-height: 1.5;
+    margin: 0 0 12px;
+  }
+  .sin-cobertura-botones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .btn-accion-cobertura {
+    background: var(--navy);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+  }
+  .btn-accion-cobertura:hover {
+    background: #1B4965;
+    transform: translateY(-1px);
+  }
+  .btn-accion-cobertura.btn-secundario {
+    background: #FFFFFF;
+    color: var(--navy);
+    border: 1.5px solid #CBD5E1;
+  }
+  .btn-accion-cobertura.btn-secundario:hover {
+    background: #F1F5F9;
+    border-color: var(--navy);
+  }
+
   .banner-homonimos-acceso {
     margin: 12px 0 8px;
     text-align: center;
@@ -2627,7 +2713,9 @@
     var cabecerasClave = [
       'occidente', 'zona occidente', 'san carlos', 'huetar norte', 'zona norte',
       'guanacaste', 'chorotega', 'pacifico central', 'zona sur', 'brunca',
-      'perez zeledon', 'limon', 'caribe', 'valle central', 'gam'
+      'perez zeledon', 'limon', 'caribe', 'valle central', 'gam',
+      'turrialba', 'turrialba y cartago', 'cartago', 'zona de los santos', 'los santos',
+      'alajuela', 'heredia', 'san jose', 'puntarenas'
     ];
     for (var kc in REGIONES_CR) {
       var reg = REGIONES_CR[kc];
@@ -2652,8 +2740,8 @@
     "transp5": ["ZONA SUR", "PACIFICO CENTRAL"],
     "c6e2dbc8": ["PACIFICO CENTRAL"],
     "2f7a4685": ["GUANACASTE"],
-    "51b25c54": ["OCCIDENTE", "PACIFICO CENTRAL"],
-    "b8816262": ["ZONA SUR", "PACIFICO CENTRAL"],
+    "51b25c54": ["OCCIDENTE"],
+    "b8816262": ["PACIFICO CENTRAL", "ZONA SUR"],
     "7ce69941": ["GUANACASTE"],
     "24316d49": ["GUANACASTE"],
     "991ac054": ["GUANACASTE"],
@@ -2669,16 +2757,16 @@
     "69833490": ["OCCIDENTE"],
     "9e5c5c54": ["ZONA SUR"],
     "534a5798": ["SAN CARLOS"],
-    "80479472": ["TURRIALBA Y CARTAGO", "VALLE CENTRAL"],
+    "80479472": ["TURRIALBA Y CARTAGO"],
     "c63da9f8": ["PACIFICO CENTRAL"],
     "d285cb84": ["VALLE CENTRAL"],
     "c425cd7b": ["VALLE CENTRAL"],
-    "402d5721": ["ZONA DE LOS SANTOS", "TURRIALBA Y CARTAGO", "VALLE CENTRAL"],
+    "402d5721": ["ZONA DE LOS SANTOS"],
     "6bde4f14": ["SAN CARLOS"],
     "16ca56ce": ["ZONA SUR"],
-    "2afda9e1": ["ZONA SUR"],
+    "2afda9e1": ["PACIFICO CENTRAL", "ZONA SUR"],
     "5acb8a47": ["GUANACASTE"],
-    "49d32ffe": ["SAN CARLOS", "GUANACASTE", "LIMON", "ZONA SUR", "PACIFICO CENTRAL"],
+    "49d32ffe": ["GUANACASTE", "SAN CARLOS", "LIMON", "PACIFICO CENTRAL", "ZONA SUR"],
     "TRP-0036": ["ZONA SUR"],
     "TRP-0037": ["SAN CARLOS"],
     "TRP-0038": ["PACIFICO CENTRAL"],
@@ -2690,13 +2778,13 @@
     "TRP-E27C5CF6": ["ZONA SUR"],
     "TRP-E0C73E19": ["GUANACASTE"],
     "TRP-0045": ["LIMON"],
-    "TRP-0046": ["PACIFICO CENTRAL", "TURRIALBA Y CARTAGO"],
+    "TRP-0046": ["PACIFICO CENTRAL"],
     "TRP-0047": ["PACIFICO CENTRAL"],
-    "TRP-0048": ["GUANACASTE", "PACIFICO CENTRAL"],
+    "TRP-0048": ["PACIFICO CENTRAL"],
     "TRP-0049": ["TURRIALBA Y CARTAGO"],
     "TRP-0050": ["ZONA SUR"],
     "TRP-0051": ["SAN CARLOS"],
-    "TRP-0052": ["TURRIALBA Y CARTAGO", "VALLE CENTRAL"],
+    "TRP-0052": ["TURRIALBA Y CARTAGO"],
     "TRP-0053": ["OCCIDENTE"]
   };
 
@@ -3290,17 +3378,40 @@
 
     var candidatos = Array.from(todos).map(function (d) {
       return { destino: d, distancia: distanciaLevenshtein(normalizar(d), normalizar(textoBuscado)) };
-    }).sort(function (a, b) { return a.distancia - b.distancia; }).slice(0, 5);
+    }).sort(function (a, b) { return a.distancia - b.distancia; }).slice(0, 6);
 
     var cont = document.getElementById('resultados');
+    var chipsHtml = candidatos.length > 0 ?
+      '<div style="margin-top:12px;">' +
+        '<strong style="font-size:12px; color:#475569; letter-spacing:0.02em;">LUGARES SIMILARES CON COBERTURA EN EL DIRECTORIO:</strong>' +
+        '<div class="acciones" style="justify-content:flex-start; margin-top:8px; gap:8px; flex-wrap:wrap;">' +
+          candidatos.map(function (c) {
+            return '<a href="#" class="btn-maps" data-sugerencia="' + escapeHtml(c.destino) +
+              '" onclick="event.preventDefault(); aplicarSugerencia(this.dataset.sugerencia, \'destino\')">📍 ' +
+              escapeHtml(c.destino) + '</a>';
+          }).join('') +
+        '</div>' +
+      '</div>' : '';
+
     cont.innerHTML =
-      '<p class="vacio">No encontramos "' + escapeHtml(textoBuscado) + '" exactamente. ¿Quisiste decir alguno de estos?</p>' +
-      '<div class="acciones" style="justify-content:center;">' +
-        candidatos.map(function (c) {
-          return '<a href="#" class="btn-maps" data-sugerencia="' + escapeHtml(c.destino) +
-            '" onclick="event.preventDefault(); aplicarSugerencia(this.dataset.sugerencia, \'destino\')">' +
-            escapeHtml(c.destino) + '</a>';
-        }).join('') +
+      '<div class="alerta-sin-cobertura">' +
+        '<div class="sin-cobertura-header">' +
+          '<div class="sin-cobertura-icono">📍🚫</div>' +
+          '<div>' +
+            '<h3 class="sin-cobertura-titulo">Lugar no asignado a ningún transportista</h3>' +
+            '<p class="sin-cobertura-subtitulo">El destino <strong>"' + escapeHtml(textoBuscado) + '"</strong> no cuenta actualmente con un transportista registrado con ruta o bodega directa en el directorio de Rutas CR.</p>' +
+          '</div>' +
+        '</div>' +
+        '<div class="sin-cobertura-cuerpo">' +
+          '<p class="sin-cobertura-consejo">' +
+            '💡 <strong>Recomendación:</strong> Muchos transportistas entregan encomiendas a caseríos y poblados rurales a través de la <em>cabecera de cantón</em> o distrito principal más cercano. Le recomendamos buscar la cabecera cantonal o revisar las opciones similares sugeridas.' +
+          '</p>' +
+          chipsHtml +
+          '<div class="sin-cobertura-botones">' +
+            '<button type="button" class="btn-accion-cobertura" onclick="mostrarTodos()">📋 Ver todos los transportistas</button>' +
+            '<button type="button" class="btn-accion-cobertura btn-secundario" onclick="abrirModalHomonimos()">📖 Consultar Diccionario de Homónimos</button>' +
+          '</div>' +
+        '</div>' +
       '</div>';
   }
 
@@ -4055,30 +4166,58 @@
     var destNombre = (document.getElementById('rotNombreDest').value || '').trim() || 'JUAN CARLOS ARIAS GÓMEZ';
     var rawTel = (document.getElementById('rotTelDest').value || '').replace(/[^0-9]/g, '');
     var destTel = rawTel.length >= 8 ? rawTel : '88765432';
-    var destDir = (document.getElementById('rotDireccionDest').value || '').trim() || 'DEL SUPERMERCADO MUSMANNI 200M NORTE';
-    var destUbic = (document.getElementById('rotUbicacionDest').value || '').trim() || 'SAN RAMÓN, ALAJUELA';
+    var destTelAlt = (document.getElementById('rotTelAltDest').value || '').trim();
+    var destCedula = (document.getElementById('rotCedulaDest').value || '').trim();
+    var destDir = (document.getElementById('rotDireccionDest').value || '').trim() || 'DEL SUPERMERCADO MUSMANNI 200M NORTE, CASA PORTÓN NEGRO';
+    var destUbic = (document.getElementById('rotUbicacionDest').value || '').trim() || 'ALAJUELA, SAN RAMÓN, SAN RAFAEL';
+    var tracking = (document.getElementById('rotTracking').value || '').trim();
     var tipoQrElem = document.getElementById('rotTipoQrDest');
-    var tipoQr = tipoQrElem ? tipoQrElem.value : 'tel';
+    var tipoQr = tipoQrElem ? tipoQrElem.value : 'vcard';
 
     var qrPayload = '';
-    var linkHref = '#';
-    var captionTexto = '📱 Escanea para contactar';
+    var linkHref = 'tel:+506' + destTel;
+    var captionTexto = '📇 Datos completos y llamada';
 
-    if (tipoQr === 'whatsapp') {
-      // Formato compacto para WhatsApp: genera módulos grandes y claros
-      qrPayload = 'https://wa.me/506' + destTel;
-      linkHref = 'https://wa.me/506' + destTel + '?text=' + encodeURIComponent('Hola ' + destNombre + ', le contactamos de la empresa de encomiendas respecto a su paquete en ' + destUbic + '.');
+    if (tipoQr === 'texto') {
+      // Texto completo estructurado y legible con todos los datos
+      qrPayload = 'DESTINATARIO: ' + destNombre + '\n' +
+        'TELÉFONO: +506 ' + destTel + (destTelAlt ? ' (Alt: ' + destTelAlt + ')' : '') + '\n' +
+        (destCedula ? 'CÉDULA: ' + destCedula + '\n' : '') +
+        'UBICACIÓN: ' + destUbic + '\n' +
+        'DIRECCIÓN: ' + destDir + '\n' +
+        (tracking ? 'GUÍA/TRACKING: ' + tracking + '\n' : '') +
+        'RUTAS CR · DIRECTORIO DE ENCOMIENDAS';
+      captionTexto = '📋 Texto completo de entrega';
+    } else if (tipoQr === 'whatsapp') {
+      // WhatsApp directo con mensaje detallado de entrega
+      var msg = 'Hola ' + destNombre + ', le contactamos respecto a su paquete en ' + destUbic + ' (Dirección: ' + destDir + ').';
+      qrPayload = 'https://wa.me/506' + destTel + '?text=' + encodeURIComponent(msg);
+      linkHref = qrPayload;
       captionTexto = '💬 Toca o escanea para WhatsApp';
-    } else if (tipoQr === 'vcard') {
-      // Estándar MECARD universalmente soportado en iOS y Android para guardar contacto
-      qrPayload = 'MECARD:N:' + destNombre + ';TEL:+506' + destTel + ';ADR:' + destUbic + ';NOTE:Encomienda Rutas CR;;';
-      linkHref = 'tel:+506' + destTel;
-      captionTexto = '📇 Toca o escanea para guardar contacto';
-    } else {
-      // Por defecto: Llamada telefónica directa de 1 toque (reconocimiento nativo inmediato en iPhone)
+    } else if (tipoQr === 'tel') {
+      // Solo llamada rápida
       qrPayload = 'tel:+506' + destTel;
-      linkHref = 'tel:+506' + destTel;
-      captionTexto = '📞 Toca o escanea para llamar (' + destTel.substring(0,4) + '-' + destTel.substring(4) + ')';
+      linkHref = qrPayload;
+      captionTexto = '📞 Llamada directa (+506 ' + destTel + ')';
+    } else {
+      // vCard 3.0 estándar COMPLETA: Reconocida nativamente por iPhone y Android
+      // Incluye Nombre, Teléfono con botón de llamar directo, Dirección exacta en Maps y Notas con Cédula
+      var notas = 'Encomienda Rutas CR.' +
+        (destCedula ? ' Cédula: ' + destCedula + '.' : '') +
+        (destTelAlt ? ' Tel Alt: ' + destTelAlt + '.' : '') +
+        (tracking ? ' Guía: ' + tracking + '.' : '') +
+        ' Señas: ' + destDir;
+
+      qrPayload = 'BEGIN:VCARD\n' +
+        'VERSION:3.0\n' +
+        'FN:' + destNombre + '\n' +
+        'N:' + destNombre + ';;;;\n' +
+        'TEL;TYPE=CELL,VOICE:+506' + destTel + '\n' +
+        (destTelAlt ? 'TEL;TYPE=HOME,VOICE:+506' + destTelAlt.replace(/[^0-9]/g, '') + '\n' : '') +
+        'ADR;TYPE=HOME:;;' + destDir.replace(/;/g, ',') + ';' + destUbic.replace(/;/g, ',') + ';;;Costa Rica\n' +
+        'NOTE:' + notas.replace(/\n/g, ' ') + '\n' +
+        'END:VCARD';
+      captionTexto = '📇 Ficha completa (Llamar / Ver datos)';
     }
 
     // Actualizar enlace clickeable en pantalla
@@ -4093,7 +4232,7 @@
       capElem.textContent = captionTexto;
     }
 
-    // Código QR de alta resolución con módulos anchos (Nivel M) para lectura inmediata en iPhone
+    // Código QR de alta resolución con módulos nítidos para iPhone/Android
     new QRCode(contenedor, {
       text: qrPayload,
       width: 240,
@@ -4182,11 +4321,12 @@
         </div>
 
         <div class="campo-grupo" style="margin-top:8px;">
-          <label for="rotTipoQrDest">Acción del Código QR de Entrega (para quien escanee)</label>
+          <label for="rotTipoQrDest">Información y Acción del Código QR de Entrega</label>
           <select id="rotTipoQrDest" onchange="actualizarVistaPreviaEtiqueta()" style="width:100%; padding:9px 12px; border-radius:8px; border:1.5px solid #CBD5E1; font-weight:600; color:var(--navy); background:#F8FAFC;">
-            <option value="tel" selected>📞 Llamada telefónica directa (Llamar al cliente con 1 toque en iPhone/Android)</option>
-            <option value="whatsapp">💬 Abrir chat directo de WhatsApp (wa.me)</option>
-            <option value="vcard">📇 Tarjeta de contacto en agenda (Nombre, teléfono y dirección)</option>
+            <option value="vcard" selected>📇 Ficha completa de contacto (Nombre, teléfono, dirección y llamada directa)</option>
+            <option value="texto">📋 Texto completo de entrega (Todos los datos legibles en pantalla)</option>
+            <option value="whatsapp">💬 Chat de WhatsApp con datos del paquete</option>
+            <option value="tel">📞 Solo llamada rápida de 1 toque (+506)</option>
           </select>
         </div>
 
