@@ -18,9 +18,436 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
+<script src="assets/qrcode.min.js">
+  // ==============================================================================
+  // ROTULADOR DE ENCOMIENDAS (PLANTILLA DE EMBALAJE CON QR Y SECUENCIA MULTIPAC)
+  // ==============================================================================
+  var bultoActualPreview = 1;
+
+  function abrirRotulador() {
+    var modal = document.getElementById('modalRotulador');
+    if (!modal) return;
+    modal.classList.add('abierto');
+    document.body.style.overflow = 'hidden';
+    actualizarVistaPreviaEtiqueta();
+  }
+
+  function abrirRotuladorConTransportista(nombreEmpresa, zonaDestino) {
+    abrirRotulador();
+    if (nombreEmpresa) {
+      document.getElementById('rotEmpresa').value = nombreEmpresa.toUpperCase();
+    }
+    if (zonaDestino) {
+      document.getElementById('rotUbicacionDest').value = zonaDestino.toUpperCase();
+    }
+    actualizarVistaPreviaEtiqueta();
+  }
+
+  function cerrarRotulador() {
+    var modal = document.getElementById('modalRotulador');
+    if (!modal) return;
+    modal.classList.remove('abierto');
+    document.body.style.overflow = '';
+  }
+
+  function generarBarcodeSvg(codigo) {
+    // Generador de código de barras simulado en SVG nítido y vectorial
+    var cleanCode = (codigo || '744100010001').replace(/[^0-9A-Z]/g, '');
+    var bars = '';
+    var x = 10;
+    for (var i = 0; i < 46; i++) {
+      var w = (i % 3 === 0 || i % 7 === 0) ? 3 : 1.5;
+      bars += '<rect x="' + x + '" y="0" width="' + w + '" height="38" fill="#111111" />';
+      x += w + 2;
+    }
+    return '<svg class="barcode-svg" viewBox="0 0 ' + (x + 10) + ' 40" preserveAspectRatio="none">' + bars + '</svg>';
+  }
+
+  function generarEtiquetaHtml(indice, totalBultos, esParaImprimir) {
+    var destNombre = (document.getElementById('rotNombreDest').value || 'JUAN CARLOS ARIAS GÓMEZ').toUpperCase().trim();
+    var destCedula = (document.getElementById('rotCedulaDest').value || '').toUpperCase().trim();
+    var destTel = (document.getElementById('rotTelDest').value || '8876-5432').trim();
+    var destTelAlt = (document.getElementById('rotTelAltDest').value || '').trim();
+    var destUbicacion = (document.getElementById('rotUbicacionDest').value || 'ALAJUELA, SAN RAMÓN, SAN RAFAEL').toUpperCase().trim();
+    var destDireccion = (document.getElementById('rotDireccionDest').value || 'DEL SUPERMERCADO MUSMANNI, 200 METROS NORTE Y 50 ESTE, CASA DE PORTÓN NEGRO, FRENTE AL PARQUE. LLAMAR ANTES DE ENTREGAR.').toUpperCase().trim();
+
+    var remNombre = (document.getElementById('rotNombreRem').value || 'MARÍA ELENA SALAZAR CASTRO').toUpperCase().trim();
+    var remCedula = (document.getElementById('rotCedulaRem').value || '1-1234-5678').toUpperCase().trim();
+    var remTel = (document.getElementById('rotTelRem').value || '8765-4321').trim();
+    var remUbicacion = (document.getElementById('rotUbicacionRem').value || 'SAN JOSÉ, SANTA ANA, POZOS').toUpperCase().trim();
+    var remDireccion = (document.getElementById('rotDireccionRem').value || 'CONDOMINIO LAS BRISAS, CASA 12').toUpperCase().trim();
+
+    var empresa = (document.getElementById('rotEmpresa').value || 'ENCOMIENDAS COSTA RICA').toUpperCase().trim();
+    var tracking = (document.getElementById('rotTracking').value || '').toUpperCase().trim();
+    var contenido = (document.getElementById('rotContenido').value || 'REPUESTOS Y DOCUMENTOS').toUpperCase().trim();
+
+    var fragil = document.getElementById('chkFragil').checked;
+    var pie = document.getElementById('chkPie').checked;
+    var horario = document.getElementById('chkHorario').checked;
+    var cod = document.getElementById('chkCod').checked;
+
+    // Distintivo de Bulto: Si es 1 = BULTO ÚNICO, si es > 1 = BULTO 1/3, 2/3, etc.
+    var bultoBadgeTexto = totalBultos <= 1 ? 'BULTO ÚNICO' : 'BULTO ' + indice + '/' + totalBultos;
+    var trackingTexto = tracking ? tracking + (totalBultos > 1 ? '-' + String(indice).padStart(2, '0') : '') : '[ESPACIO EN BLANCO PARA CÓDIGO]';
+    var barcodeNum = (tracking ? tracking.replace(/[^0-9]/g, '') : '744123456789') + (totalBultos > 1 ? String(indice) : '0');
+
+    // Identificador único para el contenedor del QR
+    var qrId = (esParaImprimir ? 'qr_print_' : 'qr_preview_') + indice;
+
+    var checksHtml = '' +
+      '<span class="' + (fragil ? 'activo' : 'inactivo') + '">' + (fragil ? '☑' : '☐') + ' Frágil</span>' +
+      '<span class="' + (pie ? 'activo' : 'inactivo') + '">' + (pie ? '☑' : '☐') + ' Mantener de pie</span>' +
+      '<span class="' + (horario ? 'activo' : 'inactivo') + '">' + (horario ? '☑' : '☐') + ' Horario de oficina</span>' +
+      (cod ? '<span class="activo">☑ Cobro Contra Entrega (C.O.D.)</span>' : '');
+
+    return '' +
+      '<div class="etiqueta-caja">' +
+        '<div class="etiqueta-header-top">' +
+          '<div class="etiqueta-titulo-box">EMBALAJE DE ENCOMIENDA</div>' +
+          '<div class="etiqueta-bulto-badge">' + bultoBadgeTexto + '</div>' +
+        '</div>' +
+        '<div class="etiqueta-sublinea">' +
+          '<span><strong>Nº TRACKING:</strong> ' + escapeHtml(trackingTexto) + '</span>' +
+          '<span><strong>TRANSPORTE:</strong> ' + escapeHtml(empresa) + '</span>' +
+        '</div>' +
+
+        '<div class="etiqueta-grid-personas" style="margin-top:10px;">' +
+          '<!-- DESTINATARIO -->' +
+          '<div class="etiqueta-bloque">' +
+            '<div class="etiqueta-bloque-titulo">📦 DESTINATARIO (Para)</div>' +
+            '<p><strong>Nombre:</strong> ' + escapeHtml(destNombre) + '</p>' +
+            (destCedula ? '<p><strong>Cédula:</strong> ' + escapeHtml(destCedula) + '</p>' : '') +
+            '<p><strong>Teléfono:</strong> ' + escapeHtml(destTel) + '</p>' +
+            (destTelAlt ? '<p><strong>Tel. alternativo:</strong> ' + escapeHtml(destTelAlt) + '</p>' : '') +
+            '<p><strong>Provincia/Cantón:</strong> ' + escapeHtml(destUbicacion) + '</p>' +
+            '<p><strong>Dirección exacta:</strong> ' + escapeHtml(destDireccion) + '</p>' +
+            '<div class="etiqueta-qr-container">' +
+              '<div id="' + qrId + '" class="etiqueta-qr-img"></div>' +
+              '<div class="etiqueta-qr-texto">📱 QR de Entrega / Contacto</div>' +
+            '</div>' +
+          '</div>' +
+
+          '<!-- REMITENTE -->' +
+          '<div class="etiqueta-bloque">' +
+            '<div class="etiqueta-bloque-titulo">📤 REMITENTE (De)</div>' +
+            '<p><strong>Nombre:</strong> ' + escapeHtml(remNombre) + '</p>' +
+            (remCedula ? '<p><strong>Cédula:</strong> ' + escapeHtml(remCedula) + '</p>' : '') +
+            '<p><strong>Teléfono:</strong> ' + escapeHtml(remTel) + '</p>' +
+            '<p><strong>Provincia/Cantón:</strong> ' + escapeHtml(remUbicacion) + '</p>' +
+            '<p><strong>Dirección:</strong> ' + escapeHtml(remDireccion) + '</p>' +
+          '</div>' +
+        '</div>' +
+
+        '<!-- INFORMACIÓN ADICIONAL -->' +
+        '<div class="etiqueta-info-adicional">' +
+          '<div class="etiqueta-info-header">⚠️ INFORMACIÓN ADICIONAL</div>' +
+          '<div class="etiqueta-checks-vista">' + checksHtml + '</div>' +
+          '<div style="margin-top:4px;"><strong>Contenido:</strong> ' + escapeHtml(contenido) + '</div>' +
+        '</div>' +
+
+        '<!-- CÓDIGO DE BARRAS FOOTER -->' +
+        '<div class="etiqueta-barcode-footer">' +
+          generarBarcodeSvg(barcodeNum) +
+          '<div class="barcode-texto">' + escapeHtml(barcodeNum) + '</div>' +
+          '<div class="barcode-empresa">' + escapeHtml(empresa) + ' · RUTAS CR</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function actualizarVistaPreviaEtiqueta() {
+    var contPreview = document.getElementById('etiquetaPreviewContenedor');
+    if (!contPreview) return;
+
+    var numBultos = parseInt(document.getElementById('rotCantidadBultos').value, 10) || 1;
+    if (numBultos < 1) numBultos = 1;
+
+    var navElem = document.getElementById('previewBultosNav');
+    if (navElem) {
+      navElem.textContent = numBultos <= 1 ? 'BULTO ÚNICO' : 'BULTO 1 DE ' + numBultos;
+    }
+
+    contPreview.innerHTML = generarEtiquetaHtml(1, numBultos, false);
+
+    // Generar código QR interactivo con los datos del destinatario
+    setTimeout(function() {
+      generarQrElemento('qr_preview_1');
+    }, 60);
+  }
+
+  function generarQrElemento(elementId) {
+    var contenedor = document.getElementById(elementId);
+    if (!contenedor || typeof QRCode === 'undefined') return;
+    contenedor.innerHTML = '';
+
+    var destNombre = (document.getElementById('rotNombreDest').value || '').trim();
+    var destTel = (document.getElementById('rotTelDest').value || '').replace(/[^0-9]/g, '');
+    var destDir = (document.getElementById('rotDireccionDest').value || '').trim();
+    var destUbic = (document.getElementById('rotUbicacionDest').value || '').trim();
+
+    // Contenido del QR: Datos directos para llamar con 1 toque o leer dirección
+    var qrPayload = 'DESTINATARIO: ' + destNombre + '\nTEL: ' + destTel + '\nLUGAR: ' + destUbic + '\nDIRECCION: ' + destDir;
+    if (destTel.length >= 8) {
+      // Si tiene teléfono válido, ponemos URL para llamada directa o WhatsApp
+      qrPayload = 'https://wa.me/506' + destTel + '?text=' + encodeURIComponent('Hola ' + destNombre + ', de la empresa de encomiendas con su paquete.');
+    }
+
+    new QRCode(contenedor, {
+      text: qrPayload,
+      width: 96,
+      height: 96,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+
+  function imprimirEtiquetas() {
+    var numBultos = parseInt(document.getElementById('rotCantidadBultos').value, 10) || 1;
+    if (numBultos < 1) numBultos = 1;
+
+    var contPrint = document.getElementById('impresionEtiquetasContenedor');
+    if (!contPrint) return;
+
+    var htmlTotal = '';
+    for (var i = 1; i <= numBultos; i++) {
+      htmlTotal += '<div class="etiqueta-print-item">' + generarEtiquetaHtml(i, numBultos, true) + '</div>';
+    }
+    contPrint.innerHTML = htmlTotal;
+    contPrint.style.display = 'block';
+
+    // Generar los QRs para cada etiqueta de impresión
+    for (var b = 1; b <= numBultos; b++) {
+      (function(idx) {
+        setTimeout(function() {
+          generarQrElemento('qr_print_' + idx);
+        }, 30 * idx);
+      })(b);
+    }
+
+    // Disparar diálogo de impresión
+    setTimeout(function() {
+      window.print();
+      contPrint.style.display = 'none';
+    }, 250 + (numBultos * 35));
+  }
+
+</script>
 <!-- Leaflet CSS & JS (100% Gratuito y Open Source) -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="">
+  // ==============================================================================
+  // ROTULADOR DE ENCOMIENDAS (PLANTILLA DE EMBALAJE CON QR Y SECUENCIA MULTIPAC)
+  // ==============================================================================
+  var bultoActualPreview = 1;
+
+  function abrirRotulador() {
+    var modal = document.getElementById('modalRotulador');
+    if (!modal) return;
+    modal.classList.add('abierto');
+    document.body.style.overflow = 'hidden';
+    actualizarVistaPreviaEtiqueta();
+  }
+
+  function abrirRotuladorConTransportista(nombreEmpresa, zonaDestino) {
+    abrirRotulador();
+    if (nombreEmpresa) {
+      document.getElementById('rotEmpresa').value = nombreEmpresa.toUpperCase();
+    }
+    if (zonaDestino) {
+      document.getElementById('rotUbicacionDest').value = zonaDestino.toUpperCase();
+    }
+    actualizarVistaPreviaEtiqueta();
+  }
+
+  function cerrarRotulador() {
+    var modal = document.getElementById('modalRotulador');
+    if (!modal) return;
+    modal.classList.remove('abierto');
+    document.body.style.overflow = '';
+  }
+
+  function generarBarcodeSvg(codigo) {
+    // Generador de código de barras simulado en SVG nítido y vectorial
+    var cleanCode = (codigo || '744100010001').replace(/[^0-9A-Z]/g, '');
+    var bars = '';
+    var x = 10;
+    for (var i = 0; i < 46; i++) {
+      var w = (i % 3 === 0 || i % 7 === 0) ? 3 : 1.5;
+      bars += '<rect x="' + x + '" y="0" width="' + w + '" height="38" fill="#111111" />';
+      x += w + 2;
+    }
+    return '<svg class="barcode-svg" viewBox="0 0 ' + (x + 10) + ' 40" preserveAspectRatio="none">' + bars + '</svg>';
+  }
+
+  function generarEtiquetaHtml(indice, totalBultos, esParaImprimir) {
+    var destNombre = (document.getElementById('rotNombreDest').value || 'JUAN CARLOS ARIAS GÓMEZ').toUpperCase().trim();
+    var destCedula = (document.getElementById('rotCedulaDest').value || '').toUpperCase().trim();
+    var destTel = (document.getElementById('rotTelDest').value || '8876-5432').trim();
+    var destTelAlt = (document.getElementById('rotTelAltDest').value || '').trim();
+    var destUbicacion = (document.getElementById('rotUbicacionDest').value || 'ALAJUELA, SAN RAMÓN, SAN RAFAEL').toUpperCase().trim();
+    var destDireccion = (document.getElementById('rotDireccionDest').value || 'DEL SUPERMERCADO MUSMANNI, 200 METROS NORTE Y 50 ESTE, CASA DE PORTÓN NEGRO, FRENTE AL PARQUE. LLAMAR ANTES DE ENTREGAR.').toUpperCase().trim();
+
+    var remNombre = (document.getElementById('rotNombreRem').value || 'MARÍA ELENA SALAZAR CASTRO').toUpperCase().trim();
+    var remCedula = (document.getElementById('rotCedulaRem').value || '1-1234-5678').toUpperCase().trim();
+    var remTel = (document.getElementById('rotTelRem').value || '8765-4321').trim();
+    var remUbicacion = (document.getElementById('rotUbicacionRem').value || 'SAN JOSÉ, SANTA ANA, POZOS').toUpperCase().trim();
+    var remDireccion = (document.getElementById('rotDireccionRem').value || 'CONDOMINIO LAS BRISAS, CASA 12').toUpperCase().trim();
+
+    var empresa = (document.getElementById('rotEmpresa').value || 'ENCOMIENDAS COSTA RICA').toUpperCase().trim();
+    var tracking = (document.getElementById('rotTracking').value || '').toUpperCase().trim();
+    var contenido = (document.getElementById('rotContenido').value || 'REPUESTOS Y DOCUMENTOS').toUpperCase().trim();
+
+    var fragil = document.getElementById('chkFragil').checked;
+    var pie = document.getElementById('chkPie').checked;
+    var horario = document.getElementById('chkHorario').checked;
+    var cod = document.getElementById('chkCod').checked;
+
+    // Distintivo de Bulto: Si es 1 = BULTO ÚNICO, si es > 1 = BULTO 1/3, 2/3, etc.
+    var bultoBadgeTexto = totalBultos <= 1 ? 'BULTO ÚNICO' : 'BULTO ' + indice + '/' + totalBultos;
+    var trackingTexto = tracking ? tracking + (totalBultos > 1 ? '-' + String(indice).padStart(2, '0') : '') : '[ESPACIO EN BLANCO PARA CÓDIGO]';
+    var barcodeNum = (tracking ? tracking.replace(/[^0-9]/g, '') : '744123456789') + (totalBultos > 1 ? String(indice) : '0');
+
+    // Identificador único para el contenedor del QR
+    var qrId = (esParaImprimir ? 'qr_print_' : 'qr_preview_') + indice;
+
+    var checksHtml = '' +
+      '<span class="' + (fragil ? 'activo' : 'inactivo') + '">' + (fragil ? '☑' : '☐') + ' Frágil</span>' +
+      '<span class="' + (pie ? 'activo' : 'inactivo') + '">' + (pie ? '☑' : '☐') + ' Mantener de pie</span>' +
+      '<span class="' + (horario ? 'activo' : 'inactivo') + '">' + (horario ? '☑' : '☐') + ' Horario de oficina</span>' +
+      (cod ? '<span class="activo">☑ Cobro Contra Entrega (C.O.D.)</span>' : '');
+
+    return '' +
+      '<div class="etiqueta-caja">' +
+        '<div class="etiqueta-header-top">' +
+          '<div class="etiqueta-titulo-box">EMBALAJE DE ENCOMIENDA</div>' +
+          '<div class="etiqueta-bulto-badge">' + bultoBadgeTexto + '</div>' +
+        '</div>' +
+        '<div class="etiqueta-sublinea">' +
+          '<span><strong>Nº TRACKING:</strong> ' + escapeHtml(trackingTexto) + '</span>' +
+          '<span><strong>TRANSPORTE:</strong> ' + escapeHtml(empresa) + '</span>' +
+        '</div>' +
+
+        '<div class="etiqueta-grid-personas" style="margin-top:10px;">' +
+          '<!-- DESTINATARIO -->' +
+          '<div class="etiqueta-bloque">' +
+            '<div class="etiqueta-bloque-titulo">📦 DESTINATARIO (Para)</div>' +
+            '<p><strong>Nombre:</strong> ' + escapeHtml(destNombre) + '</p>' +
+            (destCedula ? '<p><strong>Cédula:</strong> ' + escapeHtml(destCedula) + '</p>' : '') +
+            '<p><strong>Teléfono:</strong> ' + escapeHtml(destTel) + '</p>' +
+            (destTelAlt ? '<p><strong>Tel. alternativo:</strong> ' + escapeHtml(destTelAlt) + '</p>' : '') +
+            '<p><strong>Provincia/Cantón:</strong> ' + escapeHtml(destUbicacion) + '</p>' +
+            '<p><strong>Dirección exacta:</strong> ' + escapeHtml(destDireccion) + '</p>' +
+            '<div class="etiqueta-qr-container">' +
+              '<div id="' + qrId + '" class="etiqueta-qr-img"></div>' +
+              '<div class="etiqueta-qr-texto">📱 QR de Entrega / Contacto</div>' +
+            '</div>' +
+          '</div>' +
+
+          '<!-- REMITENTE -->' +
+          '<div class="etiqueta-bloque">' +
+            '<div class="etiqueta-bloque-titulo">📤 REMITENTE (De)</div>' +
+            '<p><strong>Nombre:</strong> ' + escapeHtml(remNombre) + '</p>' +
+            (remCedula ? '<p><strong>Cédula:</strong> ' + escapeHtml(remCedula) + '</p>' : '') +
+            '<p><strong>Teléfono:</strong> ' + escapeHtml(remTel) + '</p>' +
+            '<p><strong>Provincia/Cantón:</strong> ' + escapeHtml(remUbicacion) + '</p>' +
+            '<p><strong>Dirección:</strong> ' + escapeHtml(remDireccion) + '</p>' +
+          '</div>' +
+        '</div>' +
+
+        '<!-- INFORMACIÓN ADICIONAL -->' +
+        '<div class="etiqueta-info-adicional">' +
+          '<div class="etiqueta-info-header">⚠️ INFORMACIÓN ADICIONAL</div>' +
+          '<div class="etiqueta-checks-vista">' + checksHtml + '</div>' +
+          '<div style="margin-top:4px;"><strong>Contenido:</strong> ' + escapeHtml(contenido) + '</div>' +
+        '</div>' +
+
+        '<!-- CÓDIGO DE BARRAS FOOTER -->' +
+        '<div class="etiqueta-barcode-footer">' +
+          generarBarcodeSvg(barcodeNum) +
+          '<div class="barcode-texto">' + escapeHtml(barcodeNum) + '</div>' +
+          '<div class="barcode-empresa">' + escapeHtml(empresa) + ' · RUTAS CR</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function actualizarVistaPreviaEtiqueta() {
+    var contPreview = document.getElementById('etiquetaPreviewContenedor');
+    if (!contPreview) return;
+
+    var numBultos = parseInt(document.getElementById('rotCantidadBultos').value, 10) || 1;
+    if (numBultos < 1) numBultos = 1;
+
+    var navElem = document.getElementById('previewBultosNav');
+    if (navElem) {
+      navElem.textContent = numBultos <= 1 ? 'BULTO ÚNICO' : 'BULTO 1 DE ' + numBultos;
+    }
+
+    contPreview.innerHTML = generarEtiquetaHtml(1, numBultos, false);
+
+    // Generar código QR interactivo con los datos del destinatario
+    setTimeout(function() {
+      generarQrElemento('qr_preview_1');
+    }, 60);
+  }
+
+  function generarQrElemento(elementId) {
+    var contenedor = document.getElementById(elementId);
+    if (!contenedor || typeof QRCode === 'undefined') return;
+    contenedor.innerHTML = '';
+
+    var destNombre = (document.getElementById('rotNombreDest').value || '').trim();
+    var destTel = (document.getElementById('rotTelDest').value || '').replace(/[^0-9]/g, '');
+    var destDir = (document.getElementById('rotDireccionDest').value || '').trim();
+    var destUbic = (document.getElementById('rotUbicacionDest').value || '').trim();
+
+    // Contenido del QR: Datos directos para llamar con 1 toque o leer dirección
+    var qrPayload = 'DESTINATARIO: ' + destNombre + '\nTEL: ' + destTel + '\nLUGAR: ' + destUbic + '\nDIRECCION: ' + destDir;
+    if (destTel.length >= 8) {
+      // Si tiene teléfono válido, ponemos URL para llamada directa o WhatsApp
+      qrPayload = 'https://wa.me/506' + destTel + '?text=' + encodeURIComponent('Hola ' + destNombre + ', de la empresa de encomiendas con su paquete.');
+    }
+
+    new QRCode(contenedor, {
+      text: qrPayload,
+      width: 96,
+      height: 96,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+
+  function imprimirEtiquetas() {
+    var numBultos = parseInt(document.getElementById('rotCantidadBultos').value, 10) || 1;
+    if (numBultos < 1) numBultos = 1;
+
+    var contPrint = document.getElementById('impresionEtiquetasContenedor');
+    if (!contPrint) return;
+
+    var htmlTotal = '';
+    for (var i = 1; i <= numBultos; i++) {
+      htmlTotal += '<div class="etiqueta-print-item">' + generarEtiquetaHtml(i, numBultos, true) + '</div>';
+    }
+    contPrint.innerHTML = htmlTotal;
+    contPrint.style.display = 'block';
+
+    // Generar los QRs para cada etiqueta de impresión
+    for (var b = 1; b <= numBultos; b++) {
+      (function(idx) {
+        setTimeout(function() {
+          generarQrElemento('qr_print_' + idx);
+        }, 30 * idx);
+      })(b);
+    }
+
+    // Disparar diálogo de impresión
+    setTimeout(function() {
+      window.print();
+      contPrint.style.display = 'none';
+    }, 250 + (numBultos * 35));
+  }
+
+</script>
 
 <style>
   :root {
@@ -896,15 +1323,905 @@
     .boleto .sello { top: auto; bottom: 10px; right: 10px; }
     .boleto h3 { padding-right: 0; }
   }
+
+  /* ---------- BOTÓN ROTULAR SERVICIO HEADER ---------- */
+  .header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .header-texto { flex: 1; min-width: 260px; }
+  .btn-rotular-servicio {
+    background: linear-gradient(135deg, var(--amber), #D98218);
+    color: #0B2545;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 25px;
+    font-size: 13.5px;
+    font-weight: 800;
+    font-family: 'Space Grotesk', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(242,169,59,0.38);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    white-space: nowrap;
+    border: 1px solid rgba(255,255,255,0.4);
+  }
+  .btn-rotular-servicio:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(242,169,59,0.55);
+    background: linear-gradient(135deg, #FFB74D, var(--amber));
+  }
+
+  /* Botón rotular en tarjeta de transportista */
+  .btn-rotular-card {
+    background: #FFFDF9 !important;
+    color: #0B2545 !important;
+    border: 1.5px solid #F2A93B !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 6px rgba(242,169,59,0.15) !important;
+  }
+  .btn-rotular-card:hover {
+    background: #FFF6E6 !important;
+    border-color: #C97F16 !important;
+  }
+
+  /* ---------- MODAL DEL ROTULADOR DE ENCOMIENDAS ---------- */
+  .modal-rotulador {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(11,37,69,0.75);
+    backdrop-filter: blur(5px);
+    z-index: 100000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    overflow-y: auto;
+  }
+  .modal-rotulador.abierto {
+    display: flex;
+    animation: fadeInModal 0.25s ease;
+  }
+  @keyframes fadeInModal {
+    from { opacity: 0; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .modal-rotulador-card {
+    background: #FFFFFF;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 1060px;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .modal-rotulador-header {
+    background: var(--navy);
+    color: #FFFFFF;
+    padding: 16px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-rotulador-header h2 {
+    margin: 0;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .modal-rotulador-header .btn-cerrar {
+    background: rgba(255,255,255,0.12);
+    border: none;
+    color: #FFFFFF;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .modal-rotulador-header .btn-cerrar:hover {
+    background: rgba(255,255,255,0.25);
+  }
+  .modal-rotulador-body {
+    padding: 20px;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    background: #F8F9FB;
+  }
+  @media (max-width: 820px) {
+    .modal-rotulador-body {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Formulario de rotulado */
+  .rotulador-form-col {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    box-shadow: 0 2px 8px rgba(11,37,69,0.04);
+  }
+  .seccion-form-titulo {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 10px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid var(--amber);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .campo-grupo {
+    margin-bottom: 12px;
+  }
+  .campo-grupo label {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .campo-grupo input, .campo-grupo textarea, .campo-grupo select {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    box-sizing: border-box;
+    text-transform: uppercase;
+  }
+  .campo-grupo input:focus, .campo-grupo textarea:focus, .campo-grupo select:focus {
+    outline: 2px solid var(--amber);
+    border-color: var(--amber);
+  }
+  .campo-fila-doble {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .checks-cuidado {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .check-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+  }
+  .check-label input {
+    accent-color: var(--navy);
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Vista previa y visualización de etiqueta */
+  .rotulador-preview-col {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .preview-barra-controles {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    background: #FFFFFF;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+  }
+  .bultos-indicador {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--navy);
+    background: #FFF6E6;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--amber);
+  }
+
+  /* ---------- PLANTILLA DE ETIQUETA DE EMBALAJE (TIPO COSTA RICA) ---------- */
+  .etiqueta-caja {
+    background: #FFFFFF;
+    border: 2.5px solid #111111;
+    border-radius: 8px;
+    padding: 14px;
+    font-family: 'Inter', Arial, sans-serif;
+    color: #111111;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+    position: relative;
+    box-sizing: border-box;
+  }
+  .etiqueta-header-top {
+    border-bottom: 2px solid #111111;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .etiqueta-titulo-box {
+    font-family: 'Space Grotesk', Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+  .etiqueta-bulto-badge {
+    background: #111111;
+    color: #FFFFFF;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .etiqueta-sublinea {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    margin-top: 4px;
+    color: #222222;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .etiqueta-grid-personas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  @media (max-width: 540px) {
+    .etiqueta-grid-personas {
+      grid-template-columns: 1fr;
+    }
+  }
+  .etiqueta-bloque {
+    border: 1.5px solid #222222;
+    border-radius: 6px;
+    padding: 9px;
+    background: #FAFAFA;
+    font-size: 11.5px;
+    line-height: 1.35;
+    position: relative;
+  }
+  .etiqueta-bloque-titulo {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin: 0 0 6px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #CCCCCC;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .etiqueta-bloque p {
+    margin: 0 0 4px;
+    word-break: break-word;
+  }
+  .etiqueta-bloque strong {
+    font-weight: 700;
+  }
+  .etiqueta-qr-container {
+    text-align: center;
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px dashed #BBBBBB;
+  }
+  .etiqueta-qr-img {
+    display: inline-block;
+    background: white;
+    padding: 4px;
+    border: 1px solid #CCCCCC;
+    border-radius: 4px;
+  }
+  .etiqueta-qr-texto {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #444444;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .etiqueta-info-adicional {
+    border: 1.5px solid #222222;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    background: #FFFDF7;
+    font-size: 11.5px;
+  }
+  .etiqueta-info-header {
+    font-size: 11px;
+    font-weight: 800;
+    margin: 0 0 4px;
+    text-transform: uppercase;
+  }
+  .etiqueta-checks-vista {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-weight: 600;
+    font-size: 10.5px;
+    margin-bottom: 4px;
+  }
+  .etiqueta-checks-vista span.activo {
+    font-weight: 800;
+    color: #000000;
+  }
+  .etiqueta-checks-vista span.inactivo {
+    color: #888888;
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+  .etiqueta-barcode-footer {
+    border: 1.5px solid #222222;
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+    background: #FFFFFF;
+  }
+  .barcode-svg {
+    max-width: 100%;
+    height: 44px;
+  }
+  .barcode-texto {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    margin: 3px 0 1px;
+  }
+  .barcode-empresa {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #555555;
+    text-transform: uppercase;
+  }
+
+  /* Botones del modal footer */
+  .modal-rotulador-footer {
+    background: #FFFFFF;
+    border-top: 1px solid var(--line);
+    padding: 14px 22px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    align-items: center;
+  }
+  .btn-modal-print {
+    background: linear-gradient(135deg, #0B2545, #12325E);
+    color: #FFFFFF;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(11,37,69,0.25);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+  }
+  .btn-modal-print:hover {
+    background: #1A4273;
+    transform: translateY(-1px);
+  }
+  .btn-modal-cancel {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13.5px;
+    cursor: pointer;
+  }
+
+  /* ---------- ESTILOS DE IMPRESIÓN OFICIAL (@media print) ---------- */
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    header, .contenedor-buscador, .swr-barra, #mapa, .contenedor-transportistas, #resultados, footer, .visor-imagen, .toast-aviso, .modal-rotulador-header, .modal-rotulador-footer, .rotulador-form-col, .preview-barra-controles {
+      display: none !important;
+    }
+    #impresionEtiquetasContenedor, #impresionEtiquetasContenedor * {
+      visibility: visible;
+    }
+    #impresionEtiquetasContenedor {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      display: block !important;
+      padding: 0;
+      margin: 0;
+      background: #FFFFFF;
+    }
+    .etiqueta-print-item {
+      page-break-after: always;
+      break-after: page;
+      padding: 10mm;
+      box-sizing: border-box;
+      max-width: 160mm;
+      margin: 0 auto;
+    }
+    .etiqueta-caja {
+      box-shadow: none !important;
+      border: 3px solid #000000 !important;
+    }
+  }
+
 </style>
 
 <!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZZSVWT05KE"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZZSVWT05KE">
+  // ==============================================================================
+  // ROTULADOR DE ENCOMIENDAS (PLANTILLA DE EMBALAJE CON QR Y SECUENCIA MULTIPAC)
+  // ==============================================================================
+  var bultoActualPreview = 1;
+
+  function abrirRotulador() {
+    var modal = document.getElementById('modalRotulador');
+    if (!modal) return;
+    modal.classList.add('abierto');
+    document.body.style.overflow = 'hidden';
+    actualizarVistaPreviaEtiqueta();
+  }
+
+  function abrirRotuladorConTransportista(nombreEmpresa, zonaDestino) {
+    abrirRotulador();
+    if (nombreEmpresa) {
+      document.getElementById('rotEmpresa').value = nombreEmpresa.toUpperCase();
+    }
+    if (zonaDestino) {
+      document.getElementById('rotUbicacionDest').value = zonaDestino.toUpperCase();
+    }
+    actualizarVistaPreviaEtiqueta();
+  }
+
+  function cerrarRotulador() {
+    var modal = document.getElementById('modalRotulador');
+    if (!modal) return;
+    modal.classList.remove('abierto');
+    document.body.style.overflow = '';
+  }
+
+  function generarBarcodeSvg(codigo) {
+    // Generador de código de barras simulado en SVG nítido y vectorial
+    var cleanCode = (codigo || '744100010001').replace(/[^0-9A-Z]/g, '');
+    var bars = '';
+    var x = 10;
+    for (var i = 0; i < 46; i++) {
+      var w = (i % 3 === 0 || i % 7 === 0) ? 3 : 1.5;
+      bars += '<rect x="' + x + '" y="0" width="' + w + '" height="38" fill="#111111" />';
+      x += w + 2;
+    }
+    return '<svg class="barcode-svg" viewBox="0 0 ' + (x + 10) + ' 40" preserveAspectRatio="none">' + bars + '</svg>';
+  }
+
+  function generarEtiquetaHtml(indice, totalBultos, esParaImprimir) {
+    var destNombre = (document.getElementById('rotNombreDest').value || 'JUAN CARLOS ARIAS GÓMEZ').toUpperCase().trim();
+    var destCedula = (document.getElementById('rotCedulaDest').value || '').toUpperCase().trim();
+    var destTel = (document.getElementById('rotTelDest').value || '8876-5432').trim();
+    var destTelAlt = (document.getElementById('rotTelAltDest').value || '').trim();
+    var destUbicacion = (document.getElementById('rotUbicacionDest').value || 'ALAJUELA, SAN RAMÓN, SAN RAFAEL').toUpperCase().trim();
+    var destDireccion = (document.getElementById('rotDireccionDest').value || 'DEL SUPERMERCADO MUSMANNI, 200 METROS NORTE Y 50 ESTE, CASA DE PORTÓN NEGRO, FRENTE AL PARQUE. LLAMAR ANTES DE ENTREGAR.').toUpperCase().trim();
+
+    var remNombre = (document.getElementById('rotNombreRem').value || 'MARÍA ELENA SALAZAR CASTRO').toUpperCase().trim();
+    var remCedula = (document.getElementById('rotCedulaRem').value || '1-1234-5678').toUpperCase().trim();
+    var remTel = (document.getElementById('rotTelRem').value || '8765-4321').trim();
+    var remUbicacion = (document.getElementById('rotUbicacionRem').value || 'SAN JOSÉ, SANTA ANA, POZOS').toUpperCase().trim();
+    var remDireccion = (document.getElementById('rotDireccionRem').value || 'CONDOMINIO LAS BRISAS, CASA 12').toUpperCase().trim();
+
+    var empresa = (document.getElementById('rotEmpresa').value || 'ENCOMIENDAS COSTA RICA').toUpperCase().trim();
+    var tracking = (document.getElementById('rotTracking').value || '').toUpperCase().trim();
+    var contenido = (document.getElementById('rotContenido').value || 'REPUESTOS Y DOCUMENTOS').toUpperCase().trim();
+
+    var fragil = document.getElementById('chkFragil').checked;
+    var pie = document.getElementById('chkPie').checked;
+    var horario = document.getElementById('chkHorario').checked;
+    var cod = document.getElementById('chkCod').checked;
+
+    // Distintivo de Bulto: Si es 1 = BULTO ÚNICO, si es > 1 = BULTO 1/3, 2/3, etc.
+    var bultoBadgeTexto = totalBultos <= 1 ? 'BULTO ÚNICO' : 'BULTO ' + indice + '/' + totalBultos;
+    var trackingTexto = tracking ? tracking + (totalBultos > 1 ? '-' + String(indice).padStart(2, '0') : '') : '[ESPACIO EN BLANCO PARA CÓDIGO]';
+    var barcodeNum = (tracking ? tracking.replace(/[^0-9]/g, '') : '744123456789') + (totalBultos > 1 ? String(indice) : '0');
+
+    // Identificador único para el contenedor del QR
+    var qrId = (esParaImprimir ? 'qr_print_' : 'qr_preview_') + indice;
+
+    var checksHtml = '' +
+      '<span class="' + (fragil ? 'activo' : 'inactivo') + '">' + (fragil ? '☑' : '☐') + ' Frágil</span>' +
+      '<span class="' + (pie ? 'activo' : 'inactivo') + '">' + (pie ? '☑' : '☐') + ' Mantener de pie</span>' +
+      '<span class="' + (horario ? 'activo' : 'inactivo') + '">' + (horario ? '☑' : '☐') + ' Horario de oficina</span>' +
+      (cod ? '<span class="activo">☑ Cobro Contra Entrega (C.O.D.)</span>' : '');
+
+    return '' +
+      '<div class="etiqueta-caja">' +
+        '<div class="etiqueta-header-top">' +
+          '<div class="etiqueta-titulo-box">EMBALAJE DE ENCOMIENDA</div>' +
+          '<div class="etiqueta-bulto-badge">' + bultoBadgeTexto + '</div>' +
+        '</div>' +
+        '<div class="etiqueta-sublinea">' +
+          '<span><strong>Nº TRACKING:</strong> ' + escapeHtml(trackingTexto) + '</span>' +
+          '<span><strong>TRANSPORTE:</strong> ' + escapeHtml(empresa) + '</span>' +
+        '</div>' +
+
+        '<div class="etiqueta-grid-personas" style="margin-top:10px;">' +
+          '<!-- DESTINATARIO -->' +
+          '<div class="etiqueta-bloque">' +
+            '<div class="etiqueta-bloque-titulo">📦 DESTINATARIO (Para)</div>' +
+            '<p><strong>Nombre:</strong> ' + escapeHtml(destNombre) + '</p>' +
+            (destCedula ? '<p><strong>Cédula:</strong> ' + escapeHtml(destCedula) + '</p>' : '') +
+            '<p><strong>Teléfono:</strong> ' + escapeHtml(destTel) + '</p>' +
+            (destTelAlt ? '<p><strong>Tel. alternativo:</strong> ' + escapeHtml(destTelAlt) + '</p>' : '') +
+            '<p><strong>Provincia/Cantón:</strong> ' + escapeHtml(destUbicacion) + '</p>' +
+            '<p><strong>Dirección exacta:</strong> ' + escapeHtml(destDireccion) + '</p>' +
+            '<div class="etiqueta-qr-container">' +
+              '<div id="' + qrId + '" class="etiqueta-qr-img"></div>' +
+              '<div class="etiqueta-qr-texto">📱 QR de Entrega / Contacto</div>' +
+            '</div>' +
+          '</div>' +
+
+          '<!-- REMITENTE -->' +
+          '<div class="etiqueta-bloque">' +
+            '<div class="etiqueta-bloque-titulo">📤 REMITENTE (De)</div>' +
+            '<p><strong>Nombre:</strong> ' + escapeHtml(remNombre) + '</p>' +
+            (remCedula ? '<p><strong>Cédula:</strong> ' + escapeHtml(remCedula) + '</p>' : '') +
+            '<p><strong>Teléfono:</strong> ' + escapeHtml(remTel) + '</p>' +
+            '<p><strong>Provincia/Cantón:</strong> ' + escapeHtml(remUbicacion) + '</p>' +
+            '<p><strong>Dirección:</strong> ' + escapeHtml(remDireccion) + '</p>' +
+          '</div>' +
+        '</div>' +
+
+        '<!-- INFORMACIÓN ADICIONAL -->' +
+        '<div class="etiqueta-info-adicional">' +
+          '<div class="etiqueta-info-header">⚠️ INFORMACIÓN ADICIONAL</div>' +
+          '<div class="etiqueta-checks-vista">' + checksHtml + '</div>' +
+          '<div style="margin-top:4px;"><strong>Contenido:</strong> ' + escapeHtml(contenido) + '</div>' +
+        '</div>' +
+
+        '<!-- CÓDIGO DE BARRAS FOOTER -->' +
+        '<div class="etiqueta-barcode-footer">' +
+          generarBarcodeSvg(barcodeNum) +
+          '<div class="barcode-texto">' + escapeHtml(barcodeNum) + '</div>' +
+          '<div class="barcode-empresa">' + escapeHtml(empresa) + ' · RUTAS CR</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function actualizarVistaPreviaEtiqueta() {
+    var contPreview = document.getElementById('etiquetaPreviewContenedor');
+    if (!contPreview) return;
+
+    var numBultos = parseInt(document.getElementById('rotCantidadBultos').value, 10) || 1;
+    if (numBultos < 1) numBultos = 1;
+
+    var navElem = document.getElementById('previewBultosNav');
+    if (navElem) {
+      navElem.textContent = numBultos <= 1 ? 'BULTO ÚNICO' : 'BULTO 1 DE ' + numBultos;
+    }
+
+    contPreview.innerHTML = generarEtiquetaHtml(1, numBultos, false);
+
+    // Generar código QR interactivo con los datos del destinatario
+    setTimeout(function() {
+      generarQrElemento('qr_preview_1');
+    }, 60);
+  }
+
+  function generarQrElemento(elementId) {
+    var contenedor = document.getElementById(elementId);
+    if (!contenedor || typeof QRCode === 'undefined') return;
+    contenedor.innerHTML = '';
+
+    var destNombre = (document.getElementById('rotNombreDest').value || '').trim();
+    var destTel = (document.getElementById('rotTelDest').value || '').replace(/[^0-9]/g, '');
+    var destDir = (document.getElementById('rotDireccionDest').value || '').trim();
+    var destUbic = (document.getElementById('rotUbicacionDest').value || '').trim();
+
+    // Contenido del QR: Datos directos para llamar con 1 toque o leer dirección
+    var qrPayload = 'DESTINATARIO: ' + destNombre + '\nTEL: ' + destTel + '\nLUGAR: ' + destUbic + '\nDIRECCION: ' + destDir;
+    if (destTel.length >= 8) {
+      // Si tiene teléfono válido, ponemos URL para llamada directa o WhatsApp
+      qrPayload = 'https://wa.me/506' + destTel + '?text=' + encodeURIComponent('Hola ' + destNombre + ', de la empresa de encomiendas con su paquete.');
+    }
+
+    new QRCode(contenedor, {
+      text: qrPayload,
+      width: 96,
+      height: 96,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+
+  function imprimirEtiquetas() {
+    var numBultos = parseInt(document.getElementById('rotCantidadBultos').value, 10) || 1;
+    if (numBultos < 1) numBultos = 1;
+
+    var contPrint = document.getElementById('impresionEtiquetasContenedor');
+    if (!contPrint) return;
+
+    var htmlTotal = '';
+    for (var i = 1; i <= numBultos; i++) {
+      htmlTotal += '<div class="etiqueta-print-item">' + generarEtiquetaHtml(i, numBultos, true) + '</div>';
+    }
+    contPrint.innerHTML = htmlTotal;
+    contPrint.style.display = 'block';
+
+    // Generar los QRs para cada etiqueta de impresión
+    for (var b = 1; b <= numBultos; b++) {
+      (function(idx) {
+        setTimeout(function() {
+          generarQrElemento('qr_print_' + idx);
+        }, 30 * idx);
+      })(b);
+    }
+
+    // Disparar diálogo de impresión
+    setTimeout(function() {
+      window.print();
+      contPrint.style.display = 'none';
+    }, 250 + (numBultos * 35));
+  }
+
+</script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'G-ZZSVWT05KE');
+
+  // ==============================================================================
+  // ROTULADOR DE ENCOMIENDAS (PLANTILLA DE EMBALAJE CON QR Y SECUENCIA MULTIPAC)
+  // ==============================================================================
+  var bultoActualPreview = 1;
+
+  function abrirRotulador() {
+    var modal = document.getElementById('modalRotulador');
+    if (!modal) return;
+    modal.classList.add('abierto');
+    document.body.style.overflow = 'hidden';
+    actualizarVistaPreviaEtiqueta();
+  }
+
+  function abrirRotuladorConTransportista(nombreEmpresa, zonaDestino) {
+    abrirRotulador();
+    if (nombreEmpresa) {
+      document.getElementById('rotEmpresa').value = nombreEmpresa.toUpperCase();
+    }
+    if (zonaDestino) {
+      document.getElementById('rotUbicacionDest').value = zonaDestino.toUpperCase();
+    }
+    actualizarVistaPreviaEtiqueta();
+  }
+
+  function cerrarRotulador() {
+    var modal = document.getElementById('modalRotulador');
+    if (!modal) return;
+    modal.classList.remove('abierto');
+    document.body.style.overflow = '';
+  }
+
+  function generarBarcodeSvg(codigo) {
+    // Generador de código de barras simulado en SVG nítido y vectorial
+    var cleanCode = (codigo || '744100010001').replace(/[^0-9A-Z]/g, '');
+    var bars = '';
+    var x = 10;
+    for (var i = 0; i < 46; i++) {
+      var w = (i % 3 === 0 || i % 7 === 0) ? 3 : 1.5;
+      bars += '<rect x="' + x + '" y="0" width="' + w + '" height="38" fill="#111111" />';
+      x += w + 2;
+    }
+    return '<svg class="barcode-svg" viewBox="0 0 ' + (x + 10) + ' 40" preserveAspectRatio="none">' + bars + '</svg>';
+  }
+
+  function generarEtiquetaHtml(indice, totalBultos, esParaImprimir) {
+    var destNombre = (document.getElementById('rotNombreDest').value || 'JUAN CARLOS ARIAS GÓMEZ').toUpperCase().trim();
+    var destCedula = (document.getElementById('rotCedulaDest').value || '').toUpperCase().trim();
+    var destTel = (document.getElementById('rotTelDest').value || '8876-5432').trim();
+    var destTelAlt = (document.getElementById('rotTelAltDest').value || '').trim();
+    var destUbicacion = (document.getElementById('rotUbicacionDest').value || 'ALAJUELA, SAN RAMÓN, SAN RAFAEL').toUpperCase().trim();
+    var destDireccion = (document.getElementById('rotDireccionDest').value || 'DEL SUPERMERCADO MUSMANNI, 200 METROS NORTE Y 50 ESTE, CASA DE PORTÓN NEGRO, FRENTE AL PARQUE. LLAMAR ANTES DE ENTREGAR.').toUpperCase().trim();
+
+    var remNombre = (document.getElementById('rotNombreRem').value || 'MARÍA ELENA SALAZAR CASTRO').toUpperCase().trim();
+    var remCedula = (document.getElementById('rotCedulaRem').value || '1-1234-5678').toUpperCase().trim();
+    var remTel = (document.getElementById('rotTelRem').value || '8765-4321').trim();
+    var remUbicacion = (document.getElementById('rotUbicacionRem').value || 'SAN JOSÉ, SANTA ANA, POZOS').toUpperCase().trim();
+    var remDireccion = (document.getElementById('rotDireccionRem').value || 'CONDOMINIO LAS BRISAS, CASA 12').toUpperCase().trim();
+
+    var empresa = (document.getElementById('rotEmpresa').value || 'ENCOMIENDAS COSTA RICA').toUpperCase().trim();
+    var tracking = (document.getElementById('rotTracking').value || '').toUpperCase().trim();
+    var contenido = (document.getElementById('rotContenido').value || 'REPUESTOS Y DOCUMENTOS').toUpperCase().trim();
+
+    var fragil = document.getElementById('chkFragil').checked;
+    var pie = document.getElementById('chkPie').checked;
+    var horario = document.getElementById('chkHorario').checked;
+    var cod = document.getElementById('chkCod').checked;
+
+    // Distintivo de Bulto: Si es 1 = BULTO ÚNICO, si es > 1 = BULTO 1/3, 2/3, etc.
+    var bultoBadgeTexto = totalBultos <= 1 ? 'BULTO ÚNICO' : 'BULTO ' + indice + '/' + totalBultos;
+    var trackingTexto = tracking ? tracking + (totalBultos > 1 ? '-' + String(indice).padStart(2, '0') : '') : '[ESPACIO EN BLANCO PARA CÓDIGO]';
+    var barcodeNum = (tracking ? tracking.replace(/[^0-9]/g, '') : '744123456789') + (totalBultos > 1 ? String(indice) : '0');
+
+    // Identificador único para el contenedor del QR
+    var qrId = (esParaImprimir ? 'qr_print_' : 'qr_preview_') + indice;
+
+    var checksHtml = '' +
+      '<span class="' + (fragil ? 'activo' : 'inactivo') + '">' + (fragil ? '☑' : '☐') + ' Frágil</span>' +
+      '<span class="' + (pie ? 'activo' : 'inactivo') + '">' + (pie ? '☑' : '☐') + ' Mantener de pie</span>' +
+      '<span class="' + (horario ? 'activo' : 'inactivo') + '">' + (horario ? '☑' : '☐') + ' Horario de oficina</span>' +
+      (cod ? '<span class="activo">☑ Cobro Contra Entrega (C.O.D.)</span>' : '');
+
+    return '' +
+      '<div class="etiqueta-caja">' +
+        '<div class="etiqueta-header-top">' +
+          '<div class="etiqueta-titulo-box">EMBALAJE DE ENCOMIENDA</div>' +
+          '<div class="etiqueta-bulto-badge">' + bultoBadgeTexto + '</div>' +
+        '</div>' +
+        '<div class="etiqueta-sublinea">' +
+          '<span><strong>Nº TRACKING:</strong> ' + escapeHtml(trackingTexto) + '</span>' +
+          '<span><strong>TRANSPORTE:</strong> ' + escapeHtml(empresa) + '</span>' +
+        '</div>' +
+
+        '<div class="etiqueta-grid-personas" style="margin-top:10px;">' +
+          '<!-- DESTINATARIO -->' +
+          '<div class="etiqueta-bloque">' +
+            '<div class="etiqueta-bloque-titulo">📦 DESTINATARIO (Para)</div>' +
+            '<p><strong>Nombre:</strong> ' + escapeHtml(destNombre) + '</p>' +
+            (destCedula ? '<p><strong>Cédula:</strong> ' + escapeHtml(destCedula) + '</p>' : '') +
+            '<p><strong>Teléfono:</strong> ' + escapeHtml(destTel) + '</p>' +
+            (destTelAlt ? '<p><strong>Tel. alternativo:</strong> ' + escapeHtml(destTelAlt) + '</p>' : '') +
+            '<p><strong>Provincia/Cantón:</strong> ' + escapeHtml(destUbicacion) + '</p>' +
+            '<p><strong>Dirección exacta:</strong> ' + escapeHtml(destDireccion) + '</p>' +
+            '<div class="etiqueta-qr-container">' +
+              '<div id="' + qrId + '" class="etiqueta-qr-img"></div>' +
+              '<div class="etiqueta-qr-texto">📱 QR de Entrega / Contacto</div>' +
+            '</div>' +
+          '</div>' +
+
+          '<!-- REMITENTE -->' +
+          '<div class="etiqueta-bloque">' +
+            '<div class="etiqueta-bloque-titulo">📤 REMITENTE (De)</div>' +
+            '<p><strong>Nombre:</strong> ' + escapeHtml(remNombre) + '</p>' +
+            (remCedula ? '<p><strong>Cédula:</strong> ' + escapeHtml(remCedula) + '</p>' : '') +
+            '<p><strong>Teléfono:</strong> ' + escapeHtml(remTel) + '</p>' +
+            '<p><strong>Provincia/Cantón:</strong> ' + escapeHtml(remUbicacion) + '</p>' +
+            '<p><strong>Dirección:</strong> ' + escapeHtml(remDireccion) + '</p>' +
+          '</div>' +
+        '</div>' +
+
+        '<!-- INFORMACIÓN ADICIONAL -->' +
+        '<div class="etiqueta-info-adicional">' +
+          '<div class="etiqueta-info-header">⚠️ INFORMACIÓN ADICIONAL</div>' +
+          '<div class="etiqueta-checks-vista">' + checksHtml + '</div>' +
+          '<div style="margin-top:4px;"><strong>Contenido:</strong> ' + escapeHtml(contenido) + '</div>' +
+        '</div>' +
+
+        '<!-- CÓDIGO DE BARRAS FOOTER -->' +
+        '<div class="etiqueta-barcode-footer">' +
+          generarBarcodeSvg(barcodeNum) +
+          '<div class="barcode-texto">' + escapeHtml(barcodeNum) + '</div>' +
+          '<div class="barcode-empresa">' + escapeHtml(empresa) + ' · RUTAS CR</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function actualizarVistaPreviaEtiqueta() {
+    var contPreview = document.getElementById('etiquetaPreviewContenedor');
+    if (!contPreview) return;
+
+    var numBultos = parseInt(document.getElementById('rotCantidadBultos').value, 10) || 1;
+    if (numBultos < 1) numBultos = 1;
+
+    var navElem = document.getElementById('previewBultosNav');
+    if (navElem) {
+      navElem.textContent = numBultos <= 1 ? 'BULTO ÚNICO' : 'BULTO 1 DE ' + numBultos;
+    }
+
+    contPreview.innerHTML = generarEtiquetaHtml(1, numBultos, false);
+
+    // Generar código QR interactivo con los datos del destinatario
+    setTimeout(function() {
+      generarQrElemento('qr_preview_1');
+    }, 60);
+  }
+
+  function generarQrElemento(elementId) {
+    var contenedor = document.getElementById(elementId);
+    if (!contenedor || typeof QRCode === 'undefined') return;
+    contenedor.innerHTML = '';
+
+    var destNombre = (document.getElementById('rotNombreDest').value || '').trim();
+    var destTel = (document.getElementById('rotTelDest').value || '').replace(/[^0-9]/g, '');
+    var destDir = (document.getElementById('rotDireccionDest').value || '').trim();
+    var destUbic = (document.getElementById('rotUbicacionDest').value || '').trim();
+
+    // Contenido del QR: Datos directos para llamar con 1 toque o leer dirección
+    var qrPayload = 'DESTINATARIO: ' + destNombre + '\nTEL: ' + destTel + '\nLUGAR: ' + destUbic + '\nDIRECCION: ' + destDir;
+    if (destTel.length >= 8) {
+      // Si tiene teléfono válido, ponemos URL para llamada directa o WhatsApp
+      qrPayload = 'https://wa.me/506' + destTel + '?text=' + encodeURIComponent('Hola ' + destNombre + ', de la empresa de encomiendas con su paquete.');
+    }
+
+    new QRCode(contenedor, {
+      text: qrPayload,
+      width: 96,
+      height: 96,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+
+  function imprimirEtiquetas() {
+    var numBultos = parseInt(document.getElementById('rotCantidadBultos').value, 10) || 1;
+    if (numBultos < 1) numBultos = 1;
+
+    var contPrint = document.getElementById('impresionEtiquetasContenedor');
+    if (!contPrint) return;
+
+    var htmlTotal = '';
+    for (var i = 1; i <= numBultos; i++) {
+      htmlTotal += '<div class="etiqueta-print-item">' + generarEtiquetaHtml(i, numBultos, true) + '</div>';
+    }
+    contPrint.innerHTML = htmlTotal;
+    contPrint.style.display = 'block';
+
+    // Generar los QRs para cada etiqueta de impresión
+    for (var b = 1; b <= numBultos; b++) {
+      (function(idx) {
+        setTimeout(function() {
+          generarQrElemento('qr_print_' + idx);
+        }, 30 * idx);
+      })(b);
+    }
+
+    // Disparar diálogo de impresión
+    setTimeout(function() {
+      window.print();
+      contPrint.style.display = 'none';
+    }, 250 + (numBultos * 35));
+  }
+
 </script>
 
 </head>
@@ -913,9 +2230,18 @@
 <header>
   <div class="ruta-punteada"></div>
   <div class="contenido">
-    <p class="eyebrow">Costa Rica · Rutas y Encomiendas</p>
-    <h1>Rutas CR</h1>
-    <p>Encuentra qué transportista viaja hacia tu destino, o busca uno que ya conoces, y navega directo a su bodega con Waze o Google Maps.</p>
+    <div class="header-flex">
+      <div class="header-texto">
+        <p class="eyebrow">Costa Rica · Rutas y Encomiendas</p>
+        <h1>Rutas CR</h1>
+        <p>Encuentra qué transportista viaja hacia tu destino, o busca uno que ya conoces, y navega directo a su bodega con Waze o Google Maps.</p>
+      </div>
+      <div class="header-accion">
+        <button type="button" class="btn-rotular-servicio" onclick="abrirRotulador()" title="Crear etiqueta de embalaje lista para imprimir con QR">
+          📦 Rotular Encomienda
+        </button>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -2457,6 +3783,9 @@
       var dirVal = (b && b.direccion) ? b.direccion : '';
 
       var destinosTexto = (Array.isArray(t.destinos) ? t.destinos : []).join(', ');
+      acciones += '<button type="button" class="btn-rotular-card" onclick=\'abrirRotuladorConTransportista(' +
+        JSON.stringify(t.nombre) + ',' +
+        JSON.stringify(b && b.zona ? b.zona : '') + ')\'>📦 Rotular</button>';
       acciones += '<button type="button" class="btn-compartir" onclick=\'compartirTransportista(' +
         JSON.stringify(t.nombre) + ',' +
         JSON.stringify(zonaVal) + ',' +
@@ -2542,6 +3871,9 @@
             '<a href="#mapa" class="btn-ver-mapa" onclick="centrarEnMapa(' + b.lat + ',' + b.lng + '); return false;">🗺️ Ver mapa</a>';
         }
         var destinosTexto = (Array.isArray(t.destinos) ? t.destinos : []).join(', ');
+        acciones += '<button type="button" class="btn-rotular-card" onclick=\'abrirRotuladorConTransportista(' +
+          JSON.stringify(t.nombre) + ',' +
+          JSON.stringify(b.zona || '') + ')\'>📦 Rotular</button>';
         acciones += '<button type="button" class="btn-compartir" onclick=\'compartirTransportista(' +
           JSON.stringify(t.nombre) + ',' +
           JSON.stringify(b.zona || '') + ',' +
@@ -2808,7 +4140,350 @@
 
   // Inicializar Leaflet automáticamente al cargar el DOM
   window.addEventListener('DOMContentLoaded', initMap);
+
+  // ==============================================================================
+  // ROTULADOR DE ENCOMIENDAS (PLANTILLA DE EMBALAJE CON QR Y SECUENCIA MULTIPAC)
+  // ==============================================================================
+  var bultoActualPreview = 1;
+
+  function abrirRotulador() {
+    var modal = document.getElementById('modalRotulador');
+    if (!modal) return;
+    modal.classList.add('abierto');
+    document.body.style.overflow = 'hidden';
+    actualizarVistaPreviaEtiqueta();
+  }
+
+  function abrirRotuladorConTransportista(nombreEmpresa, zonaDestino) {
+    abrirRotulador();
+    if (nombreEmpresa) {
+      document.getElementById('rotEmpresa').value = nombreEmpresa.toUpperCase();
+    }
+    if (zonaDestino) {
+      document.getElementById('rotUbicacionDest').value = zonaDestino.toUpperCase();
+    }
+    actualizarVistaPreviaEtiqueta();
+  }
+
+  function cerrarRotulador() {
+    var modal = document.getElementById('modalRotulador');
+    if (!modal) return;
+    modal.classList.remove('abierto');
+    document.body.style.overflow = '';
+  }
+
+  function generarBarcodeSvg(codigo) {
+    // Generador de código de barras simulado en SVG nítido y vectorial
+    var cleanCode = (codigo || '744100010001').replace(/[^0-9A-Z]/g, '');
+    var bars = '';
+    var x = 10;
+    for (var i = 0; i < 46; i++) {
+      var w = (i % 3 === 0 || i % 7 === 0) ? 3 : 1.5;
+      bars += '<rect x="' + x + '" y="0" width="' + w + '" height="38" fill="#111111" />';
+      x += w + 2;
+    }
+    return '<svg class="barcode-svg" viewBox="0 0 ' + (x + 10) + ' 40" preserveAspectRatio="none">' + bars + '</svg>';
+  }
+
+  function generarEtiquetaHtml(indice, totalBultos, esParaImprimir) {
+    var destNombre = (document.getElementById('rotNombreDest').value || 'JUAN CARLOS ARIAS GÓMEZ').toUpperCase().trim();
+    var destCedula = (document.getElementById('rotCedulaDest').value || '').toUpperCase().trim();
+    var destTel = (document.getElementById('rotTelDest').value || '8876-5432').trim();
+    var destTelAlt = (document.getElementById('rotTelAltDest').value || '').trim();
+    var destUbicacion = (document.getElementById('rotUbicacionDest').value || 'ALAJUELA, SAN RAMÓN, SAN RAFAEL').toUpperCase().trim();
+    var destDireccion = (document.getElementById('rotDireccionDest').value || 'DEL SUPERMERCADO MUSMANNI, 200 METROS NORTE Y 50 ESTE, CASA DE PORTÓN NEGRO, FRENTE AL PARQUE. LLAMAR ANTES DE ENTREGAR.').toUpperCase().trim();
+
+    var remNombre = (document.getElementById('rotNombreRem').value || 'MARÍA ELENA SALAZAR CASTRO').toUpperCase().trim();
+    var remCedula = (document.getElementById('rotCedulaRem').value || '1-1234-5678').toUpperCase().trim();
+    var remTel = (document.getElementById('rotTelRem').value || '8765-4321').trim();
+    var remUbicacion = (document.getElementById('rotUbicacionRem').value || 'SAN JOSÉ, SANTA ANA, POZOS').toUpperCase().trim();
+    var remDireccion = (document.getElementById('rotDireccionRem').value || 'CONDOMINIO LAS BRISAS, CASA 12').toUpperCase().trim();
+
+    var empresa = (document.getElementById('rotEmpresa').value || 'ENCOMIENDAS COSTA RICA').toUpperCase().trim();
+    var tracking = (document.getElementById('rotTracking').value || '').toUpperCase().trim();
+    var contenido = (document.getElementById('rotContenido').value || 'REPUESTOS Y DOCUMENTOS').toUpperCase().trim();
+
+    var fragil = document.getElementById('chkFragil').checked;
+    var pie = document.getElementById('chkPie').checked;
+    var horario = document.getElementById('chkHorario').checked;
+    var cod = document.getElementById('chkCod').checked;
+
+    // Distintivo de Bulto: Si es 1 = BULTO ÚNICO, si es > 1 = BULTO 1/3, 2/3, etc.
+    var bultoBadgeTexto = totalBultos <= 1 ? 'BULTO ÚNICO' : 'BULTO ' + indice + '/' + totalBultos;
+    var trackingTexto = tracking ? tracking + (totalBultos > 1 ? '-' + String(indice).padStart(2, '0') : '') : '[ESPACIO EN BLANCO PARA CÓDIGO]';
+    var barcodeNum = (tracking ? tracking.replace(/[^0-9]/g, '') : '744123456789') + (totalBultos > 1 ? String(indice) : '0');
+
+    // Identificador único para el contenedor del QR
+    var qrId = (esParaImprimir ? 'qr_print_' : 'qr_preview_') + indice;
+
+    var checksHtml = '' +
+      '<span class="' + (fragil ? 'activo' : 'inactivo') + '">' + (fragil ? '☑' : '☐') + ' Frágil</span>' +
+      '<span class="' + (pie ? 'activo' : 'inactivo') + '">' + (pie ? '☑' : '☐') + ' Mantener de pie</span>' +
+      '<span class="' + (horario ? 'activo' : 'inactivo') + '">' + (horario ? '☑' : '☐') + ' Horario de oficina</span>' +
+      (cod ? '<span class="activo">☑ Cobro Contra Entrega (C.O.D.)</span>' : '');
+
+    return '' +
+      '<div class="etiqueta-caja">' +
+        '<div class="etiqueta-header-top">' +
+          '<div class="etiqueta-titulo-box">EMBALAJE DE ENCOMIENDA</div>' +
+          '<div class="etiqueta-bulto-badge">' + bultoBadgeTexto + '</div>' +
+        '</div>' +
+        '<div class="etiqueta-sublinea">' +
+          '<span><strong>Nº TRACKING:</strong> ' + escapeHtml(trackingTexto) + '</span>' +
+          '<span><strong>TRANSPORTE:</strong> ' + escapeHtml(empresa) + '</span>' +
+        '</div>' +
+
+        '<div class="etiqueta-grid-personas" style="margin-top:10px;">' +
+          '<!-- DESTINATARIO -->' +
+          '<div class="etiqueta-bloque">' +
+            '<div class="etiqueta-bloque-titulo">📦 DESTINATARIO (Para)</div>' +
+            '<p><strong>Nombre:</strong> ' + escapeHtml(destNombre) + '</p>' +
+            (destCedula ? '<p><strong>Cédula:</strong> ' + escapeHtml(destCedula) + '</p>' : '') +
+            '<p><strong>Teléfono:</strong> ' + escapeHtml(destTel) + '</p>' +
+            (destTelAlt ? '<p><strong>Tel. alternativo:</strong> ' + escapeHtml(destTelAlt) + '</p>' : '') +
+            '<p><strong>Provincia/Cantón:</strong> ' + escapeHtml(destUbicacion) + '</p>' +
+            '<p><strong>Dirección exacta:</strong> ' + escapeHtml(destDireccion) + '</p>' +
+            '<div class="etiqueta-qr-container">' +
+              '<div id="' + qrId + '" class="etiqueta-qr-img"></div>' +
+              '<div class="etiqueta-qr-texto">📱 QR de Entrega / Contacto</div>' +
+            '</div>' +
+          '</div>' +
+
+          '<!-- REMITENTE -->' +
+          '<div class="etiqueta-bloque">' +
+            '<div class="etiqueta-bloque-titulo">📤 REMITENTE (De)</div>' +
+            '<p><strong>Nombre:</strong> ' + escapeHtml(remNombre) + '</p>' +
+            (remCedula ? '<p><strong>Cédula:</strong> ' + escapeHtml(remCedula) + '</p>' : '') +
+            '<p><strong>Teléfono:</strong> ' + escapeHtml(remTel) + '</p>' +
+            '<p><strong>Provincia/Cantón:</strong> ' + escapeHtml(remUbicacion) + '</p>' +
+            '<p><strong>Dirección:</strong> ' + escapeHtml(remDireccion) + '</p>' +
+          '</div>' +
+        '</div>' +
+
+        '<!-- INFORMACIÓN ADICIONAL -->' +
+        '<div class="etiqueta-info-adicional">' +
+          '<div class="etiqueta-info-header">⚠️ INFORMACIÓN ADICIONAL</div>' +
+          '<div class="etiqueta-checks-vista">' + checksHtml + '</div>' +
+          '<div style="margin-top:4px;"><strong>Contenido:</strong> ' + escapeHtml(contenido) + '</div>' +
+        '</div>' +
+
+        '<!-- CÓDIGO DE BARRAS FOOTER -->' +
+        '<div class="etiqueta-barcode-footer">' +
+          generarBarcodeSvg(barcodeNum) +
+          '<div class="barcode-texto">' + escapeHtml(barcodeNum) + '</div>' +
+          '<div class="barcode-empresa">' + escapeHtml(empresa) + ' · RUTAS CR</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function actualizarVistaPreviaEtiqueta() {
+    var contPreview = document.getElementById('etiquetaPreviewContenedor');
+    if (!contPreview) return;
+
+    var numBultos = parseInt(document.getElementById('rotCantidadBultos').value, 10) || 1;
+    if (numBultos < 1) numBultos = 1;
+
+    var navElem = document.getElementById('previewBultosNav');
+    if (navElem) {
+      navElem.textContent = numBultos <= 1 ? 'BULTO ÚNICO' : 'BULTO 1 DE ' + numBultos;
+    }
+
+    contPreview.innerHTML = generarEtiquetaHtml(1, numBultos, false);
+
+    // Generar código QR interactivo con los datos del destinatario
+    setTimeout(function() {
+      generarQrElemento('qr_preview_1');
+    }, 60);
+  }
+
+  function generarQrElemento(elementId) {
+    var contenedor = document.getElementById(elementId);
+    if (!contenedor || typeof QRCode === 'undefined') return;
+    contenedor.innerHTML = '';
+
+    var destNombre = (document.getElementById('rotNombreDest').value || '').trim();
+    var destTel = (document.getElementById('rotTelDest').value || '').replace(/[^0-9]/g, '');
+    var destDir = (document.getElementById('rotDireccionDest').value || '').trim();
+    var destUbic = (document.getElementById('rotUbicacionDest').value || '').trim();
+
+    // Contenido del QR: Datos directos para llamar con 1 toque o leer dirección
+    var qrPayload = 'DESTINATARIO: ' + destNombre + '\nTEL: ' + destTel + '\nLUGAR: ' + destUbic + '\nDIRECCION: ' + destDir;
+    if (destTel.length >= 8) {
+      // Si tiene teléfono válido, ponemos URL para llamada directa o WhatsApp
+      qrPayload = 'https://wa.me/506' + destTel + '?text=' + encodeURIComponent('Hola ' + destNombre + ', de la empresa de encomiendas con su paquete.');
+    }
+
+    new QRCode(contenedor, {
+      text: qrPayload,
+      width: 96,
+      height: 96,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+
+  function imprimirEtiquetas() {
+    var numBultos = parseInt(document.getElementById('rotCantidadBultos').value, 10) || 1;
+    if (numBultos < 1) numBultos = 1;
+
+    var contPrint = document.getElementById('impresionEtiquetasContenedor');
+    if (!contPrint) return;
+
+    var htmlTotal = '';
+    for (var i = 1; i <= numBultos; i++) {
+      htmlTotal += '<div class="etiqueta-print-item">' + generarEtiquetaHtml(i, numBultos, true) + '</div>';
+    }
+    contPrint.innerHTML = htmlTotal;
+    contPrint.style.display = 'block';
+
+    // Generar los QRs para cada etiqueta de impresión
+    for (var b = 1; b <= numBultos; b++) {
+      (function(idx) {
+        setTimeout(function() {
+          generarQrElemento('qr_print_' + idx);
+        }, 30 * idx);
+      })(b);
+    }
+
+    // Disparar diálogo de impresión
+    setTimeout(function() {
+      window.print();
+      contPrint.style.display = 'none';
+    }, 250 + (numBultos * 35));
+  }
+
 </script>
+
+
+<!-- CONTENEDOR OCULTO PARA IMPRESIÓN NATIVA -->
+<div id="impresionEtiquetasContenedor" style="display:none;"></div>
+
+<!-- MODAL INTERACTIVO DE ROTULADOR DE ENCOMIENDAS -->
+<div id="modalRotulador" class="modal-rotulador" role="dialog" aria-modal="true" aria-labelledby="rotuladorTitulo">
+  <div class="modal-rotulador-card">
+    <div class="modal-rotulador-header">
+      <h2 id="rotuladorTitulo">📦 Rotulador de Encomiendas · Rutas CR</h2>
+      <button type="button" class="btn-cerrar" onclick="cerrarRotulador()" title="Cerrar ventana">✕</button>
+    </div>
+
+    <div class="modal-rotulador-body">
+      <!-- Columna 1: Formulario interactivo -->
+      <div class="rotulador-form-col">
+        <!-- SECCIÓN DESTINATARIO -->
+        <div class="seccion-form-titulo">📥 Destinatario (¿Quién Recibe?)</div>
+        <div class="campo-grupo">
+          <label for="rotNombreDest">Nombre completo *</label>
+          <input type="text" id="rotNombreDest" placeholder="EJ: JUAN CARLOS ARIAS GÓMEZ" oninput="actualizarVistaPreviaEtiqueta()">
+        </div>
+        <div class="campo-fila-doble">
+          <div class="campo-grupo">
+            <label for="rotCedulaDest">Cédula (opcional)</label>
+            <input type="text" id="rotCedulaDest" placeholder="EJ: 1-1234-5678" oninput="actualizarVistaPreviaEtiqueta()">
+          </div>
+          <div class="campo-grupo">
+            <label for="rotTelDest">Teléfono principal *</label>
+            <input type="text" id="rotTelDest" placeholder="EJ: 8876-5432" oninput="actualizarVistaPreviaEtiqueta()">
+          </div>
+        </div>
+        <div class="campo-fila-doble">
+          <div class="campo-grupo">
+            <label for="rotTelAltDest">Teléfono alternativo</label>
+            <input type="text" id="rotTelAltDest" placeholder="EJ: 2234-5678" oninput="actualizarVistaPreviaEtiqueta()">
+          </div>
+          <div class="campo-grupo">
+            <label for="rotUbicacionDest">Provincia / Cantón / Distrito</label>
+            <input type="text" id="rotUbicacionDest" list="listaDestinos" placeholder="EJ: ALAJUELA, SAN RAMÓN, SAN RAFAEL" oninput="actualizarVistaPreviaEtiqueta()">
+          </div>
+        </div>
+        <div class="campo-grupo">
+          <label for="rotDireccionDest">Dirección exacta / Señas a la tica</label>
+          <textarea id="rotDireccionDest" rows="2" placeholder="EJ: DEL MUSMANNI 200M NORTE, CASA PORTÓN NEGRO..." oninput="actualizarVistaPreviaEtiqueta()"></textarea>
+        </div>
+
+        <!-- SECCIÓN REMITENTE -->
+        <div class="seccion-form-titulo" style="margin-top:16px;">📤 Remitente (¿Quién Envía?)</div>
+        <div class="campo-grupo">
+          <label for="rotNombreRem">Nombre completo o negocio</label>
+          <input type="text" id="rotNombreRem" placeholder="EJ: MARÍA ELENA SALAZAR CASTRO" oninput="actualizarVistaPreviaEtiqueta()">
+        </div>
+        <div class="campo-fila-doble">
+          <div class="campo-grupo">
+            <label for="rotCedulaRem">Cédula o Céd. Jurídica</label>
+            <input type="text" id="rotCedulaRem" placeholder="EJ: 1-1234-5678" oninput="actualizarVistaPreviaEtiqueta()">
+          </div>
+          <div class="campo-grupo">
+            <label for="rotTelRem">Teléfono remitente</label>
+            <input type="text" id="rotTelRem" placeholder="EJ: 8765-4321" oninput="actualizarVistaPreviaEtiqueta()">
+          </div>
+        </div>
+        <div class="campo-fila-doble">
+          <div class="campo-grupo">
+            <label for="rotUbicacionRem">Provincia, Cantón</label>
+            <input type="text" id="rotUbicacionRem" placeholder="EJ: SAN JOSÉ, SANTA ANA, POZOS" oninput="actualizarVistaPreviaEtiqueta()">
+          </div>
+          <div class="campo-grupo">
+            <label for="rotDireccionRem">Dirección remitente</label>
+            <input type="text" id="rotDireccionRem" placeholder="EJ: CONDOMINIO LAS BRISAS, CASA 12" oninput="actualizarVistaPreviaEtiqueta()">
+          </div>
+        </div>
+
+        <!-- SECCIÓN DETALLES DEL PAQUETE -->
+        <div class="seccion-form-titulo" style="margin-top:16px;">📦 Detalles del Envío y Bultos</div>
+        <div class="campo-fila-doble">
+          <div class="campo-grupo">
+            <label for="rotEmpresa">Empresa de Encomienda</label>
+            <input type="text" id="rotEmpresa" list="listaTransportistas" placeholder="EJ: TEMPISQUE, TRANSUR, MACHO..." oninput="actualizarVistaPreviaEtiqueta()">
+          </div>
+          <div class="campo-grupo">
+            <label for="rotCantidadBultos"><strong>Cantidad de Paquetes / Cajas *</strong></label>
+            <input type="number" id="rotCantidadBultos" min="1" max="50" value="1" style="font-weight:700; color:var(--navy);" oninput="actualizarVistaPreviaEtiqueta()">
+          </div>
+        </div>
+        <div class="campo-fila-doble">
+          <div class="campo-grupo">
+            <label for="rotTracking">Nº Tracking / Guía (o en blanco)</label>
+            <input type="text" id="rotTracking" placeholder="DEJAR EN BLANCO PARA VENTANILLA" oninput="actualizarVistaPreviaEtiqueta()">
+          </div>
+          <div class="campo-grupo">
+            <label for="rotContenido">Contenido del paquete</label>
+            <input type="text" id="rotContenido" placeholder="EJ: REPUESTOS Y DOCUMENTOS" oninput="actualizarVistaPreviaEtiqueta()">
+          </div>
+        </div>
+
+        <div class="campo-grupo">
+          <label>Indicaciones de cuidado especial:</label>
+          <div class="checks-cuidado">
+            <label class="check-label"><input type="checkbox" id="chkFragil" checked onchange="actualizarVistaPreviaEtiqueta()"> ⚠️ Frágil</label>
+            <label class="check-label"><input type="checkbox" id="chkPie" onchange="actualizarVistaPreviaEtiqueta()"> ⬆ Mantener de pie</label>
+            <label class="check-label"><input type="checkbox" id="chkHorario" onchange="actualizarVistaPreviaEtiqueta()"> 🏢 Horario oficina</label>
+            <label class="check-label"><input type="checkbox" id="chkCod" onchange="actualizarVistaPreviaEtiqueta()"> 💵 Pago Contra Entrega</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna 2: Vista previa en vivo -->
+      <div class="rotulador-preview-col">
+        <div class="preview-barra-controles">
+          <span style="font-size:12px; font-weight:700; color:var(--muted);">👁️ VISTA PREVIA DE IMPRESIÓN</span>
+          <div id="previewBultosNav" class="bultos-indicador">BULTO 1/1</div>
+        </div>
+
+        <!-- Plantilla visual de la etiqueta -->
+        <div id="etiquetaPreviewContenedor">
+          <!-- Renderizado dinámicamente por JS -->
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-rotulador-footer">
+      <button type="button" class="btn-modal-cancel" onclick="cerrarRotulador()">Cerrar</button>
+      <button type="button" class="btn-modal-print" onclick="imprimirEtiquetas()">
+        🖨️ Imprimir Etiquetas
+      </button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

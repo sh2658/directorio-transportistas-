@@ -1,11 +1,12 @@
-// Service Worker para Rutas CR - PWA Offline Support (v8)
-const CACHE_NAME = 'rutas-cr-v8';
+// Service Worker para Rutas CR - PWA Offline Support (v9)
+const CACHE_NAME = 'rutas-cr-v9';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './assets/icon-192.png',
   './assets/icon-512.png',
+  './assets/qrcode.min.js',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
   'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap'
