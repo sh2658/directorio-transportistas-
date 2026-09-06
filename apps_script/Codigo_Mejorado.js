@@ -344,6 +344,15 @@ function escribirRepartoEnCapturas_(sheet, rowNumber, photoPath, gpsValue, dataI
 
     const nuevaFila = new Array(cols.headersCount).fill('');
 
+    // Asignar ID Único para que AppSheet reconozca cada fila nueva de forma independiente
+    const idxIdKey = findColIndex_(sheet.getDataRange().getValues()[0].map(String), ["ID", "ID_CAPTURA", "IDCAPTURA", "KEY", "CODIGO"]);
+    const uuidNuevo = "CAP-" + Utilities.formatDate(new Date(), "GMT-6", "yyyyMMdd-HHmmss") + "-" + (k + 1);
+    if (idxIdKey !== -1) {
+      nuevaFila[idxIdKey] = uuidNuevo;
+    } else if (cols.headersCount > 0 && !nuevaFila[0]) {
+      nuevaFila[0] = uuidNuevo;
+    }
+
     if (cols.idxFoto !== -1) nuevaFila[cols.idxFoto] = photoPath;
     if (cols.idxEstado !== -1) {
       nuevaFila[cols.idxEstado] = existeId ? 'Existe - ¿Actualizar?' : CONFIG.STATUS_DONE;
