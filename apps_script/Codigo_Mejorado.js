@@ -29,6 +29,8 @@ function onOpen() {
   try {
     SpreadsheetApp.getUi()
       .createMenu('Capturas con IA')
+      .addItem('📥 Cargar 22 transportistas del PDF (Borrador)', 'cargarCapturasDesdePDF')
+      .addSeparator()
       .addItem('⚡ Reprocesar fila seleccionada', 'reprocesarFilaSeleccionada')
       .addItem('Procesar pendientes ahora', 'procesarCapturasPendientes')
       .addItem('Asignar aprobadas ahora', 'asignarCapturasAprobadas')
