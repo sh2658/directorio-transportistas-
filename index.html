@@ -1217,19 +1217,45 @@
     padding-top: 6px;
     border-top: 1px dashed #BBBBBB;
   }
+  .dest-qr-link {
+    display: inline-block;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  .dest-qr-link:hover {
+    transform: scale(1.02);
+    opacity: 0.95;
+  }
   .etiqueta-qr-img {
     display: inline-block;
-    background: white;
-    padding: 4px;
-    border: 1px solid #CCCCCC;
-    border-radius: 4px;
+    background: #FFFFFF !important;
+    padding: 10px !important;
+    border: 2px solid #000000;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  }
+  .etiqueta-qr-img canvas {
+    display: none !important;
+  }
+  .etiqueta-qr-img img {
+    display: block !important;
+    margin: 0 auto;
+    width: 140px !important;
+    height: 140px !important;
+    max-width: 140px !important;
+    max-height: 140px !important;
+    aspect-ratio: 1 / 1 !important;
+    image-rendering: pixelated;
   }
   .etiqueta-qr-texto {
-    font-size: 9.5px;
-    font-weight: 700;
-    color: #444444;
+    font-size: 10px;
+    font-weight: 800;
+    color: #0B2545;
     text-transform: uppercase;
-    margin-top: 2px;
+    margin-top: 4px;
+    letter-spacing: 0.02em;
   }
   .etiqueta-info-adicional {
     border: 1.5px solid #222222;
@@ -1262,12 +1288,12 @@
     text-decoration: line-through;
     opacity: 0.6;
   }
-  /* Pie Promocional Rutas CR con QR Web Oficial */
+  /* Pie Promocional Rutas CR con QR Web Oficial y Enlaces Clickeables */
   .etiqueta-promo-rutas {
-    border: 1.5px solid #222222;
-    border-radius: 6px;
-    padding: 9px 12px;
-    background: #F8F9FA;
+    border: 2px solid #0B2545;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #F8FAFC;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1292,20 +1318,31 @@
   .promo-rutas-desc {
     font-size: 9.5px;
     color: #444444;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
     line-height: 1.3;
   }
+  .promo-rutas-url-link {
+    display: inline-block;
+    text-decoration: none;
+    cursor: pointer;
+  }
   .promo-rutas-url {
-    font-size: 10px;
+    font-size: 10.5px;
     font-family: 'JetBrains Mono', monospace;
     color: #0B2545;
-    font-weight: 700;
+    font-weight: 800;
     word-break: break-all;
     background: #FFFFFF;
-    border: 1px solid #DFDAD0;
-    padding: 3px 6px;
-    border-radius: 4px;
+    border: 1.5px solid #0B2545;
+    padding: 4px 8px;
+    border-radius: 5px;
     display: inline-block;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .promo-rutas-url-link:hover .promo-rutas-url {
+    background: #0B2545;
+    color: #FFFFFF;
+    text-decoration: underline;
   }
   .promo-rutas-qr-box {
     display: flex;
@@ -1316,21 +1353,45 @@
     padding-left: 10px;
     border-left: 1px dashed #CCCCCC;
   }
+  .promo-qr-link {
+    display: inline-block;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+  .promo-qr-link:hover {
+    transform: scale(1.03);
+  }
   .promo-qr-canvas {
-    background: #FFFFFF;
-    padding: 3px;
-    border: 1px solid #CCCCCC;
-    border-radius: 4px;
+    background: #FFFFFF !important;
+    padding: 10px !important;
+    border: 2px solid #000000;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
     display: inline-block;
   }
+  .promo-qr-canvas canvas {
+    display: none !important;
+  }
+  .promo-qr-canvas img {
+    display: block !important;
+    margin: 0 auto;
+    width: 110px !important;
+    height: 110px !important;
+    max-width: 110px !important;
+    max-height: 110px !important;
+    aspect-ratio: 1 / 1 !important;
+    image-rendering: pixelated;
+  }
   .promo-qr-caption {
-    font-size: 8px;
+    font-size: 9px;
     font-weight: 800;
-    color: #444444;
+    color: #0B2545;
     text-transform: uppercase;
-    margin-top: 3px;
-    max-width: 80px;
-    line-height: 1.1;
+    margin-top: 4px;
+    max-width: 120px;
+    line-height: 1.15;
   }
 
   /* Botones del modal footer */
@@ -1639,20 +1700,7 @@
   .promo-qr-link:hover, .dest-qr-link:hover {
     transform: scale(1.03);
   }
-  .etiqueta-qr-img {
-    background: #ffffff;
-    padding: 6px;
-    border-radius: 8px;
-    border: 1px solid #E2E8F0;
-    display: inline-block;
-  }
-  .promo-qr-canvas {
-    background: #ffffff;
-    padding: 4px;
-    border-radius: 6px;
-    border: 1px solid #E2E8F0;
-    display: inline-block;
-  }
+
   .btn-ver-destinos-modal {
     background: #F1F5F9;
     border: 1.5px solid #CBD5E1;
@@ -3907,8 +3955,10 @@
             '<p><strong>Provincia/Cantón:</strong> ' + escapeHtml(destUbicacion) + '</p>' +
             '<p><strong>Dirección exacta:</strong> ' + escapeHtml(destDireccion) + '</p>' +
             '<div class="etiqueta-qr-container">' +
-              '<div id="' + qrId + '" class="etiqueta-qr-img"></div>' +
-              '<div class="etiqueta-qr-texto">📱 QR de Entrega / Contacto</div>' +
+              '<a id="link_' + qrId + '" href="#" target="_blank" rel="noopener noreferrer" class="dest-qr-link" title="Toca o escanea para contactar al destinatario">' +
+                '<div id="' + qrId + '" class="etiqueta-qr-img"></div>' +
+                '<div id="caption_' + qrId + '" class="etiqueta-qr-texto">📱 QR de Entrega / Contacto</div>' +
+              '</a>' +
             '</div>' +
           '</div>' +
 
@@ -3935,11 +3985,15 @@
           '<div class="promo-rutas-info">' +
             '<div class="promo-rutas-titulo">🚚 Rutas CR · Directorio de Encomiendas</div>' +
             '<div class="promo-rutas-desc">Encuentra rutas, bodegas, teléfonos y navegación directa con Waze o Google Maps en todo el país.</div>' +
-            '<div class="promo-rutas-url">🌐 ' + escapeHtml(obtenerUrlWebVisual()) + '</div>' +
+            '<a href="https://sh2658.github.io/directorio-transportistas-/" target="_blank" rel="noopener noreferrer" class="promo-rutas-url-link" title="Abrir página oficial Rutas CR">' +
+              '<div class="promo-rutas-url">🌐 https://sh2658.github.io/directorio-transportistas-/</div>' +
+            '</a>' +
           '</div>' +
           '<div class="promo-rutas-qr-box">' +
-            '<div id="' + qrWebId + '" class="promo-qr-canvas"></div>' +
-            '<div class="promo-qr-caption">📱 Escanea para buscar rutas</div>' +
+            '<a href="https://sh2658.github.io/directorio-transportistas-/" target="_blank" rel="noopener noreferrer" class="promo-qr-link" title="Haz clic o escanea para entrar a la web">' +
+              '<div id="' + qrWebId + '" class="promo-qr-canvas"></div>' +
+              '<div class="promo-qr-caption">👆 Toca o escanea para abrir</div>' +
+            '</a>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -3967,15 +4021,11 @@
   }
 
   function obtenerUrlWebOficial() {
-    var loc = window.location;
-    if (loc.hostname === 'localhost' || loc.hostname === '127.0.0.1') {
-      return 'https://sh2658.github.io/directorio-transportistas-/';
-    }
-    return loc.origin + loc.pathname;
+    return 'https://sh2658.github.io/directorio-transportistas-/';
   }
 
   function obtenerUrlWebVisual() {
-    return obtenerUrlWebOficial().replace(/^https?:\/\//, '').replace(/\/$/, '');
+    return 'sh2658.github.io/directorio-transportistas-';
   }
 
   function generarQrWeb(elementId) {
@@ -3983,14 +4033,17 @@
     if (!contenedor || typeof QRCode === 'undefined') return;
     contenedor.innerHTML = '';
 
-    // QR Web de alta definición y contraste óptimo para iPhone/Android
+    // URL oficial fija para enlace directo y escaneo de cámara
+    var urlWeb = 'https://sh2658.github.io/directorio-transportistas-/';
+
+    // Generar en canvas de 220x220 a nivel M (15% corrección) para módulos anchos y nítidos
     new QRCode(contenedor, {
-      text: obtenerUrlWebOficial(),
-      width: 96,
-      height: 96,
-      colorDark: '#0B2545',
+      text: urlWeb,
+      width: 220,
+      height: 220,
+      colorDark: '#000000',
       colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.H
+      correctLevel: QRCode.CorrectLevel.M
     });
   }
 
@@ -3999,36 +4052,33 @@
     if (!contenedor || typeof QRCode === 'undefined') return;
     contenedor.innerHTML = '';
 
-    var destNombre = (document.getElementById('rotNombreDest').value || '').trim();
-    var destTel = (document.getElementById('rotTelDest').value || '').replace(/[^0-9]/g, '');
-    var destDir = (document.getElementById('rotDireccionDest').value || '').trim();
-    var destUbic = (document.getElementById('rotUbicacionDest').value || '').trim();
+    var destNombre = (document.getElementById('rotNombreDest').value || '').trim() || 'JUAN CARLOS ARIAS GÓMEZ';
+    var rawTel = (document.getElementById('rotTelDest').value || '').replace(/[^0-9]/g, '');
+    var destTel = rawTel.length >= 8 ? rawTel : '88765432';
+    var destDir = (document.getElementById('rotDireccionDest').value || '').trim() || 'DEL SUPERMERCADO MUSMANNI 200M NORTE';
+    var destUbic = (document.getElementById('rotUbicacionDest').value || '').trim() || 'SAN RAMÓN, ALAJUELA';
     var tipoQrElem = document.getElementById('rotTipoQrDest');
-    var tipoQr = tipoQrElem ? tipoQrElem.value : 'whatsapp';
+    var tipoQr = tipoQrElem ? tipoQrElem.value : 'tel';
 
     var qrPayload = '';
     var linkHref = '#';
     var captionTexto = '📱 Escanea para contactar';
 
-    if (tipoQr === 'tel' && destTel.length >= 8) {
-      qrPayload = 'tel:+506' + destTel;
-      linkHref = qrPayload;
-      captionTexto = '📞 Toca o escanea para llamar';
-    } else if (tipoQr === 'vcard' && destNombre) {
-      qrPayload = 'BEGIN:VCARD\nVERSION:3.0\nFN:' + destNombre + '\nTEL:+506' + destTel + '\nADR:;;' + destDir + ';' + destUbic + ';;;Costa Rica\nNOTE:Destinatario Encomienda Rutas CR\nEND:VCARD';
+    if (tipoQr === 'whatsapp') {
+      // Formato compacto para WhatsApp: genera módulos grandes y claros
+      qrPayload = 'https://wa.me/506' + destTel;
+      linkHref = 'https://wa.me/506' + destTel + '?text=' + encodeURIComponent('Hola ' + destNombre + ', le contactamos de la empresa de encomiendas respecto a su paquete en ' + destUbic + '.');
+      captionTexto = '💬 Toca o escanea para WhatsApp';
+    } else if (tipoQr === 'vcard') {
+      // Estándar MECARD universalmente soportado en iOS y Android para guardar contacto
+      qrPayload = 'MECARD:N:' + destNombre + ';TEL:+506' + destTel + ';ADR:' + destUbic + ';NOTE:Encomienda Rutas CR;;';
       linkHref = 'tel:+506' + destTel;
       captionTexto = '📇 Toca o escanea para guardar contacto';
     } else {
-      // Por defecto WhatsApp
-      if (destTel.length >= 8) {
-        linkHref = 'https://wa.me/506' + destTel + '?text=' + encodeURIComponent('Hola ' + destNombre + ', le contactamos de la empresa de encomiendas respecto a su paquete en ' + destUbic + '.');
-        qrPayload = linkHref;
-        captionTexto = '💬 Toca o escanea para abrir WhatsApp';
-      } else {
-        qrPayload = 'DESTINATARIO: ' + destNombre + '\nTEL: ' + destTel + '\nLUGAR: ' + destUbic + '\nDIRECCION: ' + destDir;
-        linkHref = '#';
-        captionTexto = '📦 Datos de Entrega';
-      }
+      // Por defecto: Llamada telefónica directa de 1 toque (reconocimiento nativo inmediato en iPhone)
+      qrPayload = 'tel:+506' + destTel;
+      linkHref = 'tel:+506' + destTel;
+      captionTexto = '📞 Toca o escanea para llamar (' + destTel.substring(0,4) + '-' + destTel.substring(4) + ')';
     }
 
     // Actualizar enlace clickeable en pantalla
@@ -4043,14 +4093,14 @@
       capElem.textContent = captionTexto;
     }
 
-    // Código QR de gran tamaño y corrección de error H para lectura instantánea en iPhone
+    // Código QR de alta resolución con módulos anchos (Nivel M) para lectura inmediata en iPhone
     new QRCode(contenedor, {
       text: qrPayload,
-      width: 140,
-      height: 140,
+      width: 240,
+      height: 240,
       colorDark: '#000000',
       colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.H
+      correctLevel: QRCode.CorrectLevel.M
     });
   }
 
@@ -4134,9 +4184,9 @@
         <div class="campo-grupo" style="margin-top:8px;">
           <label for="rotTipoQrDest">Acción del Código QR de Entrega (para quien escanee)</label>
           <select id="rotTipoQrDest" onchange="actualizarVistaPreviaEtiqueta()" style="width:100%; padding:9px 12px; border-radius:8px; border:1.5px solid #CBD5E1; font-weight:600; color:var(--navy); background:#F8FAFC;">
-            <option value="whatsapp" selected>💬 Abrir WhatsApp con mensaje directo (Chat o llamada WhatsApp)</option>
-            <option value="tel">📞 Llamada telefónica directa (Llamar al cliente con 1 toque)</option>
-            <option value="vcard">📇 Tarjeta de contacto completa (Nombre, teléfono y dirección)</option>
+            <option value="tel" selected>📞 Llamada telefónica directa (Llamar al cliente con 1 toque en iPhone/Android)</option>
+            <option value="whatsapp">💬 Abrir chat directo de WhatsApp (wa.me)</option>
+            <option value="vcard">📇 Tarjeta de contacto en agenda (Nombre, teléfono y dirección)</option>
           </select>
         </div>
 
