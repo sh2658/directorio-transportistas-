@@ -3691,38 +3691,62 @@
     cont.innerHTML = lista.map(function (t) {
       var telefonosTexto = (Array.isArray(t.telefonos) ? t.telefonos : []).map(function(tel){ return tel.numero; }).filter(Boolean).join(', ');
 
-      var bodegasHtml = (Array.isArray(t.bodegas) ? t.bodegas : []).map(function (b) {
-        var acciones = '';
-        if (coordenadasValidas(b)) {
-          acciones = botonesNavegacionHtml(b.lat, b.lng) +
-            '<a href="#mapa" class="btn-ver-mapa" onclick="centrarEnMapa(' + b.lat + ',' + b.lng + '); return false;">🗺️ Ver mapa</a>';
-        }
-        var destinosTexto = (Array.isArray(t.destinos) ? t.destinos : []).join(', ');
-              acciones += '<button type="button" class="btn-rotular-card" onclick=\'abrirRotuladorConTransportista(' +
-        JSON.stringify(t.nombre) + ',' +
-        JSON.stringify(zonaVal || dirVal || '') + ')\'>📦 Rotular</button>';
-      acciones += '<button type="button" class="btn-compartir" onclick=\'compartirTransportista(' +
-          JSON.stringify(t.nombre) + ',' +
-          JSON.stringify(b.zona || '') + ',' +
-          JSON.stringify(b.direccion || '') + ',' +
-          JSON.stringify(b.lat || '') + ',' +
-          JSON.stringify(b.lng || '') + ',' +
-          JSON.stringify(telefonosTexto) + ',' +
-          JSON.stringify(t.horario || '') + ',' +
-          JSON.stringify(destinosTexto) + ')\'>📤 Compartir</button>';
+      var tieneBodegas = Array.isArray(t.bodegas) && t.bodegas.length > 0;
+      var bodegasHtml = '';
 
-        var distanciaTxt = '';
-        if (ubicacionUsuario && coordenadasValidas(b)) {
-          var d = distanciaKm(ubicacionUsuario.lat, ubicacionUsuario.lng, b.lat, b.lng);
-          distanciaTxt = ' <span class="mono">(~' + d.toFixed(1) + ' km de ti)</span>';
-        }
-        return '' +
-          '<div class="bodega-item">' +
-            (b.zona ? '<span class="zona-tag">' + escapeHtml(b.zona) + '</span><br>' : '') +
-            '<p><strong>BODEGA:</strong> ' + escapeHtml(b.direccion || 'SIN DIRECCIÓN REGISTRADA') + distanciaTxt + '</p>' +
-            (acciones ? '<div class="acciones">' + acciones + '</div>' : '<p><em>Sin coordenadas registradas</em></p>') +
-          '</div>';
-      }).join('') || '<p><em>Sin bodegas registradas</em></p>';
+      if (tieneBodegas) {
+        bodegasHtml = t.bodegas.map(function (b) {
+          var acciones = '';
+          if (coordenadasValidas(b)) {
+            acciones = botonesNavegacionHtml(b.lat, b.lng) +
+              '<a href="#mapa" class="btn-ver-mapa" onclick="centrarEnMapa(' + b.lat + ',' + b.lng + '); return false;">🗺️ Ver mapa</a>';
+          }
+          var zonaVal = (b && b.zona) ? b.zona : '';
+          var dirVal = (b && b.direccion) ? b.direccion : '';
+          var latVal = (b && coordenadasValidas(b)) ? b.lat : '';
+          var lngVal = (b && coordenadasValidas(b)) ? b.lng : '';
+          var destinosTexto = (Array.isArray(t.destinos) ? t.destinos : []).join(', ');
+
+          acciones += '<button type="button" class="btn-rotular-card" onclick=\'abrirRotuladorConTransportista(' +
+            JSON.stringify(t.nombre) + ',' +
+            JSON.stringify(zonaVal || dirVal || '') + ')\'>📦 Rotular</button>';
+          acciones += '<button type="button" class="btn-compartir" onclick=\'compartirTransportista(' +
+            JSON.stringify(t.nombre) + ',' +
+            JSON.stringify(zonaVal) + ',' +
+            JSON.stringify(dirVal) + ',' +
+            JSON.stringify(latVal) + ',' +
+            JSON.stringify(lngVal) + ',' +
+            JSON.stringify(telefonosTexto) + ',' +
+            JSON.stringify(t.horario || '') + ',' +
+            JSON.stringify(destinosTexto) + ')\'>📤 Compartir</button>';
+
+          var distanciaTxt = '';
+          if (ubicacionUsuario && coordenadasValidas(b)) {
+            var d = distanciaKm(ubicacionUsuario.lat, ubicacionUsuario.lng, b.lat, b.lng);
+            distanciaTxt = ' <span class="mono">(~' + d.toFixed(1) + ' km de ti)</span>';
+          }
+          return '' +
+            '<div class="bodega-item">' +
+              (b.zona ? '<span class="zona-tag">' + escapeHtml(b.zona) + '</span><br>' : '') +
+              '<p><strong>BODEGA:</strong> ' + escapeHtml(b.direccion || 'SIN DIRECCIÓN REGISTRADA') + distanciaTxt + '</p>' +
+              (acciones ? '<div class="acciones">' + acciones + '</div>' : '<p><em>Sin coordenadas registradas</em></p>') +
+            '</div>';
+        }).join('');
+      } else {
+        var destinosTextoSinBodega = (Array.isArray(t.destinos) ? t.destinos : []).join(', ');
+        bodegasHtml = '<div class="bodega-item">' +
+          '<p><em>Sin bodegas registradas</em></p>' +
+          '<div class="acciones">' +
+            '<button type="button" class="btn-rotular-card" onclick=\'abrirRotuladorConTransportista(' +
+              JSON.stringify(t.nombre) + ',"")\'>📦 Rotular</button>' +
+            '<button type="button" class="btn-compartir" onclick=\'compartirTransportista(' +
+              JSON.stringify(t.nombre) + ',"","","","",' +
+              JSON.stringify(telefonosTexto) + ',' +
+              JSON.stringify(t.horario || '') + ',' +
+              JSON.stringify(destinosTextoSinBodega) + ')\'>📤 Compartir</button>' +
+          '</div>' +
+        '</div>';
+      }
 
       var destinosHtml = (t.destinos && t.destinos.length)
         ? '<p class="destinos-lista"><strong>DESTINOS QUE CUBRE:</strong> ' + t.destinos.map(escapeHtml).join(', ') + '</p>'
