@@ -134,19 +134,62 @@
   }
   .fila-input button:hover { background: var(--navy-2); }
 
-  /* Chips de destinos populares */
+  /* Explorador refinado: Frecuentes, Zonas y Provincias */
+  .explorador-wrapper {
+    margin-top: 14px;
+    border-top: 1px solid rgba(223, 218, 208, 0.6);
+    padding-top: 10px;
+  }
+  .explorador-tabs {
+    display: inline-flex;
+    background: #F1EFEA;
+    border-radius: 20px;
+    padding: 3px;
+    gap: 3px;
+    margin-bottom: 8px;
+    border: 1px solid var(--line);
+  }
+  .tab-pill {
+    background: transparent;
+    border: none;
+    border-radius: 16px;
+    padding: 4px 11px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.18s ease;
+    user-select: none;
+  }
+  .tab-pill:hover {
+    color: var(--navy);
+  }
+  .tab-pill.activa {
+    background: #FFFFFF;
+    color: var(--navy);
+    box-shadow: 0 2px 6px rgba(11,37,69,0.12);
+  }
+  .panel-chips {
+    display: flex;
+    animation: fadeInChips 0.2s ease-out;
+  }
+  @keyframes fadeInChips {
+    from { opacity: 0; transform: translateY(-2px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
   .chips-destinos {
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
-    margin-top: 12px;
     align-items: center;
   }
   .chips-etiqueta {
-    font-size: 11.5px;
+    font-size: 11px;
     color: var(--muted);
-    font-weight: 500;
+    font-weight: 700;
     margin-right: 2px;
+    letter-spacing: 0.04em;
   }
   .chip {
     font-size: 11.5px;
@@ -166,11 +209,31 @@
     color: white;
     border-color: var(--navy);
   }
+  .chip-zona {
+    background: #F0F5FA;
+    border-color: #BACFE6;
+    font-weight: 600;
+  }
+  .chip-zona:hover {
+    background: var(--navy);
+    color: #FFFFFF;
+    border-color: var(--navy);
+  }
+  .chip-provincia {
+    background: #FAF8F3;
+    border-color: #E2DBD0;
+    font-weight: 600;
+  }
+  .chip-provincia:hover {
+    background: var(--navy-2);
+    color: #FFFFFF;
+    border-color: var(--navy-2);
+  }
   .chip-ver-todos {
     background: #FFF6E6;
     border-color: var(--amber);
     color: var(--navy);
-    font-weight: 600;
+    font-weight: 700;
   }
   .chip-ver-todos:hover {
     background: var(--amber);
@@ -877,16 +940,51 @@
       <button onclick="buscar()">BUSCAR</button>
     </div>
 
-    <!-- Chips de acceso rápido -->
-    <div class="chips-destinos">
-      <span class="chips-etiqueta">FRECUENTES:</span>
-      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('PÉREZ ZELEDÓN', 'destino')">PÉREZ ZELEDÓN</a>
-      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('LIBERIA', 'destino')">LIBERIA</a>
-      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('SAN CARLOS', 'destino')">SAN CARLOS</a>
-      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('LIMÓN', 'destino')">LIMÓN</a>
-      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('PUNTARENAS', 'destino')">PUNTARENAS</a>
-      <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('GOLFITO', 'destino')">GOLFITO</a>
-      <a href="#" class="chip chip-ver-todos" onclick="event.preventDefault(); mostrarTodos()">📋 VER TODOS</a>
+    <!-- Explorador elegante por Categorías: Frecuentes, Zonas y Provincias -->
+    <div class="explorador-wrapper">
+      <div class="explorador-tabs">
+        <button type="button" class="tab-pill activa" id="tabBtnFrecuentes" onclick="cambiarPestanaExplorar('frecuentes')">📍 Populares</button>
+        <button type="button" class="tab-pill" id="tabBtnZonas" onclick="cambiarPestanaExplorar('zonas')">🧭 Zonas y Regiones</button>
+        <button type="button" class="tab-pill" id="tabBtnProvincias" onclick="cambiarPestanaExplorar('provincias')">🗺️ Provincias</button>
+      </div>
+
+      <!-- Panel 1: Destinos Populares -->
+      <div id="panelChipsFrecuentes" class="chips-destinos panel-chips">
+        <span class="chips-etiqueta">POPULARES:</span>
+        <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('PÉREZ ZELEDÓN', 'destino')">PÉREZ ZELEDÓN</a>
+        <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('LIBERIA', 'destino')">LIBERIA</a>
+        <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('SAN CARLOS', 'destino')">SAN CARLOS</a>
+        <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('LIMÓN', 'destino')">LIMÓN</a>
+        <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('PUNTARENAS', 'destino')">PUNTARENAS</a>
+        <a href="#" class="chip" onclick="event.preventDefault(); aplicarSugerencia('GOLFITO', 'destino')">GOLFITO</a>
+        <a href="#" class="chip chip-ver-todos" onclick="event.preventDefault(); mostrarTodos()">📋 VER TODOS</a>
+      </div>
+
+      <!-- Panel 2: Zonas y Regiones -->
+      <div id="panelChipsZonas" class="chips-destinos panel-chips" style="display:none;">
+        <span class="chips-etiqueta">ZONAS:</span>
+        <a href="#" class="chip chip-zona" onclick="event.preventDefault(); aplicarSugerencia('OCCIDENTE', 'destino')">🌿 OCCIDENTE</a>
+        <a href="#" class="chip chip-zona" onclick="event.preventDefault(); aplicarSugerencia('SAN CARLOS', 'destino')">🌋 SAN CARLOS / HUETAR</a>
+        <a href="#" class="chip chip-zona" onclick="event.preventDefault(); aplicarSugerencia('GUANACASTE', 'destino')">🌊 GUANACASTE (CHOROTEGA)</a>
+        <a href="#" class="chip chip-zona" onclick="event.preventDefault(); aplicarSugerencia('PACIFICO CENTRAL', 'destino')">🌴 PACÍFICO CENTRAL</a>
+        <a href="#" class="chip chip-zona" onclick="event.preventDefault(); aplicarSugerencia('ZONA SUR', 'destino')">🐋 ZONA SUR (BRUNCA)</a>
+        <a href="#" class="chip chip-zona" onclick="event.preventDefault(); aplicarSugerencia('LIMON', 'destino')">🚢 LIMÓN (CARIBE)</a>
+        <a href="#" class="chip chip-zona" onclick="event.preventDefault(); aplicarSugerencia('VALLE CENTRAL', 'destino')">☕ VALLE CENTRAL</a>
+        <a href="#" class="chip chip-ver-todos" onclick="event.preventDefault(); mostrarTodos()">📋 VER TODOS</a>
+      </div>
+
+      <!-- Panel 3: Provincias -->
+      <div id="panelChipsProvincias" class="chips-destinos panel-chips" style="display:none;">
+        <span class="chips-etiqueta">PROVINCIAS:</span>
+        <a href="#" class="chip chip-provincia" onclick="event.preventDefault(); aplicarSugerencia('PROVINCIA SAN JOSE', 'destino')">📍 SAN JOSÉ</a>
+        <a href="#" class="chip chip-provincia" onclick="event.preventDefault(); aplicarSugerencia('PROVINCIA ALAJUELA', 'destino')">📍 ALAJUELA</a>
+        <a href="#" class="chip chip-provincia" onclick="event.preventDefault(); aplicarSugerencia('PROVINCIA CARTAGO', 'destino')">📍 CARTAGO</a>
+        <a href="#" class="chip chip-provincia" onclick="event.preventDefault(); aplicarSugerencia('PROVINCIA HEREDIA', 'destino')">📍 HEREDIA</a>
+        <a href="#" class="chip chip-provincia" onclick="event.preventDefault(); aplicarSugerencia('PROVINCIA GUANACASTE', 'destino')">📍 GUANACASTE</a>
+        <a href="#" class="chip chip-provincia" onclick="event.preventDefault(); aplicarSugerencia('PROVINCIA PUNTARENAS', 'destino')">📍 PUNTARENAS</a>
+        <a href="#" class="chip chip-provincia" onclick="event.preventDefault(); aplicarSugerencia('PROVINCIA LIMON', 'destino')">📍 LIMÓN</a>
+        <a href="#" class="chip chip-ver-todos" onclick="event.preventDefault(); mostrarTodos()">📋 VER TODOS</a>
+      </div>
     </div>
   </div>
 </div>
@@ -1109,17 +1207,15 @@
 
   function construirListaDestinos(data) {
     var set = new Set();
-    // Cabeceras y zonas regionales clave
-    set.add('SAN CARLOS');
-    set.add('PÉREZ ZELEDÓN');
-    set.add('ZONA SUR');
-    set.add('GUANACASTE');
-    set.add('LIMÓN');
-    set.add('PUNTARENAS');
-    set.add('SARAPIQUÍ');
-    set.add('UPALA');
-    set.add('LOS CHILES');
-    set.add('GUATUSO');
+    // Zonas y provincias clave para autocompletado
+    var clavesRegionales = [
+      'OCCIDENTE', 'SAN CARLOS', 'GUANACASTE', 'PACÍFICO CENTRAL', 'ZONA SUR',
+      'LIMÓN', 'VALLE CENTRAL', 'CHOROTEGA', 'HUETAR NORTE', 'HUETAR CARIBE',
+      'BRUNCA', 'PÉREZ ZELEDÓN', 'SARAPIQUÍ', 'UPALA', 'LOS CHILES', 'GUATUSO',
+      'PROVINCIA SAN JOSÉ', 'PROVINCIA ALAJUELA', 'PROVINCIA CARTAGO',
+      'PROVINCIA HEREDIA', 'PROVINCIA GUANACASTE', 'PROVINCIA PUNTARENAS', 'PROVINCIA LIMÓN'
+    ];
+    clavesRegionales.forEach(function(k) { set.add(k); });
 
     data.forEach(function (t) {
       (Array.isArray(t.destinos) ? t.destinos : []).forEach(function (d) {
@@ -1136,6 +1232,25 @@
       return a.localeCompare(b, 'es', { sensitivity: 'base' });
     });
     llenarDatalist('listaTransportistas', nombres);
+  }
+
+
+  function cambiarPestanaExplorar(categoria) {
+    var tabs = ['frecuentes', 'zonas', 'provincias'];
+    tabs.forEach(function(t) {
+      var btn = document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
+      var panel = document.getElementById('panelChips' + t.charAt(0).toUpperCase() + t.slice(1));
+      if (btn) {
+        if (t === categoria) {
+          btn.classList.add('activa');
+        } else {
+          btn.classList.remove('activa');
+        }
+      }
+      if (panel) {
+        panel.style.display = (t === categoria) ? 'flex' : 'none';
+      }
+    });
   }
 
   function cambiarModo() {
@@ -1276,87 +1391,667 @@
 
   // Zonas y cantones clave de Costa Rica con sus distritos y localidades asociadas
   const REGIONES_CR = {
-    'SAN CARLOS': {
-      titulo: 'SAN CARLOS',
-      descripcion: 'Ciudad Quesada, La Fortuna, Aguas Zarcas, Pital, Florencia, Venecia, El Tanque, Pocosol, Muelle, etc.',
-      terminos: [
-        'san carlos', 'ciudad quesada', 'quesada', 'la fortuna', 'fortuna', 'aguas zarcas',
-        'pital', 'florencia', 'venecia', 'el tanque', 'tanque', 'santa rosa de pocosol',
-        'pocosol', 'la tigra', 'muelle', 'boca arenal', 'monterrey', 'la palmera',
-        'platanar', 'chachagua', 'penas blancas', 'valle azul', 'bajo los rodriguez',
-        'santa clara', 'los angeles', 'cerro cortes', 'buenos aires de cutris', 'cutris',
-        'la marina', 'san isidro de penas blancas'
-      ],
-      terminosEmpresa: ['san carlos', 'sancarle']
+    "OCCIDENTE": {
+        "titulo": "ZONA OCCIDENTE",
+        "subtitulo": "Alajuela Occidental",
+        "descripcion": "San Ramón, Palmares, Naranjo, Zarcero, Sarchí, Grecia, Atenas, Poás y alrededores.",
+        "terminos": [
+            "occidente",
+            "zona occidente",
+            "san ramon",
+            "palmares",
+            "naranjo",
+            "zarcero",
+            "sarchi",
+            "valverde vega",
+            "grecia",
+            "atenas",
+            "poas",
+            "san pedro de poas",
+            "rio segundo",
+            "tacares",
+            "san roque",
+            "piedades",
+            "candelaria",
+            "alfaro ruiz",
+            "sabana larga",
+            "bolivar"
+        ],
+        "terminosEmpresa": [
+            "occidente",
+            "ramon",
+            "palmares",
+            "sarchi",
+            "grecia"
+        ]
     },
-    'PEREZ ZELEDON': {
-      titulo: 'PÉREZ ZELEDÓN',
-      descripcion: 'San Isidro de El General, Daniel Flores, Rivas, Platanillo, Pejibaye, Cajón, etc.',
-      terminos: [
-        'perez zeledon', 'san isidro de el general', 'san isidro del general', 'san isidro',
-        'daniel flores', 'rivas', 'platanillo', 'pejibaye', 'cajon', 'palmares p.z.',
-        'platanares', 'la palma', 'pacuar', 'san pedro'
-      ],
-      terminosEmpresa: ['perez zeledon', 'zeledon']
+    "SAN CARLOS": {
+        "titulo": "SAN CARLOS Y ZONA NORTE",
+        "subtitulo": "Región Huetar Norte",
+        "descripcion": "Ciudad Quesada, La Fortuna, Aguas Zarcas, Pital, Florencia, Venecia, Pocosol, Upala, Los Chiles, Guatuso, Sarapiquí.",
+        "terminos": [
+            "san carlos",
+            "huetar norte",
+            "zona norte",
+            "ciudad quesada",
+            "quesada",
+            "la fortuna",
+            "fortuna",
+            "aguas zarcas",
+            "pital",
+            "florencia",
+            "venecia",
+            "el tanque",
+            "tanque",
+            "santa rosa de pocosol",
+            "pocosol",
+            "la tigra",
+            "muelle",
+            "boca arenal",
+            "monterrey",
+            "la palmera",
+            "platanar",
+            "chachagua",
+            "penas blancas",
+            "valle azul",
+            "bajo los rodriguez",
+            "santa clara",
+            "los angeles",
+            "cerro cortes",
+            "buenos aires de cutris",
+            "cutris",
+            "la marina",
+            "san isidro de penas blancas",
+            "upala",
+            "los chiles",
+            "guatuso",
+            "bijagua",
+            "canelete",
+            "colonia",
+            "san jorge",
+            "sarapiqui",
+            "puerto viejo de sarapiqui",
+            "la virgen",
+            "rio frio",
+            "rio cuarto",
+            "santa rita",
+            "cerro cortez",
+            "katira",
+            "venado",
+            "jabillos"
+        ],
+        "terminosEmpresa": [
+            "san carlos",
+            "sancarle",
+            "norteno",
+            "upala"
+        ]
     },
-    'ZONA SUR': {
-      titulo: 'ZONA SUR / GOLFITO / CORREDORES',
-      descripcion: 'Golfito, Paso Canoas, Ciudad Neilly, Río Claro, Palmar Norte/Sur, San Vito, etc.',
-      terminos: [
-        'zona sur', 'golfito', 'paso canoas', 'ciudad neilly', 'rio claro', 'palmar norte',
-        'palmar sur', 'san vito', 'san vito de coto brus', 'coto brus', 'sabalito',
-        'agua buena', 'la cuesta', 'corredores', 'laurel', 'ciudad cortes', 'puerto jimenez',
-        'uvita', 'dominical', 'ojochal'
-      ],
-      terminosEmpresa: ['zona sur', 'golfito']
+    "GUANACASTE": {
+        "titulo": "GUANACASTE (REGIÓN CHOROTEGA)",
+        "subtitulo": "Bajura y Playas de Guanacaste",
+        "descripcion": "Liberia, Nicoya, Santa Cruz, Cañas, Bagaces, Carrillo, Filadelfia, Playas del Coco, Tamarindo, Sámara, Nosara, Tilarán, Abangares.",
+        "terminos": [
+            "guanacaste",
+            "chorotega",
+            "region chorotega",
+            "liberia",
+            "nicoya",
+            "santa cruz",
+            "canas",
+            "cañas",
+            "bagaces",
+            "filadelfia",
+            "playas del coco",
+            "el coco",
+            "tamarindo",
+            "samara",
+            "sámara",
+            "nosara",
+            "hojancha",
+            "la cruz",
+            "tilaran",
+            "mansion",
+            "sardinal",
+            "belen",
+            "huacas",
+            "flamingo",
+            "potrero",
+            "potreo",
+            "playa hermosa",
+            "playa panama",
+            "brasilito",
+            "27 de abril",
+            "pinilla",
+            "playa grande",
+            "avellanas",
+            "playa negra",
+            "paraiso",
+            "paraíso",
+            "la garita",
+            "matapalo",
+            "colorado",
+            "los jocotes",
+            "libertad",
+            "chirco",
+            "chircó",
+            "san pedro",
+            "belen de carrillo",
+            "carrillo",
+            "las juntas",
+            "las juntas de abangares",
+            "abangares",
+            "jicaral",
+            "lepen",
+            "carmona",
+            "zapotal",
+            "puerto humo",
+            "ostional",
+            "marbella",
+            "garza",
+            "playa guiones",
+            "playa pelada",
+            "san juanillo"
+        ],
+        "terminosEmpresa": [
+            "guanacaste",
+            "chorotega",
+            "liberia",
+            "nicoya",
+            "tempisque"
+        ]
     },
-    'GUANACASTE': {
-      titulo: 'GUANACASTE',
-      descripcion: 'Liberia, Nicoya, Santa Cruz, Cañas, Bagaces, Filadelfia, Playas del Coco, Tamarindo, etc.',
-      terminos: [
-        'guanacaste', 'liberia', 'nicoya', 'santa cruz', 'canas', 'bagaces', 'filadelfia',
-        'playas del coco', 'el coco', 'tamarindo', 'samara', 'nosara', 'hojancha', 'la cruz',
-        'tilaran', 'mansion', 'sardinal', 'belen', 'huacas', 'flamingo', 'potrero'
-      ],
-      terminosEmpresa: ['guanacaste', 'liberia', 'nicoya']
+    "PACIFICO CENTRAL": {
+        "titulo": "PACÍFICO CENTRAL",
+        "subtitulo": "Costa Pacífica Central y Península",
+        "descripcion": "Puntarenas centro, Esparza, Barranca, El Roble, Jacó, Quepos, Manuel Antonio, Parrita, Cóbano, Santa Teresa, Monteverde.",
+        "terminos": [
+            "pacifico central",
+            "pacífico central",
+            "puntarenas",
+            "esparza",
+            "barranca",
+            "el roble",
+            "chacarita",
+            "caldera",
+            "miramar",
+            "jaco",
+            "jacó",
+            "herradura",
+            "quepos",
+            "parrita",
+            "tarcoles",
+            "paquera",
+            "cobano",
+            "cóbano",
+            "montezuma",
+            "santa teresa",
+            "mal pais",
+            "mal país",
+            "tambor",
+            "monteverde",
+            "santa elena",
+            "santa elena monteverde",
+            "quebrada ganado",
+            "esterillos",
+            "damas",
+            "manuel antonio",
+            "isla chira",
+            "cabuya",
+            "cabo blanco",
+            "guacimal",
+            "costa de pajaros",
+            "punta morales",
+            "chomes",
+            "abangaritos",
+            "lepanto",
+            "pilas de canjel"
+        ],
+        "terminosEmpresa": [
+            "pacifico central",
+            "puntarenas",
+            "portena",
+            "golfo"
+        ]
     },
-    'PUNTARENAS': {
-      titulo: 'PUNTARENAS / PACÍFICO CENTRAL',
-      descripcion: 'Puntarenas centro, Esparza, Barranca, El Roble, Jacó, Quepos, Parrita, Cóbano, etc.',
-      terminos: [
-        'puntarenas', 'esparza', 'barranca', 'el roble', 'chacarita', 'caldera', 'miramar',
-        'jaco', 'herradura', 'quepos', 'parrita', 'tarcoles', 'paquera', 'cobano', 'montezuma',
-        'santa teresa', 'mal pais', 'tambor', 'monteverde'
-      ],
-      terminosEmpresa: ['puntarenas', 'portena']
+    "ZONA SUR": {
+        "titulo": "ZONA SUR (REGIÓN BRUNCA)",
+        "subtitulo": "Pérez Zeledón, Osa, Golfito y Frontera Sur",
+        "descripcion": "Pérez Zeledón (San Isidro), Buenos Aires, Palmar Norte/Sur, Ciudad Cortés, Uvita, Dominical, Golfito, Puerto Jiménez, San Vito, Paso Canoas, Neily.",
+        "terminos": [
+            "zona sur",
+            "brunca",
+            "region brunca",
+            "perez zeledon",
+            "pérez zeledón",
+            "san isidro de el general",
+            "san isidro del general",
+            "san isidro",
+            "daniel flores",
+            "rivas",
+            "platanillo",
+            "pejibaye",
+            "cajon",
+            "palmares p.z.",
+            "platanares",
+            "pacuar",
+            "buenos aires",
+            "palmar norte",
+            "palmar sur",
+            "ciudad cortes",
+            "cuidad cortes",
+            "piedras blancas",
+            "ojochal",
+            "uvita",
+            "dominical",
+            "golfito",
+            "puerto jimenez",
+            "puerto jiménez",
+            "ciudad neily",
+            "cuidad neily",
+            "paso canoas",
+            "la cuesta",
+            "cuervito",
+            "san vito",
+            "sereno",
+            "sabalito",
+            "agua buena",
+            "coronado",
+            "drake",
+            "la palma",
+            "canaza",
+            "cañaza",
+            "sandalo",
+            "sándalo",
+            "rio claro",
+            "río claro",
+            "chacarita de osa",
+            "chararita",
+            "bahia drake",
+            "bahia ballena",
+            "potrero grande",
+            "corredores",
+            "laurel",
+            "rey curre",
+            "pindeco",
+            "paso real"
+        ],
+        "terminosEmpresa": [
+            "zona sur",
+            "brunca",
+            "zeledon",
+            "transur",
+            "transroden",
+            "golfito"
+        ]
     },
-    'LIMON': {
-      titulo: 'LIMÓN / CARIBE',
-      descripcion: 'Limón centro, Puerto Viejo, Cahuita, Sixaola, Siquirres, Guápiles, Pococí, etc.',
-      terminos: [
-        'limon', 'puerto viejo', 'puerto viejo de talamanca', 'cahuita', 'sixaola', 'talamanca',
-        'bribri', 'siquirres', 'guapiles', 'pococi', 'cariari', 'matina', 'bataan', 'guacimo'
-      ],
-      terminosEmpresa: ['limon', 'caribe']
+    "LIMON": {
+        "titulo": "LIMÓN Y CARIBE (REGIÓN HUETAR CARIBE)",
+        "subtitulo": "Caribe Norte y Sur",
+        "descripcion": "Limón centro, Guápiles, Pococí, Siquirres, Matina, Batán, Guácimo, Cahuita, Puerto Viejo, Bribri, Talamanca, Sixaola.",
+        "terminos": [
+            "limon",
+            "limón",
+            "caribe",
+            "huetar caribe",
+            "puerto viejo",
+            "puerto viejo de talamanca",
+            "cahuita",
+            "sixaola",
+            "talamanca",
+            "bribri",
+            "siquirres",
+            "guapiles",
+            "guápiles",
+            "pococi",
+            "pococí",
+            "cariari",
+            "matina",
+            "bataan",
+            "bataán",
+            "guacimo",
+            "guácimo",
+            "pocora",
+            "la guaria",
+            "bananito",
+            "valle la estrella",
+            "hone creek",
+            "home greek",
+            "rio frio",
+            "rio jimenez",
+            "ticaban",
+            "cairo",
+            "estrada",
+            "pacuarito"
+        ],
+        "terminosEmpresa": [
+            "limon",
+            "caribe",
+            "atlantico",
+            "talamanca"
+        ]
+    },
+    "VALLE CENTRAL": {
+        "titulo": "VALLE CENTRAL (REGIÓN CENTRAL)",
+        "subtitulo": "Gran Área Metropolitana y Rural Central",
+        "descripcion": "San José, Heredia, Cartago, Alajuela central, Turrialba, Puriscal, Los Santos (Tarrazú, Dota, León Cortés).",
+        "terminos": [
+            "valle central",
+            "gam",
+            "region central",
+            "central",
+            "san jose",
+            "san josé",
+            "cartago",
+            "heredia",
+            "alajuela",
+            "turrialba",
+            "juan vinas",
+            "juan viñas",
+            "la suiza",
+            "pejibaye",
+            "tucurrique",
+            "tuis",
+            "pavones",
+            "chitaria",
+            "tres x",
+            "tres equis",
+            "puriscal",
+            "turrucares",
+            "aserri",
+            "aserrí",
+            "acosta",
+            "tarrazu",
+            "tarrazú",
+            "dota",
+            "leon cortes",
+            "león cortés",
+            "desamparados",
+            "escazu",
+            "santa ana",
+            "barva",
+            "santo domingo",
+            "san rafael",
+            "tibas",
+            "tibás",
+            "moravia",
+            "coronado",
+            "guadalupe",
+            "curridabat",
+            "tres rios",
+            "paraiso",
+            "paraíso",
+            "orosi",
+            "cachi",
+            "pacayas",
+            "el guarco",
+            "birrisito",
+            "cot",
+            "taras",
+            "tejar",
+            "ujarras"
+        ],
+        "terminosEmpresa": [
+            "san jose",
+            "cartago",
+            "heredia",
+            "alajuela",
+            "metropolitano"
+        ]
+    },
+    "PROVINCIA SAN JOSE": {
+        "titulo": "PROVINCIA DE SAN JOSÉ",
+        "subtitulo": "Pérez Zeledón, Central, Los Santos y Puriscal",
+        "descripcion": "Cobertura en cantones de San José: Pérez Zeledón, Central, Desamparados, Puriscal, Aserrí, Mora, Tarrazú, Dota, etc.",
+        "terminos": [
+            "san jose",
+            "san josé",
+            "provincia san jose",
+            "perez zeledon",
+            "pérez zeledón",
+            "san isidro de el general",
+            "desamparados",
+            "puriscal",
+            "aserri",
+            "aserrí",
+            "acosta",
+            "tarrazu",
+            "tarrazú",
+            "dota",
+            "leon cortes",
+            "escazu",
+            "santa ana",
+            "alajuelita",
+            "coronado",
+            "tibás",
+            "moravia",
+            "montes de oca",
+            "curridabat"
+        ],
+        "terminosEmpresa": [
+            "san jose"
+        ]
+    },
+    "PROVINCIA ALAJUELA": {
+        "titulo": "PROVINCIA DE ALAJUELA",
+        "subtitulo": "San Carlos, Occidente, Zona Norte y Central",
+        "descripcion": "Cobertura en cantones de Alajuela: San Carlos, San Ramón, Grecia, Naranjo, Palmares, Poás, Zarcero, Upala, Los Chiles, Guatuso, Río Cuarto.",
+        "terminos": [
+            "alajuela",
+            "provincia alajuela",
+            "san carlos",
+            "ciudad quesada",
+            "la fortuna",
+            "aguas zarcas",
+            "san ramon",
+            "palmares",
+            "naranjo",
+            "zarcero",
+            "sarchi",
+            "grecia",
+            "atenas",
+            "poas",
+            "upala",
+            "los chiles",
+            "guatuso",
+            "rio cuarto",
+            "pital",
+            "florencia",
+            "pocosol"
+        ],
+        "terminosEmpresa": [
+            "alajuela",
+            "sancarle",
+            "ramon"
+        ]
+    },
+    "PROVINCIA CARTAGO": {
+        "titulo": "PROVINCIA DE CARTAGO",
+        "subtitulo": "Cartago, Paraíso, Turrialba, Alvarado y El Guarco",
+        "descripcion": "Cobertura en cantones de Cartago: Central, Paraíso, La Unión (Tres Ríos), Jiménez (Juan Viñas), Turrialba, Alvarado (Pacayas), Oreamuno, El Guarco.",
+        "terminos": [
+            "cartago",
+            "provincia cartago",
+            "turrialba",
+            "tres rios",
+            "paraiso",
+            "paraíso",
+            "la union",
+            "juan vinas",
+            "juan viñas",
+            "la suiza",
+            "pejibaye",
+            "tucurrique",
+            "pacayas",
+            "el guarco",
+            "tejar",
+            "orosi",
+            "cachi",
+            "cot",
+            "taras",
+            "birrisito",
+            "ujarras"
+        ],
+        "terminosEmpresa": [
+            "cartago",
+            "turrialba"
+        ]
+    },
+    "PROVINCIA HEREDIA": {
+        "titulo": "PROVINCIA DE HEREDIA",
+        "subtitulo": "Heredia, Barva, Santo Domingo, Santa Bárbara, Sarapiquí",
+        "descripcion": "Cobertura en cantones de Heredia: Central, Barva, Santo Domingo, Santa Bárbara, San Rafael, San Isidro, Belén, Flores, San Pablo, Sarapiquí.",
+        "terminos": [
+            "heredia",
+            "provincia heredia",
+            "sarapiqui",
+            "puerto viejo de sarapiqui",
+            "la virgen",
+            "horquetas",
+            "barva",
+            "santo domingo",
+            "santa barbara",
+            "san rafael",
+            "san isidro",
+            "belen",
+            "san joaquin",
+            "flores"
+        ],
+        "terminosEmpresa": [
+            "heredia",
+            "sarapiqui"
+        ]
+    },
+    "PROVINCIA GUANACASTE": {
+        "titulo": "PROVINCIA DE GUANACASTE",
+        "subtitulo": "Liberia, Nicoya, Santa Cruz, Cañas, Bagaces, Playas",
+        "descripcion": "Cobertura en los 11 cantones de Guanacaste: Liberia, Nicoya, Santa Cruz, Bagaces, Carrillo, Cañas, Abangares, Tilarán, Nandayure, La Cruz, Hojancha.",
+        "terminos": [
+            "guanacaste",
+            "provincia guanacaste",
+            "liberia",
+            "nicoya",
+            "santa cruz",
+            "canas",
+            "cañas",
+            "bagaces",
+            "filadelfia",
+            "playas del coco",
+            "el coco",
+            "tamarindo",
+            "samara",
+            "nosara",
+            "hojancha",
+            "la cruz",
+            "tilaran",
+            "mansion",
+            "sardinal",
+            "belen",
+            "huacas",
+            "flamingo",
+            "potrero"
+        ],
+        "terminosEmpresa": [
+            "guanacaste",
+            "liberia",
+            "nicoya"
+        ]
+    },
+    "PROVINCIA PUNTARENAS": {
+        "titulo": "PROVINCIA DE PUNTARENAS",
+        "subtitulo": "Pacífico Central, Península y Zona Sur",
+        "descripcion": "Cobertura en cantones de Puntarenas: Central, Esparza, Buenos Aires, Montes de Oro, Osa, Quepos, Golfito, Coto Brus, Parrita, Corredores, Garabito, Monteverde, Puerto Jiménez.",
+        "terminos": [
+            "puntarenas",
+            "provincia puntarenas",
+            "esparza",
+            "barranca",
+            "el roble",
+            "jaco",
+            "quepos",
+            "parrita",
+            "golfito",
+            "puerto jimenez",
+            "ciudad neily",
+            "paso canoas",
+            "san vito",
+            "palmar norte",
+            "palmar sur",
+            "ciudad cortes",
+            "uvita",
+            "dominical",
+            "cobano",
+            "paquera",
+            "santa teresa",
+            "monteverde"
+        ],
+        "terminosEmpresa": [
+            "puntarenas",
+            "transur",
+            "golfito"
+        ]
+    },
+    "PROVINCIA LIMON": {
+        "titulo": "PROVINCIA DE LIMÓN",
+        "subtitulo": "Limón, Pococí, Siquirres, Talamanca, Matina, Guácimo",
+        "descripcion": "Cobertura en los 6 cantones de Limón: Central, Pococí (Guápiles), Siquirres, Talamanca (Bribri, Puerto Viejo), Matina (Batán), Guácimo.",
+        "terminos": [
+            "limon",
+            "limón",
+            "provincia limon",
+            "guapiles",
+            "guápiles",
+            "siquirres",
+            "talamanca",
+            "puerto viejo",
+            "cahuita",
+            "sixaola",
+            "bribri",
+            "matina",
+            "bataan",
+            "guacimo",
+            "cariari",
+            "pocora"
+        ],
+        "terminosEmpresa": [
+            "limon",
+            "caribe"
+        ]
     }
-  };
+};
 
   function obtenerInfoRegion(buscado) {
     var bNorm = normalizar(buscado);
     if (!bNorm) return null;
 
-    // Búsqueda directa por nombre de región
+    // Búsqueda directa por clave o título exacto
     for (var key in REGIONES_CR) {
       if (normalizar(key) === bNorm || normalizar(REGIONES_CR[key].titulo) === bNorm) {
         return REGIONES_CR[key];
       }
     }
-    // Si el término coincide con las cabeceras principales
+
+    // Si busca una provincia con o sin el prefijo "PROVINCIA"
     for (var k in REGIONES_CR) {
-      var r = REGIONES_CR[k];
-      if (bNorm === 'san carlos' || bNorm === 'guanacaste' || bNorm === 'zona sur' || bNorm === 'limon' || bNorm === 'perez zeledon') {
-        if (r.terminos.some(function(t) { return normalizar(t) === bNorm; })) {
-          return r;
+      if (k.startsWith("PROVINCIA ")) {
+        var nomProv = normalizar(k.replace("PROVINCIA ", ""));
+        if (bNorm === nomProv || bNorm === "PROVINCIA " + nomProv || bNorm === "PROVINCIA DE " + nomProv) {
+          return REGIONES_CR[k];
+        }
+      }
+    }
+
+    // Si coincide exactamente con un término clave de zona o cabecera regional
+    var cabecerasClave = [
+      'occidente', 'zona occidente', 'san carlos', 'huetar norte', 'zona norte',
+      'guanacaste', 'chorotega', 'pacifico central', 'zona sur', 'brunca',
+      'perez zeledon', 'limon', 'caribe', 'valle central', 'gam'
+    ];
+    for (var kc in REGIONES_CR) {
+      var reg = REGIONES_CR[kc];
+      if (cabecerasClave.includes(bNorm)) {
+        if (normalizar(kc) === bNorm || reg.terminos.some(function(t) { return normalizar(t) === bNorm; })) {
+          return reg;
         }
       }
     }
