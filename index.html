@@ -114,7 +114,7 @@
   .fila-input input[type="text"] {
     flex: 1;
     padding: 12px 14px;
-    font-size: 15px;
+    font-size: 16px;
     border: 1px solid var(--line);
     border-radius: 9px;
     font-family: 'Inter', sans-serif;
@@ -1967,14 +1967,14 @@
         <input type="text" list="listaDestinos" id="inputDestino" placeholder="¿A DÓNDE ENVÍAS? (EJ: PÉREZ ZELEDÓN, LIBERIA...)" autocomplete="off" oninput="debounceBuscar()">
         <button type="button" class="btn-clear" id="btnClearDestino" onclick="limpiarBuscador('inputDestino')" title="Limpiar búsqueda">✕</button>
       </div>
-      <button onclick="buscar()">BUSCAR</button>
+      <button type="button" id="btnBuscar" onclick="buscar(true)">BUSCAR</button>
     </div>
     <div id="filaTransportista" class="fila-input" style="display:none;">
       <div class="input-wrapper">
         <input type="text" list="listaTransportistas" id="inputTransportista" placeholder="NOMBRE DE LA EMPRESA..." autocomplete="off" oninput="debounceBuscar()">
         <button type="button" class="btn-clear" id="btnClearTransportista" onclick="limpiarBuscador('inputTransportista')" title="Limpiar búsqueda">✕</button>
       </div>
-      <button onclick="buscar()">BUSCAR</button>
+      <button type="button" id="btnBuscarTransportista" onclick="buscar(true)">BUSCAR</button>
     </div>
 
     <!-- Explorador elegante por Categorías: Frecuentes, Zonas y Provincias -->
@@ -2307,14 +2307,14 @@
   document.getElementById('inputDestino').addEventListener('keydown', function (evento) {
     if (evento.key === 'Enter') {
       evento.preventDefault();
-      buscarPorDestino();
+      buscarPorDestino(true);
     }
   });
 
   document.getElementById('inputTransportista').addEventListener('keydown', function (evento) {
     if (evento.key === 'Enter') {
       evento.preventDefault();
-      buscarPorTransportista();
+      buscarPorTransportista(true);
     }
   });
 
@@ -4088,8 +4088,8 @@
 
       var botones = '';
       if (info.esCelular) {
-        botones += '<a class="btn-wa" href="' + info.waUrl + '" target="_blank" rel="noopener noreferrer" title="Escribir por WhatsApp a ' + escapeHtml(t.nombre) + '">' +
-                   SVG_WA + ' WhatsApp</a>';
+        botones += '<a class="btn-wa" href="' + info.waUrl + '" target="_blank" rel="noopener noreferrer" title="Escribir por WhatsApp a ' + escapeHtml(t.nombre) + ' (' + escapeHtml(info.formatoVisible) + ')">' +
+                   SVG_WA + ' <span class="btn-wa-text">WhatsApp </span>' + escapeHtml(info.formatoVisible) + '</a>';
       }
       botones += '<a class="btn-tel" href="' + info.telUrl + '" title="Llamar al ' + escapeHtml(info.formatoVisible) + '"><span style="color:#F2A93B;font-size:14px;margin-right:4px;">☎</span> ' + escapeHtml(info.formatoVisible) + '</a>';
       return botones;
@@ -4168,7 +4168,7 @@
     }
 
     timerBusqueda = setTimeout(function () {
-      buscar();
+      buscar(false);
     }, 280);
   }
 
@@ -4267,15 +4267,18 @@
     }, 2800);
   }
 
-  function buscar() {
+  function buscar(esManual) {
     var modo = document.querySelector('input[name="modo"]:checked').value;
-    if (modo === 'transportista') { buscarPorTransportista(); }
-    else { buscarPorDestino(); }
+    if (modo === 'transportista') { buscarPorTransportista(Boolean(esManual)); }
+    else { buscarPorDestino(Boolean(esManual)); }
   }
 
-  function buscarPorDestino() {
+  function buscarPorDestino(esManual) {
     var destinoBuscado = document.getElementById('inputDestino').value.trim();
-    if (!destinoBuscado) { alert('Escribe un destino primero.'); return; }
+    if (!destinoBuscado) {
+      if (esManual) alert('Escribe un destino primero.');
+      return;
+    }
 
     var infoRegion = obtenerInfoRegion(destinoBuscado);
 
@@ -4285,7 +4288,7 @@
 
     if (coincidencias.length === 0) {
       mostrarSugerenciasDestino(destinoBuscado);
-      scrollHaciaResultados();
+      if (esManual) scrollHaciaResultados();
       return;
     }
 
@@ -4317,7 +4320,7 @@
       return item.bodega ? Object.assign({}, item.bodega, { transportista: item.transportista }) : null;
     }).filter(Boolean);
     renderMarcadores(bodegasConContexto);
-    scrollHaciaResultados();
+    if (esManual) scrollHaciaResultados();
   }
 
 
@@ -4814,9 +4817,12 @@ function renderTarjetasTransportistasHtml(lista) {
     cont.innerHTML = bannerHtml + renderTarjetasTransportistasHtml(lista);
   }
 
-  function buscarPorTransportista() {
+  function buscarPorTransportista(esManual) {
     var nombreBuscado = document.getElementById('inputTransportista').value.trim();
-    if (!nombreBuscado) { alert('Escribe el nombre de un transportista primero.'); return; }
+    if (!nombreBuscado) {
+      if (esManual) alert('Escribe el nombre de un transportista primero.');
+      return;
+    }
 
     var coincidencias = transportistas.filter(function (t) {
       return coincideAproximado(t.nombre, nombreBuscado);
@@ -4825,7 +4831,7 @@ function renderTarjetasTransportistasHtml(lista) {
     if (coincidencias.length === 0) {
       mostrarSugerenciasTransportista(nombreBuscado);
       renderMarcadores([]);
-      scrollHaciaResultados();
+      if (esManual) scrollHaciaResultados();
       return;
     }
 
@@ -4838,7 +4844,7 @@ function renderTarjetasTransportistasHtml(lista) {
       });
     });
     renderMarcadores(todasLasBodegas);
-    scrollHaciaResultados();
+    if (esManual) scrollHaciaResultados();
   }
 
   function mostrarSugerenciasTransportista(textoBuscado) {
@@ -4982,6 +4988,7 @@ function renderTarjetasTransportistasHtml(lista) {
     headerH2.style.cssText = 'font-size:18px; color:var(--navy); margin:10px 0 16px; text-align:center; text-transform:uppercase;';
     headerH2.textContent = 'Mostrando las ' + transportistas.length + ' empresas registradas';
     cont.prepend(headerH2);
+    scrollHaciaResultados();
   }
 
   // Renderiza marcadores con Leaflet agrupando bodegas compartidas en una misma ubicación física

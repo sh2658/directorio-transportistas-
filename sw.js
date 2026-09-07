@@ -1,5 +1,5 @@
-// Service Worker para Rutas CR - PWA Offline Support (v19)
-const CACHE_NAME = 'rutas-cr-v19';
+// Service Worker para Rutas CR - PWA Offline Support (v20)
+const CACHE_NAME = 'rutas-cr-v20';
 const ASSETS = [
   './',
   './index.html',
