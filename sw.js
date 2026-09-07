@@ -1,5 +1,5 @@
-// Service Worker para Rutas CR - PWA Offline Support (v18)
-const CACHE_NAME = 'rutas-cr-v18';
+// Service Worker para Rutas CR - PWA Offline Support (v19)
+const CACHE_NAME = 'rutas-cr-v19';
 const ASSETS = [
   './',
   './index.html',
@@ -7,6 +7,9 @@ const ASSETS = [
   './assets/icon-192.png',
   './assets/icon-512.png',
   './assets/qrcode.min.js',
+  './assets/cantones_logistica_cr.json',
+  './assets/localidades_dta_cr.json',
+  './assets/localidades_dta_cr.js',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
   'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap'

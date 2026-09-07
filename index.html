@@ -19,6 +19,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <script src="assets/qrcode.min.js"></script>
+<script src="assets/localidades_dta_cr.js"></script>
 <!-- Leaflet CSS & JS (100% Gratuito y Open Source) -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -2387,6 +2388,17 @@
       lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180 && !(lat === 0 && lng === 0);
   }
 
+  function scrollHaciaResultados() {
+    setTimeout(function() {
+      var el = document.getElementById('resultados');
+      if (el) {
+        var yOffset = -20;
+        var y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }, 60);
+  }
+
   function aplicarSugerencia(valor, modo) {
     var id = modo === 'transportista' ? 'inputTransportista' : 'inputDestino';
     document.getElementById(id).value = valor;
@@ -2399,6 +2411,7 @@
       cambiarModo();
       buscarPorDestino();
     }
+    scrollHaciaResultados();
   }
 
   function distanciaLevenshtein(a, b) {
@@ -2797,6 +2810,933 @@
     "PROVINCIA HEREDIA": ["VALLE CENTRAL", "SAN CARLOS"],
     "PROVINCIA LIMON": ["LIMON"]
   };
+
+  // Matriz Oficial de Cabeceras Cantonales y Centros Logísticos de Costa Rica (DTA)
+  const CANTONES_LOGISTICA_CR = {
+  "Golfito": {
+    "cabecera": "GOLFITO",
+    "provincia": "Puntarenas",
+    "zona": "ZONA SUR",
+    "centrosCercanos": [
+      "GOLFITO",
+      "RÍO CLARO",
+      "CIUDAD NEILLY",
+      "PASO CANOAS",
+      "PALMAR NORTE"
+    ]
+  },
+  "Corredores": {
+    "cabecera": "CIUDAD NEILLY",
+    "provincia": "Puntarenas",
+    "zona": "ZONA SUR",
+    "centrosCercanos": [
+      "CIUDAD NEILLY",
+      "PASO CANOAS",
+      "RÍO CLARO",
+      "LAUREL",
+      "LA CUESTA"
+    ]
+  },
+  "Coto Brus": {
+    "cabecera": "SAN VITO",
+    "provincia": "Puntarenas",
+    "zona": "ZONA SUR",
+    "centrosCercanos": [
+      "SAN VITO",
+      "SABALITO",
+      "AGUA BUENA",
+      "CIUDAD NEILLY"
+    ]
+  },
+  "Osa": {
+    "cabecera": "CIUDAD CORTÉS",
+    "provincia": "Puntarenas",
+    "zona": "ZONA SUR",
+    "centrosCercanos": [
+      "PALMAR NORTE",
+      "PALMAR SUR",
+      "CIUDAD CORTÉS",
+      "UVITA",
+      "DOMINICAL"
+    ]
+  },
+  "Buenos Aires": {
+    "cabecera": "BUENOS AIRES",
+    "provincia": "Puntarenas",
+    "zona": "ZONA SUR",
+    "centrosCercanos": [
+      "BUENOS AIRES",
+      "PALMAR NORTE",
+      "PÉREZ ZELEDÓN",
+      "PASO REAL",
+      "REY CURRÉ"
+    ]
+  },
+  "Puerto Jiménez": {
+    "cabecera": "PUERTO JIMÉNEZ",
+    "provincia": "Puntarenas",
+    "zona": "ZONA SUR",
+    "centrosCercanos": [
+      "PUERTO JIMÉNEZ",
+      "GOLFITO",
+      "CHACARITA DE OSA",
+      "RÍO CLARO"
+    ]
+  },
+  "Pérez Zeledón": {
+    "cabecera": "SAN ISIDRO DE EL GENERAL",
+    "provincia": "San José",
+    "zona": "ZONA SUR",
+    "centrosCercanos": [
+      "PÉREZ ZELEDÓN",
+      "SAN ISIDRO DE EL GENERAL",
+      "DANIEL FLORES",
+      "PALMARES P.Z.",
+      "DOMINICAL"
+    ]
+  },
+  "San Ramón": {
+    "cabecera": "SAN RAMÓN",
+    "provincia": "Alajuela",
+    "zona": "OCCIDENTE",
+    "centrosCercanos": [
+      "SAN RAMÓN",
+      "PALMARES",
+      "NARANJO",
+      "SARCHÍ"
+    ]
+  },
+  "Palmares": {
+    "cabecera": "PALMARES",
+    "provincia": "Alajuela",
+    "zona": "OCCIDENTE",
+    "centrosCercanos": [
+      "PALMARES",
+      "SAN RAMÓN",
+      "NARANJO",
+      "SARCHÍ"
+    ]
+  },
+  "Naranjo": {
+    "cabecera": "NARANJO",
+    "provincia": "Alajuela",
+    "zona": "OCCIDENTE",
+    "centrosCercanos": [
+      "NARANJO",
+      "PALMARES",
+      "SAN RAMÓN",
+      "GRECIA",
+      "SARCHÍ"
+    ]
+  },
+  "Grecia": {
+    "cabecera": "GRECIA",
+    "provincia": "Alajuela",
+    "zona": "OCCIDENTE",
+    "centrosCercanos": [
+      "GRECIA",
+      "SARCHÍ",
+      "NARANJO",
+      "POÁS",
+      "ALAJUELA"
+    ]
+  },
+  "Sarchí": {
+    "cabecera": "SARCHÍ",
+    "provincia": "Alajuela",
+    "zona": "OCCIDENTE",
+    "centrosCercanos": [
+      "SARCHÍ",
+      "GRECIA",
+      "NARANJO",
+      "SAN RAMÓN"
+    ]
+  },
+  "Atenas": {
+    "cabecera": "ATENAS",
+    "provincia": "Alajuela",
+    "zona": "OCCIDENTE",
+    "centrosCercanos": [
+      "ATENAS",
+      "ALAJUELA",
+      "OROTINA",
+      "PALMARES"
+    ]
+  },
+  "Poás": {
+    "cabecera": "SAN PEDRO DE POÁS",
+    "provincia": "Alajuela",
+    "zona": "OCCIDENTE",
+    "centrosCercanos": [
+      "POÁS",
+      "GRECIA",
+      "ALAJUELA"
+    ]
+  },
+  "Zarcero": {
+    "cabecera": "ZARCERO",
+    "provincia": "Alajuela",
+    "zona": "OCCIDENTE",
+    "centrosCercanos": [
+      "ZARCERO",
+      "NARANJO",
+      "SAN RAMÓN",
+      "CIUDAD QUESADA"
+    ]
+  },
+  "San Carlos": {
+    "cabecera": "CIUDAD QUESADA",
+    "provincia": "Alajuela",
+    "zona": "SAN CARLOS",
+    "centrosCercanos": [
+      "CIUDAD QUESADA",
+      "LA FORTUNA",
+      "AGUAS ZARCAS",
+      "PITAL",
+      "FLORENCIA",
+      "POCOSOL",
+      "MUELLE"
+    ]
+  },
+  "Upala": {
+    "cabecera": "UPALA",
+    "provincia": "Alajuela",
+    "zona": "SAN CARLOS",
+    "centrosCercanos": [
+      "UPALA",
+      "BIJAGUA",
+      "GUATUSO",
+      "CAÑAS",
+      "LIBERIA"
+    ]
+  },
+  "Los Chiles": {
+    "cabecera": "LOS CHILES",
+    "provincia": "Alajuela",
+    "zona": "SAN CARLOS",
+    "centrosCercanos": [
+      "LOS CHILES",
+      "POCOSOL",
+      "MUELLE",
+      "CIUDAD QUESADA"
+    ]
+  },
+  "Guatuso": {
+    "cabecera": "SAN RAFAEL DE GUATUSO",
+    "provincia": "Alajuela",
+    "zona": "SAN CARLOS",
+    "centrosCercanos": [
+      "GUATUSO",
+      "UPALA",
+      "KATIRA",
+      "LA FORTUNA"
+    ]
+  },
+  "Río Cuarto": {
+    "cabecera": "RÍO CUARTO",
+    "provincia": "Alajuela",
+    "zona": "SAN CARLOS",
+    "centrosCercanos": [
+      "RÍO CUARTO",
+      "SANTA RITA",
+      "AGUAS ZARCAS",
+      "VENECIA",
+      "CIUDAD QUESADA"
+    ]
+  },
+  "Sarapiquí": {
+    "cabecera": "PUERTO VIEJO DE SARAPIQUÍ",
+    "provincia": "Heredia",
+    "zona": "SAN CARLOS",
+    "centrosCercanos": [
+      "PUERTO VIEJO DE SARAPIQUÍ",
+      "LA VIRGEN",
+      "HORQUETAS",
+      "GUÁPILES",
+      "CIUDAD QUESADA"
+    ]
+  },
+  "Liberia": {
+    "cabecera": "LIBERIA",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "LIBERIA",
+      "FILADELFIA",
+      "BAGACES",
+      "CAÑAS",
+      "PLAYAS DEL COCO"
+    ]
+  },
+  "Nicoya": {
+    "cabecera": "NICOYA",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "NICOYA",
+      "SANTA CRUZ",
+      "MANSIÓN",
+      "SÁMARA",
+      "NOSARA"
+    ]
+  },
+  "Santa Cruz": {
+    "cabecera": "SANTA CRUZ",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "SANTA CRUZ",
+      "HUACAS",
+      "TAMARINDO",
+      "FILADELFIA",
+      "NICOYA",
+      "FLAMINGO"
+    ]
+  },
+  "Bagaces": {
+    "cabecera": "BAGACES",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "BAGACES",
+      "CAÑAS",
+      "LIBERIA",
+      "FORTUNA DE BAGACES"
+    ]
+  },
+  "Carrillo": {
+    "cabecera": "FILADELFIA",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "FILADELFIA",
+      "PLAYAS DEL COCO",
+      "SARDINAL",
+      "BELÉN DE CARRILLO",
+      "LIBERIA"
+    ]
+  },
+  "Cañas": {
+    "cabecera": "CAÑAS",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "CAÑAS",
+      "BAGACES",
+      "TILARÁN",
+      "LIBERIA",
+      "LAS JUNTAS"
+    ]
+  },
+  "Abangares": {
+    "cabecera": "LAS JUNTAS",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "LAS JUNTAS",
+      "CAÑAS",
+      "MIRAMAR",
+      "PUNTARENAS"
+    ]
+  },
+  "Tilarán": {
+    "cabecera": "TILARÁN",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "TILARÁN",
+      "CAÑAS",
+      "TRONADORA",
+      "LA FORTUNA"
+    ]
+  },
+  "Nandayure": {
+    "cabecera": "CARMONA",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "CARMONA",
+      "JICARAL",
+      "HOJANCHA",
+      "NICOYA"
+    ]
+  },
+  "La Cruz": {
+    "cabecera": "LA CRUZ",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "LA CRUZ",
+      "PEÑAS BLANCAS",
+      "LIBERIA",
+      "SANTA CECILIA"
+    ]
+  },
+  "Hojancha": {
+    "cabecera": "HOJANCHA",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "HOJANCHA",
+      "NICOYA",
+      "MANSIÓN",
+      "SÁMARA"
+    ]
+  },
+  "Puntarenas": {
+    "cabecera": "PUNTARENAS",
+    "provincia": "Puntarenas",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "PUNTARENAS",
+      "BARRANCA",
+      "EL ROBLE",
+      "ESPARZA",
+      "CALDERA",
+      "PAQUERA",
+      "CÓBANO"
+    ]
+  },
+  "Esparza": {
+    "cabecera": "ESPARZA",
+    "provincia": "Puntarenas",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "ESPARZA",
+      "PUNTARENAS",
+      "BARRANCA",
+      "OROTINA",
+      "SAN RAMÓN"
+    ]
+  },
+  "Montes de Oro": {
+    "cabecera": "MIRAMAR",
+    "provincia": "Puntarenas",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "MIRAMAR",
+      "ESPARZA",
+      "PUNTARENAS",
+      "LAS JUNTAS"
+    ]
+  },
+  "Garabito": {
+    "cabecera": "JACÓ",
+    "provincia": "Puntarenas",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "JACÓ",
+      "HERRADURA",
+      "TÁRCOLES",
+      "PARRITA",
+      "QUEPOS"
+    ]
+  },
+  "Parrita": {
+    "cabecera": "PARRITA",
+    "provincia": "Puntarenas",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "PARRITA",
+      "JACÓ",
+      "QUEPOS"
+    ]
+  },
+  "Quepos": {
+    "cabecera": "QUEPOS",
+    "provincia": "Puntarenas",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "QUEPOS",
+      "MANUEL ANTONIO",
+      "PARRITA",
+      "DOMINICAL",
+      "UVITA"
+    ]
+  },
+  "Monteverde": {
+    "cabecera": "SANTA ELENA",
+    "provincia": "Puntarenas",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "SANTA ELENA",
+      "MONTEVERDE",
+      "LAS JUNTAS",
+      "TILARÁN"
+    ]
+  },
+  "Orotina": {
+    "cabecera": "OROTINA",
+    "provincia": "Alajuela",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "OROTINA",
+      "SAN MATEO",
+      "ESPARZA",
+      "ATENAS",
+      "JACÓ"
+    ]
+  },
+  "San Mateo": {
+    "cabecera": "SAN MATEO",
+    "provincia": "Alajuela",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "SAN MATEO",
+      "OROTINA",
+      "ESPARZA",
+      "ATENAS"
+    ]
+  },
+  "Pococí": {
+    "cabecera": "GUÁPILES",
+    "provincia": "Limón",
+    "zona": "LIMON",
+    "centrosCercanos": [
+      "GUÁPILES",
+      "CARIARI",
+      "LA RITA",
+      "GUÁCIMO",
+      "SIQUIRRES"
+    ]
+  },
+  "Siquirres": {
+    "cabecera": "SIQUIRRES",
+    "provincia": "Limón",
+    "zona": "LIMON",
+    "centrosCercanos": [
+      "SIQUIRRES",
+      "GUÁCIMO",
+      "BATÁN",
+      "MATINA",
+      "LIMÓN"
+    ]
+  },
+  "Limón": {
+    "cabecera": "LIMÓN",
+    "provincia": "Limón",
+    "zona": "LIMON",
+    "centrosCercanos": [
+      "LIMÓN",
+      "MOÍN",
+      "LIVERPOOL",
+      "CAHUITA",
+      "SIQUIRRES"
+    ]
+  },
+  "Talamanca": {
+    "cabecera": "BRIBRI",
+    "provincia": "Limón",
+    "zona": "LIMON",
+    "centrosCercanos": [
+      "BRIBRI",
+      "PUERTO VIEJO",
+      "CAHUITA",
+      "SIXÁOLA",
+      "LIMÓN"
+    ]
+  },
+  "Matina": {
+    "cabecera": "MATINA",
+    "provincia": "Limón",
+    "zona": "LIMON",
+    "centrosCercanos": [
+      "BATÁN",
+      "MATINA",
+      "SIQUIRRES",
+      "LIMÓN"
+    ]
+  },
+  "Guácimo": {
+    "cabecera": "GUÁCIMO",
+    "provincia": "Limón",
+    "zona": "LIMON",
+    "centrosCercanos": [
+      "GUÁCIMO",
+      "GUÁPILES",
+      "SIQUIRRES"
+    ]
+  },
+  "Turrialba": {
+    "cabecera": "TURRIALBA",
+    "provincia": "Cartago",
+    "zona": "TURRIALBA Y CARTAGO",
+    "centrosCercanos": [
+      "TURRIALBA",
+      "LA SUIZA",
+      "SANTA CRUZ DE TURRIALBA",
+      "TUCURRIQUE",
+      "CARTAGO"
+    ]
+  },
+  "Jiménez": {
+    "cabecera": "JUAN VIÑAS",
+    "provincia": "Cartago",
+    "zona": "TURRIALBA Y CARTAGO",
+    "centrosCercanos": [
+      "JUAN VIÑAS",
+      "TURRIALBA",
+      "TUCURRIQUE",
+      "CARTAGO"
+    ]
+  },
+  "Cartago": {
+    "cabecera": "CARTAGO",
+    "provincia": "Cartago",
+    "zona": "TURRIALBA Y CARTAGO",
+    "centrosCercanos": [
+      "CARTAGO",
+      "PARAÍSO",
+      "TEJAR",
+      "TRES RÍOS",
+      "SAN JOSÉ"
+    ]
+  },
+  "Paraíso": {
+    "cabecera": "PARAÍSO",
+    "provincia": "Cartago",
+    "zona": "TURRIALBA Y CARTAGO",
+    "centrosCercanos": [
+      "PARAÍSO",
+      "OROSI",
+      "CARTAGO",
+      "CERVANTES"
+    ]
+  },
+  "Alvarado": {
+    "cabecera": "PACAYAS",
+    "provincia": "Cartago",
+    "zona": "TURRIALBA Y CARTAGO",
+    "centrosCercanos": [
+      "PACAYAS",
+      "CERVANTES",
+      "CARTAGO",
+      "TURRIALBA"
+    ]
+  },
+  "Oreamuno": {
+    "cabecera": "SAN RAFAEL DE OREAMUNO",
+    "provincia": "Cartago",
+    "zona": "TURRIALBA Y CARTAGO",
+    "centrosCercanos": [
+      "SAN RAFAEL",
+      "POTRERO CERRADO",
+      "CARTAGO"
+    ]
+  },
+  "El Guarco": {
+    "cabecera": "TEJAR",
+    "provincia": "Cartago",
+    "zona": "TURRIALBA Y CARTAGO",
+    "centrosCercanos": [
+      "TEJAR",
+      "CARTAGO",
+      "SAN ISIDRO DE EL GENERAL"
+    ]
+  },
+  "La Unión": {
+    "cabecera": "TRES RÍOS",
+    "provincia": "Cartago",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "TRES RÍOS",
+      "CARTAGO",
+      "SAN JOSÉ",
+      "CURRIDABAT"
+    ]
+  },
+  "Tarrazú": {
+    "cabecera": "SAN MARCOS DE TARRAZÚ",
+    "provincia": "San José",
+    "zona": "ZONA DE LOS SANTOS",
+    "centrosCercanos": [
+      "SAN MARCOS DE TARRAZÚ",
+      "SANTA MARÍA DE DOTA",
+      "SAN PABLO DE LEÓN CORTÉS",
+      "CARTAGO",
+      "PÉREZ ZELEDÓN"
+    ]
+  },
+  "Dota": {
+    "cabecera": "SANTA MARÍA DE DOTA",
+    "provincia": "San José",
+    "zona": "ZONA DE LOS SANTOS",
+    "centrosCercanos": [
+      "SANTA MARÍA DE DOTA",
+      "SAN MARCOS DE TARRAZÚ",
+      "SAN PABLO DE LEÓN CORTÉS",
+      "CARTAGO"
+    ]
+  },
+  "León Cortés Castro": {
+    "cabecera": "SAN PABLO DE LEÓN CORTÉS",
+    "provincia": "San José",
+    "zona": "ZONA DE LOS SANTOS",
+    "centrosCercanos": [
+      "SAN PABLO DE LEÓN CORTÉS",
+      "SAN MARCOS DE TARRAZÚ",
+      "SANTA MARÍA DE DOTA",
+      "CARTAGO"
+    ]
+  },
+  "San José": {
+    "cabecera": "SAN JOSÉ",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN JOSÉ",
+      "BARRIO MÉXICO",
+      "PAVAS",
+      "DESAMPARADOS"
+    ]
+  },
+  "Escazú": {
+    "cabecera": "ESCAZÚ",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "ESCAZÚ",
+      "SAN JOSÉ",
+      "SANTA ANA"
+    ]
+  },
+  "Desamparados": {
+    "cabecera": "DESAMPARADOS",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "DESAMPARADOS",
+      "SAN JOSÉ",
+      "ASERRI"
+    ]
+  },
+  "Puriscal": {
+    "cabecera": "PURISCAL",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "PURISCAL",
+      "SANTIAGO DE PURISCAL",
+      "SAN JOSÉ"
+    ]
+  },
+  "Aserrí": {
+    "cabecera": "ASERRÍ",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "ASERRÍ",
+      "DESAMPARADOS",
+      "SAN JOSÉ"
+    ]
+  },
+  "Mora": {
+    "cabecera": "CIUDAD COLÓN",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "CIUDAD COLÓN",
+      "SANTA ANA",
+      "SAN JOSÉ"
+    ]
+  },
+  "Goicoechea": {
+    "cabecera": "CALLE BLANCOS",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "CALLE BLANCOS",
+      "GUADALUPE",
+      "SAN JOSÉ"
+    ]
+  },
+  "Santa Ana": {
+    "cabecera": "SANTA ANA",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SANTA ANA",
+      "ESCAZÚ",
+      "SAN JOSÉ"
+    ]
+  },
+  "Alajuelita": {
+    "cabecera": "ALAJUELITA",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "ALAJUELITA",
+      "SAN JOSÉ"
+    ]
+  },
+  "Vázquez de Coronado": {
+    "cabecera": "CORONADO",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "CORONADO",
+      "MORAVIA",
+      "SAN JOSÉ"
+    ]
+  },
+  "Acosta": {
+    "cabecera": "SAN IGNACIO DE ACOSTA",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN IGNACIO DE ACOSTA",
+      "ASERRÍ",
+      "SAN JOSÉ"
+    ]
+  },
+  "Tibás": {
+    "cabecera": "TIBÁS",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "TIBÁS",
+      "SAN JOSÉ"
+    ]
+  },
+  "Moravia": {
+    "cabecera": "MORAVIA",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "MORAVIA",
+      "GUADALUPE",
+      "SAN JOSÉ"
+    ]
+  },
+  "Montes de Oca": {
+    "cabecera": "SAN PEDRO",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN PEDRO",
+      "SABANILLA",
+      "SAN JOSÉ"
+    ]
+  },
+  "Turrubares": {
+    "cabecera": "SAN PABLO DE TURRUBARES",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN PABLO DE TURRUBARES",
+      "OROTINA",
+      "PURISCAL"
+    ]
+  },
+  "Curridabat": {
+    "cabecera": "CURRIDABAT",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "CURRIDABAT",
+      "SAN JOSÉ",
+      "TRES RÍOS"
+    ]
+  },
+  "Alajuela": {
+    "cabecera": "ALAJUELA",
+    "provincia": "Alajuela",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "ALAJUELA",
+      "SAN JOSÉ",
+      "HEREDIA"
+    ]
+  },
+  "Heredia": {
+    "cabecera": "HEREDIA",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "HEREDIA",
+      "SAN JOSÉ",
+      "ALAJUELA"
+    ]
+  },
+  "Barva": {
+    "cabecera": "BARVA",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "BARVA",
+      "HEREDIA",
+      "SAN JOSÉ"
+    ]
+  },
+  "Santo Domingo": {
+    "cabecera": "SANTO DOMINGO",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SANTO DOMINGO",
+      "HEREDIA",
+      "SAN JOSÉ"
+    ]
+  },
+  "Santa Bárbara": {
+    "cabecera": "SANTA BÁRBARA",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SANTA BÁRBARA",
+      "HEREDIA",
+      "ALAJUELA"
+    ]
+  },
+  "San Rafael": {
+    "cabecera": "SAN RAFAEL",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN RAFAEL",
+      "HEREDIA"
+    ]
+  },
+  "San Isidro": {
+    "cabecera": "SAN ISIDRO",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN ISIDRO",
+      "HEREDIA"
+    ]
+  },
+  "Belén": {
+    "cabecera": "SAN ANTONIO DE BELÉN",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN ANTONIO DE BELÉN",
+      "ALAJUELA",
+      "HEREDIA"
+    ]
+  },
+  "Flores": {
+    "cabecera": "SAN JOAQUÍN DE FLORES",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN JOAQUÍN DE FLORES",
+      "HEREDIA",
+      "ALAJUELA"
+    ]
+  },
+  "San Pablo": {
+    "cabecera": "SAN PABLO",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN PABLO",
+      "HEREDIA"
+    ]
+  }
+};
+
 
   const HOMONIMOS_CR = [
     {
@@ -3345,7 +4285,7 @@
 
     if (coincidencias.length === 0) {
       mostrarSugerenciasDestino(destinoBuscado);
-      renderMarcadores([]);
+      scrollHaciaResultados();
       return;
     }
 
@@ -3377,9 +4317,287 @@
       return item.bodega ? Object.assign({}, item.bodega, { transportista: item.transportista }) : null;
     }).filter(Boolean);
     renderMarcadores(bodegasConContexto);
+    scrollHaciaResultados();
+  }
+
+
+function renderTarjetasTransportistasHtml(lista) {
+    return lista.map(function (item) {
+      var t = item.transportista;
+      var acciones = telefonosHtml(t);
+      var b = item.bodega;
+      if (b && coordenadasValidas(b)) {
+        acciones += botonesNavegacionHtml(b.lat, b.lng) +
+                    '<a href="#mapa" class="btn-ver-mapa" onclick="centrarEnMapa(' + b.lat + ',' + b.lng + '); return false;">🗺️ Ver mapa</a>';
+      }
+      var telefonosTexto = (Array.isArray(t.telefonos) ? t.telefonos : []).map(function(tel){ return tel.numero; }).filter(Boolean).join(', ');
+      var latVal = (b && coordenadasValidas(b)) ? b.lat : '';
+      var lngVal = (b && coordenadasValidas(b)) ? b.lng : '';
+      var zonaVal = (b && b.zona) ? b.zona : '';
+      var dirVal = (b && b.direccion) ? b.direccion : '';
+
+      var destinosTexto = (Array.isArray(t.destinos) ? t.destinos : []).join(', ');
+      acciones += '<button type="button" class="btn-rotular-card" onclick=\'abrirRotuladorConTransportista(' +
+        JSON.stringify(t.nombre) + ',' +
+        JSON.stringify(zonaVal || dirVal || '') + ')\'>📦 Rotular</button>';
+      acciones += '<button type="button" class="btn-compartir" onclick=\'compartirTransportista(' +
+        JSON.stringify(t.nombre) + ',' +
+        JSON.stringify(zonaVal) + ',' +
+        JSON.stringify(dirVal) + ',' +
+        JSON.stringify(latVal) + ',' +
+        JSON.stringify(lngVal) + ',' +
+        JSON.stringify(telefonosTexto) + ',' +
+        JSON.stringify(t.horario || '') + ',' +
+        JSON.stringify(destinosTexto) + ')\'>📤 Compartir</button>';
+
+      var sello = item.distancia !== null
+        ? '<div class="sello"><b>' + item.distancia.toFixed(1) + '</b>km</div>'
+        : '';
+
+      return '' +
+        '<div class="boleto">' +
+          '<div class="foto-col">' + fotoHtml(t) + '</div>' +
+          '<div class="divisor"></div>' +
+          '<div class="info-col">' +
+            sello +
+            (b && b.zona ? '<span class="zona-tag">' + escapeHtml(b.zona) + '</span><br>' : '') +
+            '<h3>' + escapeHtml(t.nombre) + '</h3>' +
+            renderZonasBadges(t) +
+            (t.horario ? '<p><strong>HORARIO:</strong> ' + escapeHtml(t.horario) + '</p>' : '') +
+            (b ? '<p><strong>BODEGA:</strong> ' + escapeHtml(b.direccion || b.zona || 'SIN DIRECCIÓN REGISTRADA') + '</p>' : '<p><em>Sin coordenadas de bodega registradas</em></p>') +
+            (t.destinos && t.destinos.length ? '<div class="destinos-contenedor-card"><p class="destinos-lista"><strong>DESTINOS QUE CUBRE (' + t.destinos.length + '):</strong> ' + t.destinos.slice(0, 10).map(function(d){ return formatearDestinoConZona(d, t); }).join(', ') + (t.destinos.length > 10 ? ' <em style="color:var(--muted); font-size:12px;">(+ ' + (t.destinos.length - 10) + ' más...)</em>' : '') + '</p><button type="button" class="btn-ver-destinos-modal" onclick=\'abrirModalDestinosTransportista(' + JSON.stringify(t.id) + ')\'>📋 Ver lista completa (' + t.destinos.length + ') y buscar</button></div>' : '') +
+            '<div class="acciones">' + acciones + '</div>' +
+          '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function cargarLocalidadesDTA() {
+    if (typeof LOCALIDADES_DTA !== 'undefined' && LOCALIDADES_DTA && Object.keys(LOCALIDADES_DTA).length > 0) {
+      console.log('✅ Localidades DTA ya disponibles en memoria:', Object.keys(LOCALIDADES_DTA).length);
+      return;
+    }
+    fetch('./assets/localidades_dta_cr.json')
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        window.LOCALIDADES_DTA = data;
+        console.log('✅ Localidades DTA cargadas en memoria via fetch:', Object.keys(window.LOCALIDADES_DTA).length);
+      })
+      .catch(function (err) {
+        console.warn('Localidades DTA secundarias no cargadas:', err);
+      });
+  }
+  cargarLocalidadesDTA();
+
+  // Resuelve la ubicación física de un lugar según la División Territorial Administrativa (DTA)
+  function resolverUbicacionDTA(textoBuscado) {
+    if (!textoBuscado) return null;
+    var buscadoNorm = normalizar(textoBuscado);
+
+    function buscarLogisticaCanton(cantonNombre) {
+      if (!cantonNombre) return null;
+      var cNorm = normalizar(cantonNombre);
+      for (var k in CANTONES_LOGISTICA_CR) {
+        if (normalizar(k) === cNorm) return CANTONES_LOGISTICA_CR[k];
+      }
+      return null;
+    }
+
+    // 1. Búsqueda en diccionario de 11.000+ localidades oficiales DTA
+    var dtaData = (typeof LOCALIDADES_DTA !== 'undefined' && LOCALIDADES_DTA) ? LOCALIDADES_DTA : (window.LOCALIDADES_DTA || null);
+    if (dtaData) {
+      var loc = dtaData[buscadoNorm.toLowerCase()] || dtaData[buscadoNorm];
+      if (loc) {
+        var canton = loc[0];
+        var prov = loc[1];
+        var dist = loc[2] || '';
+        var log = buscarLogisticaCanton(canton);
+        return {
+          tipo: 'localidad',
+          nombre: textoBuscado,
+          canton: canton,
+          provincia: prov,
+          distrito: dist,
+          logistica: log
+        };
+      }
+    }
+
+    // 2. Búsqueda directa por nombre de cantón
+    for (var c in CANTONES_LOGISTICA_CR) {
+      if (normalizar(c) === buscadoNorm) {
+        return {
+          tipo: 'canton',
+          nombre: c,
+          canton: c,
+          provincia: CANTONES_LOGISTICA_CR[c].provincia,
+          distrito: '',
+          logistica: CANTONES_LOGISTICA_CR[c]
+        };
+      }
+    }
+
+    // 3. Búsqueda si el texto contiene el nombre de algún cantón
+    for (var c in CANTONES_LOGISTICA_CR) {
+      var cNorm = normalizar(c);
+      if (cNorm.length >= 4 && (buscadoNorm.indexOf(cNorm) !== -1 || cNorm.indexOf(buscadoNorm) !== -1)) {
+        return {
+          tipo: 'canton_parcial',
+          nombre: textoBuscado,
+          canton: c,
+          provincia: CANTONES_LOGISTICA_CR[c].provincia,
+          distrito: '',
+          logistica: CANTONES_LOGISTICA_CR[c]
+        };
+      }
+    }
+
+    // 4. Búsqueda en catálogo de homónimos
+    if (typeof HOMONIMOS_CR !== 'undefined') {
+      var homonimo = HOMONIMOS_CR.find(function(h) {
+        return normalizar(h.lugar) === buscadoNorm;
+      });
+      if (homonimo) {
+        return {
+          tipo: 'homonimo',
+          nombre: homonimo.lugar,
+          homonimo: homonimo
+        };
+      }
+    }
+
+    return null;
   }
 
   function mostrarSugerenciasDestino(textoBuscado) {
+    var cont = document.getElementById('resultados');
+    var dtaInfo = resolverUbicacionDTA(textoBuscado);
+
+    // Caso A: Es un homónimo conocido en Costa Rica (existe en múltiples cantones/regiones)
+    if (dtaInfo && dtaInfo.tipo === 'homonimo') {
+      var h = dtaInfo.homonimo;
+      var variantesHtml = (h.variantes || []).map(function(v) {
+        var log = CANTONES_LOGISTICA_CR[v.canton] || null;
+        var cabecera = log ? log.cabecera : v.canton;
+        return '<div style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:8px; padding:12px; margin-top:8px;">' +
+          '<strong style="color:var(--navy); font-size:14px;">📍 ' + escapeHtml(v.canton) + ' (' + escapeHtml(v.provincia) + ' · ' + escapeHtml(v.zona) + ')</strong>' +
+          '<p style="margin:4px 0 8px; font-size:13px; color:#475569;">Transportistas que viajan a esta zona: ' + escapeHtml(v.transportistas) + '</p>' +
+          '<button type="button" class="btn-maps" onclick="aplicarSugerencia(\'' + escapeHtml(cabecera) + '\', \'destino\')">Ver transportistas hacia ' + escapeHtml(cabecera) + '</button>' +
+        '</div>';
+      }).join('');
+
+      cont.innerHTML =
+        '<div class="alerta-sin-cobertura">' +
+          '<div class="sin-cobertura-header">' +
+            '<div class="sin-cobertura-icono">📍⚠️</div>' +
+            '<div>' +
+              '<h3 class="sin-cobertura-titulo">Lugar Homónimo: "' + escapeHtml(h.lugar) + '" existe en varias zonas</h3>' +
+              '<p class="sin-cobertura-subtitulo">' + escapeHtml(h.descripcion) + '</p>' +
+            '</div>' +
+          '</div>' +
+          '<div class="sin-cobertura-cuerpo">' +
+            '<p class="sin-cobertura-consejo">Elegí a cuál de estas zonas deseás enviar para ver los transportistas correctos:</p>' +
+            variantesHtml +
+            '<div class="sin-cobertura-botones" style="margin-top:14px;">' +
+              '<button type="button" class="btn-accion-cobertura" onclick="abrirModalHomonimos()">📖 Ver Diccionario Completo</button>' +
+              '<button type="button" class="btn-accion-cobertura btn-secundario" onclick="mostrarTodos()">📋 Ver todos los transportistas</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      renderMarcadores([]);
+      return;
+    }
+
+    // Caso B: Lugar identificado geográficamente en la DTA (ej: "La Gamba" -> Cantón de Golfito, Puntarenas)
+    if (dtaInfo && dtaInfo.logistica) {
+      var log = dtaInfo.logistica;
+      var canton = dtaInfo.canton;
+      var prov = dtaInfo.provincia;
+      var dist = dtaInfo.distrito;
+      var cabecera = log.cabecera;
+      var centros = log.centrosCercanos || [cabecera];
+
+      // Filtrar qué transportistas cubren la cabecera o centros cercanos de este cantón
+      var transportistasCercanos = transportistas.filter(function(t) {
+        var destinosNorm = (t.destinos || []).map(normalizar);
+        return centros.some(function(c) {
+          var cNorm = normalizar(c);
+          return destinosNorm.some(function(d) {
+            return d.indexOf(cNorm) !== -1 || cNorm.indexOf(d) !== -1;
+          });
+        });
+      });
+
+      // Chips para la cabecera del cantón y centros logísticos cercanos
+      var chipsCentrosHtml = centros.map(function(c) {
+        var esCabecera = (c === cabecera);
+        var label = esCabecera ? '📍 ' + c + ' (Cabecera cantonal)' : '📍 ' + c;
+        var style = esCabecera ? 'font-weight:700; background:#EFF6FF; border-color:#3B82F6; color:#1D4ED8;' : '';
+        return '<a href="#" class="btn-maps" style="' + style + '" onclick="event.preventDefault(); aplicarSugerencia(\'' + escapeHtml(c) + '\', \'destino\')">' +
+          escapeHtml(label) + '</a>';
+      }).join('');
+
+      var alertaHtml =
+        '<div class="alerta-sin-cobertura">' +
+          '<div class="sin-cobertura-header">' +
+            '<div class="sin-cobertura-icono">📍ℹ️</div>' +
+            '<div>' +
+              '<h3 class="sin-cobertura-titulo">Lugar no registrado con ruta directa: ' + escapeHtml(textoBuscado.toUpperCase()) + '</h3>' +
+              '<p class="sin-cobertura-subtitulo">Ubicación oficial DTA: <strong>' + (dist ? 'Distrito ' + escapeHtml(dist) + ', ' : '') + 'Cantón de ' + escapeHtml(canton) + ' (' + escapeHtml(prov) + ')</strong></p>' +
+            '</div>' +
+          '</div>' +
+          '<div class="sin-cobertura-cuerpo">' +
+            '<p class="sin-cobertura-consejo">' +
+              '💡 <strong>Recomendación logística para envíos a ' + escapeHtml(textoBuscado) + ':</strong><br>' +
+              'Actualmente ningún transportista tiene ruta registrada puerta a puerta hasta este caserío rural. Para enviar encomiendas a esta zona, las empresas entregan en la <strong>cabecera cantonal (' + escapeHtml(cabecera) + ')</strong> o en los <strong>cruces y centros de distribución más cercanos</strong>, donde podés retirar o coordinar el flete local.' +
+            '</p>' +
+            '<div style="margin-top:14px;">' +
+              '<strong style="font-size:12px; color:#475569; letter-spacing:0.02em;">CABECERA CANTONAL Y CENTROS CERCANOS EN ' + escapeHtml(canton.toUpperCase()) + ':</strong>' +
+              '<div class="acciones" style="justify-content:flex-start; margin-top:8px; gap:8px; flex-wrap:wrap;">' +
+                chipsCentrosHtml +
+              '</div>' +
+            '</div>' +
+            '<div class="sin-cobertura-botones" style="margin-top:16px;">' +
+              '<button type="button" class="btn-accion-cobertura" onclick="aplicarSugerencia(\'' + escapeHtml(cabecera) + '\', \'destino\')">🚚 Ver transportistas a ' + escapeHtml(cabecera) + '</button>' +
+              '<button type="button" class="btn-accion-cobertura btn-secundario" onclick="mostrarTodos()">📋 Ver todos los transportistas</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+
+      var tarjetasHtml = '';
+      if (transportistasCercanos.length > 0) {
+        var headerResultadosHtml =
+          '<div style="margin: 24px 0 14px; padding: 12px 18px; background: #F8FAFC; border-radius: 10px; border: 1px solid #E2E8F0; text-align: center;">' +
+            '<h3 style="font-size: 15px; color: var(--navy); margin: 0; font-weight: 800;">🚛 Transportistas que viajan a la zona de ' + escapeHtml(canton) + ' y centros cercanos (' + transportistasCercanos.length + ' empresas disponibles)</h3>' +
+          '</div>';
+
+        var conDistancia = transportistasCercanos.map(function(t) {
+          var bodegasConCoords = (Array.isArray(t.bodegas) ? t.bodegas : []).filter(coordenadasValidas);
+          var mejorBodega = bodegasConCoords.length > 0 ? bodegasConCoords[0] : null;
+          return { transportista: t, bodega: mejorBodega, distancia: null };
+        });
+
+        tarjetasHtml = headerResultadosHtml + renderTarjetasTransportistasHtml(conDistancia);
+
+        var todasLasBodegas = [];
+        transportistasCercanos.forEach(function (t) {
+          (Array.isArray(t.bodegas) ? t.bodegas : []).forEach(function (b) {
+            if (coordenadasValidas(b)) todasLasBodegas.push(Object.assign({}, b, { transportista: t }));
+          });
+        });
+        renderMarcadores(todasLasBodegas);
+      } else {
+        renderMarcadores([]);
+      }
+
+      cont.innerHTML = alertaHtml + tarjetasHtml;
+      return;
+    }
+
+    // Caso C: No reconocido en DTA ni como cantón -> Fallback a sugerencias léxicas
     var todos = new Set();
     transportistas.forEach(function (t) { (t.destinos || []).forEach(function (d) { todos.add(d); }); });
 
@@ -3387,10 +4605,9 @@
       return { destino: d, distancia: distanciaLevenshtein(normalizar(d), normalizar(textoBuscado)) };
     }).sort(function (a, b) { return a.distancia - b.distancia; }).slice(0, 6);
 
-    var cont = document.getElementById('resultados');
     var chipsHtml = candidatos.length > 0 ?
       '<div style="margin-top:12px;">' +
-        '<strong style="font-size:12px; color:#475569; letter-spacing:0.02em;">LUGARES SIMILARES CON COBERTURA EN EL DIRECTORIO:</strong>' +
+        '<strong style="font-size:12px; color:#475569; letter-spacing:0.02em;">LUGARES CON ESCRITURA SIMILAR EN EL DIRECTORIO:</strong>' +
         '<div class="acciones" style="justify-content:flex-start; margin-top:8px; gap:8px; flex-wrap:wrap;">' +
           candidatos.map(function (c) {
             return '<a href="#" class="btn-maps" data-sugerencia="' + escapeHtml(c.destino) +
@@ -3405,13 +4622,13 @@
         '<div class="sin-cobertura-header">' +
           '<div class="sin-cobertura-icono">📍🚫</div>' +
           '<div>' +
-            '<h3 class="sin-cobertura-titulo">Lugar no asignado a ningún transportista</h3>' +
-            '<p class="sin-cobertura-subtitulo">El destino <strong>"' + escapeHtml(textoBuscado) + '"</strong> no cuenta actualmente con un transportista registrado con ruta o bodega directa en el directorio de Rutas CR.</p>' +
+            '<h3 class="sin-cobertura-titulo">Lugar no registrado en el directorio</h3>' +
+            '<p class="sin-cobertura-subtitulo">El destino <strong>"' + escapeHtml(textoBuscado) + '"</strong> no se encuentra actualmente entre las rutas de los transportistas ni en la división territorial básica.</p>' +
           '</div>' +
         '</div>' +
         '<div class="sin-cobertura-cuerpo">' +
           '<p class="sin-cobertura-consejo">' +
-            '💡 <strong>Recomendación:</strong> Muchos transportistas entregan encomiendas a caseríos y poblados rurales a través de la <em>cabecera de cantón</em> o distrito principal más cercano. Le recomendamos buscar la cabecera cantonal o revisar las opciones similares sugeridas.' +
+            '💡 <strong>Recomendación:</strong> Intentá buscar la <em>cabecera de cantón</em> principal más cercana a donde se ubica este lugar, o consultá el Diccionario de Homónimos para verificar en qué cantón se encuentra.' +
           '</p>' +
           chipsHtml +
           '<div class="sin-cobertura-botones">' +
@@ -3420,6 +4637,7 @@
           '</div>' +
         '</div>' +
       '</div>';
+    renderMarcadores([]);
   }
 
 
@@ -3589,58 +4807,11 @@
     if (infoRegion) {
       bannerHtml = '<div class="banner-zona">' +
         '<span style="font-size:20px;flex-shrink:0;">📍</span>' +
-        '<div>Mostrando <strong>' + lista.length + ' transportistas</strong> que viajan a la zona de <strong>' + escapeHtml(infoRegion.titulo) + '</strong> (' + escapeHtml(infoRegion.descripcion) + ')</div>' +
+        '<div>Mostrando <strong>' + lista.length + ' transportistas</strong> que viajan a la zona de <strong>' + escapeHtml(infoRegion.titulo || infoRegion.zona || '') + '</strong>' + (infoRegion.descripcion ? ' (' + escapeHtml(infoRegion.descripcion) + ')' : '') + '</div>' +
       '</div>';
     }
 
-    cont.innerHTML = bannerHtml + lista.map(function (item) {
-      var t = item.transportista;
-      var acciones = telefonosHtml(t);
-      var b = item.bodega;
-      if (b && coordenadasValidas(b)) {
-        acciones += botonesNavegacionHtml(b.lat, b.lng) +
-                    '<a href="#mapa" class="btn-ver-mapa" onclick="centrarEnMapa(' + b.lat + ',' + b.lng + '); return false;">🗺️ Ver mapa</a>';
-      }
-      var telefonosTexto = (Array.isArray(t.telefonos) ? t.telefonos : []).map(function(tel){ return tel.numero; }).filter(Boolean).join(', ');
-      var latVal = (b && coordenadasValidas(b)) ? b.lat : '';
-      var lngVal = (b && coordenadasValidas(b)) ? b.lng : '';
-      var zonaVal = (b && b.zona) ? b.zona : '';
-      var dirVal = (b && b.direccion) ? b.direccion : '';
-
-      var destinosTexto = (Array.isArray(t.destinos) ? t.destinos : []).join(', ');
-            acciones += '<button type="button" class="btn-rotular-card" onclick=\'abrirRotuladorConTransportista(' +
-        JSON.stringify(t.nombre) + ',' +
-        JSON.stringify(zonaVal || dirVal || '') + ')\'>📦 Rotular</button>';
-      acciones += '<button type="button" class="btn-compartir" onclick=\'compartirTransportista(' +
-        JSON.stringify(t.nombre) + ',' +
-        JSON.stringify(zonaVal) + ',' +
-        JSON.stringify(dirVal) + ',' +
-        JSON.stringify(latVal) + ',' +
-        JSON.stringify(lngVal) + ',' +
-        JSON.stringify(telefonosTexto) + ',' +
-        JSON.stringify(t.horario || '') + ',' +
-        JSON.stringify(destinosTexto) + ')\'>📤 Compartir</button>';
-
-      var sello = item.distancia !== null
-        ? '<div class="sello"><b>' + item.distancia.toFixed(1) + '</b>km</div>'
-        : '';
-
-      return '' +
-        '<div class="boleto">' +
-          '<div class="foto-col">' + fotoHtml(t) + '</div>' +
-          '<div class="divisor"></div>' +
-          '<div class="info-col">' +
-            sello +
-            (b && b.zona ? '<span class="zona-tag">' + escapeHtml(b.zona) + '</span><br>' : '') +
-            '<h3>' + escapeHtml(t.nombre) + '</h3>' +
-            renderZonasBadges(t) +
-            (t.horario ? '<p><strong>HORARIO:</strong> ' + escapeHtml(t.horario) + '</p>' : '') +
-            (b ? '<p><strong>BODEGA:</strong> ' + escapeHtml(b.direccion || b.zona || 'SIN DIRECCIÓN REGISTRADA') + '</p>' : '<p><em>Sin coordenadas de bodega registradas</em></p>') +
-            (t.destinos && t.destinos.length ? '<div class="destinos-contenedor-card"><p class="destinos-lista"><strong>DESTINOS QUE CUBRE (' + t.destinos.length + '):</strong> ' + t.destinos.slice(0, 10).map(function(d){ return formatearDestinoConZona(d, t); }).join(', ') + (t.destinos.length > 10 ? ' <em style="color:var(--muted); font-size:12px;">(+ ' + (t.destinos.length - 10) + ' más...)</em>' : '') + '</p><button type="button" class="btn-ver-destinos-modal" onclick=\'abrirModalDestinosTransportista(' + JSON.stringify(t.id) + ')\'>📋 Ver lista completa (' + t.destinos.length + ') y buscar</button></div>' : '') +
-            '<div class="acciones">' + acciones + '</div>' +
-          '</div>' +
-        '</div>';
-    }).join('');
+    cont.innerHTML = bannerHtml + renderTarjetasTransportistasHtml(lista);
   }
 
   function buscarPorTransportista() {
@@ -3654,6 +4825,7 @@
     if (coincidencias.length === 0) {
       mostrarSugerenciasTransportista(nombreBuscado);
       renderMarcadores([]);
+      scrollHaciaResultados();
       return;
     }
 
@@ -3666,6 +4838,7 @@
       });
     });
     renderMarcadores(todasLasBodegas);
+    scrollHaciaResultados();
   }
 
   function mostrarSugerenciasTransportista(textoBuscado) {
@@ -3673,16 +4846,42 @@
       return { nombre: t.nombre, distancia: distanciaLevenshtein(normalizar(t.nombre), normalizar(textoBuscado)) };
     }).sort(function (a, b) { return a.distancia - b.distancia; }).slice(0, 5);
 
+    var candidatosCercanos = candidatos.filter(function(c) { return c.distancia <= 5; });
+
     var cont = document.getElementById('resultados');
+    var sugerenciasHtml = candidatosCercanos.length > 0 ?
+      '<div style="margin-top:14px;">' +
+        '<strong style="font-size:12px; color:#475569; letter-spacing:0.02em;">¿BUSCABAS ALGUNO DE ESTOS TRANSPORTISTAS REGISTRADOS?</strong>' +
+        '<div class="acciones" style="justify-content:flex-start; margin-top:8px; gap:8px; flex-wrap:wrap;">' +
+          candidatosCercanos.map(function (c) {
+            return '<a href="#" class="btn-maps" data-sugerencia="' + escapeHtml(c.nombre) +
+              '" onclick="event.preventDefault(); aplicarSugerencia(this.dataset.sugerencia, \'transportista\')">🚚 ' +
+              escapeHtml(c.nombre) + '</a>';
+          }).join('') +
+        '</div>' +
+      '</div>' : '';
+
     cont.innerHTML =
-      '<p class="vacio">No encontramos "' + escapeHtml(textoBuscado) + '" exactamente. ¿Quisiste decir alguno de estos?</p>' +
-      '<div class="acciones" style="justify-content:center;">' +
-        candidatos.map(function (c) {
-          return '<a href="#" class="btn-maps" data-sugerencia="' + escapeHtml(c.nombre) +
-            '" onclick="event.preventDefault(); aplicarSugerencia(this.dataset.sugerencia, \'transportista\')">' +
-            escapeHtml(c.nombre) + '</a>';
-        }).join('') +
+      '<div class="alerta-sin-cobertura">' +
+        '<div class="sin-cobertura-header">' +
+          '<div class="sin-cobertura-icono">🚛🚫</div>' +
+          '<div>' +
+            '<h3 class="sin-cobertura-titulo">Transportista no registrado en el directorio</h3>' +
+            '<p class="sin-cobertura-subtitulo">No encontramos una empresa registrada bajo el nombre <strong>"' + escapeHtml(textoBuscado) + '"</strong> en Rutas CR.</p>' +
+          '</div>' +
+        '</div>' +
+        '<div class="sin-cobertura-cuerpo">' +
+          '<p class="sin-cobertura-consejo">' +
+            '💡 <strong>¿Sos el transportista o conocés este servicio?</strong> Ayudanos a mantener actualizado el directorio comunitario de Costa Rica enviando las rutas, bodegas y teléfonos por medio del formulario oficial para agregarlo gratuitamente.' +
+          '</p>' +
+          sugerenciasHtml +
+          '<div class="sin-cobertura-botones">' +
+            '<a href="https://docs.google.com/forms/d/e/1FAIpQLSeX8iJwM3M_SEm4VsUXj6NlhjEq_lPWwxQ4CbMYIFk-HlB4ww/viewform" target="_blank" rel="noopener" class="btn-accion-cobertura" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">📝 Enviar datos de este transportista</a>' +
+            '<button type="button" class="btn-accion-cobertura btn-secundario" onclick="mostrarTodos()">📋 Ver todos los transportistas</button>' +
+          '</div>' +
+        '</div>' +
       '</div>';
+    renderMarcadores([]);
   }
 
   function renderResultadosTransportista(lista) {
@@ -3991,7 +5190,10 @@
   }
 
   // Inicializar Leaflet automáticamente al cargar el DOM
-  window.addEventListener('DOMContentLoaded', initMap);
+  window.addEventListener('DOMContentLoaded', function() {
+    initMap();
+    cargarLocalidadesDTA();
+  });
 
   // ==============================================================================
   // ROTULADOR DE ENCOMIENDAS (CON TRANSPORTISTA OPCIONAL, QR Y MULTIPAQUETE 1/N)

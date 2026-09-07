@@ -1,0 +1,924 @@
+{
+  "Golfito": {
+    "cabecera": "GOLFITO",
+    "provincia": "Puntarenas",
+    "zona": "ZONA SUR",
+    "centrosCercanos": [
+      "GOLFITO",
+      "RÍO CLARO",
+      "CIUDAD NEILLY",
+      "PASO CANOAS",
+      "PALMAR NORTE"
+    ]
+  },
+  "Corredores": {
+    "cabecera": "CIUDAD NEILLY",
+    "provincia": "Puntarenas",
+    "zona": "ZONA SUR",
+    "centrosCercanos": [
+      "CIUDAD NEILLY",
+      "PASO CANOAS",
+      "RÍO CLARO",
+      "LAUREL",
+      "LA CUESTA"
+    ]
+  },
+  "Coto Brus": {
+    "cabecera": "SAN VITO",
+    "provincia": "Puntarenas",
+    "zona": "ZONA SUR",
+    "centrosCercanos": [
+      "SAN VITO",
+      "SABALITO",
+      "AGUA BUENA",
+      "CIUDAD NEILLY"
+    ]
+  },
+  "Osa": {
+    "cabecera": "CIUDAD CORTÉS",
+    "provincia": "Puntarenas",
+    "zona": "ZONA SUR",
+    "centrosCercanos": [
+      "PALMAR NORTE",
+      "PALMAR SUR",
+      "CIUDAD CORTÉS",
+      "UVITA",
+      "DOMINICAL"
+    ]
+  },
+  "Buenos Aires": {
+    "cabecera": "BUENOS AIRES",
+    "provincia": "Puntarenas",
+    "zona": "ZONA SUR",
+    "centrosCercanos": [
+      "BUENOS AIRES",
+      "PALMAR NORTE",
+      "PÉREZ ZELEDÓN",
+      "PASO REAL",
+      "REY CURRÉ"
+    ]
+  },
+  "Puerto Jiménez": {
+    "cabecera": "PUERTO JIMÉNEZ",
+    "provincia": "Puntarenas",
+    "zona": "ZONA SUR",
+    "centrosCercanos": [
+      "PUERTO JIMÉNEZ",
+      "GOLFITO",
+      "CHACARITA DE OSA",
+      "RÍO CLARO"
+    ]
+  },
+  "Pérez Zeledón": {
+    "cabecera": "SAN ISIDRO DE EL GENERAL",
+    "provincia": "San José",
+    "zona": "ZONA SUR",
+    "centrosCercanos": [
+      "PÉREZ ZELEDÓN",
+      "SAN ISIDRO DE EL GENERAL",
+      "DANIEL FLORES",
+      "PALMARES P.Z.",
+      "DOMINICAL"
+    ]
+  },
+  "San Ramón": {
+    "cabecera": "SAN RAMÓN",
+    "provincia": "Alajuela",
+    "zona": "OCCIDENTE",
+    "centrosCercanos": [
+      "SAN RAMÓN",
+      "PALMARES",
+      "NARANJO",
+      "SARCHÍ"
+    ]
+  },
+  "Palmares": {
+    "cabecera": "PALMARES",
+    "provincia": "Alajuela",
+    "zona": "OCCIDENTE",
+    "centrosCercanos": [
+      "PALMARES",
+      "SAN RAMÓN",
+      "NARANJO",
+      "SARCHÍ"
+    ]
+  },
+  "Naranjo": {
+    "cabecera": "NARANJO",
+    "provincia": "Alajuela",
+    "zona": "OCCIDENTE",
+    "centrosCercanos": [
+      "NARANJO",
+      "PALMARES",
+      "SAN RAMÓN",
+      "GRECIA",
+      "SARCHÍ"
+    ]
+  },
+  "Grecia": {
+    "cabecera": "GRECIA",
+    "provincia": "Alajuela",
+    "zona": "OCCIDENTE",
+    "centrosCercanos": [
+      "GRECIA",
+      "SARCHÍ",
+      "NARANJO",
+      "POÁS",
+      "ALAJUELA"
+    ]
+  },
+  "Sarchí": {
+    "cabecera": "SARCHÍ",
+    "provincia": "Alajuela",
+    "zona": "OCCIDENTE",
+    "centrosCercanos": [
+      "SARCHÍ",
+      "GRECIA",
+      "NARANJO",
+      "SAN RAMÓN"
+    ]
+  },
+  "Atenas": {
+    "cabecera": "ATENAS",
+    "provincia": "Alajuela",
+    "zona": "OCCIDENTE",
+    "centrosCercanos": [
+      "ATENAS",
+      "ALAJUELA",
+      "OROTINA",
+      "PALMARES"
+    ]
+  },
+  "Poás": {
+    "cabecera": "SAN PEDRO DE POÁS",
+    "provincia": "Alajuela",
+    "zona": "OCCIDENTE",
+    "centrosCercanos": [
+      "POÁS",
+      "GRECIA",
+      "ALAJUELA"
+    ]
+  },
+  "Zarcero": {
+    "cabecera": "ZARCERO",
+    "provincia": "Alajuela",
+    "zona": "OCCIDENTE",
+    "centrosCercanos": [
+      "ZARCERO",
+      "NARANJO",
+      "SAN RAMÓN",
+      "CIUDAD QUESADA"
+    ]
+  },
+  "San Carlos": {
+    "cabecera": "CIUDAD QUESADA",
+    "provincia": "Alajuela",
+    "zona": "SAN CARLOS",
+    "centrosCercanos": [
+      "CIUDAD QUESADA",
+      "LA FORTUNA",
+      "AGUAS ZARCAS",
+      "PITAL",
+      "FLORENCIA",
+      "POCOSOL",
+      "MUELLE"
+    ]
+  },
+  "Upala": {
+    "cabecera": "UPALA",
+    "provincia": "Alajuela",
+    "zona": "SAN CARLOS",
+    "centrosCercanos": [
+      "UPALA",
+      "BIJAGUA",
+      "GUATUSO",
+      "CAÑAS",
+      "LIBERIA"
+    ]
+  },
+  "Los Chiles": {
+    "cabecera": "LOS CHILES",
+    "provincia": "Alajuela",
+    "zona": "SAN CARLOS",
+    "centrosCercanos": [
+      "LOS CHILES",
+      "POCOSOL",
+      "MUELLE",
+      "CIUDAD QUESADA"
+    ]
+  },
+  "Guatuso": {
+    "cabecera": "SAN RAFAEL DE GUATUSO",
+    "provincia": "Alajuela",
+    "zona": "SAN CARLOS",
+    "centrosCercanos": [
+      "GUATUSO",
+      "UPALA",
+      "KATIRA",
+      "LA FORTUNA"
+    ]
+  },
+  "Río Cuarto": {
+    "cabecera": "RÍO CUARTO",
+    "provincia": "Alajuela",
+    "zona": "SAN CARLOS",
+    "centrosCercanos": [
+      "RÍO CUARTO",
+      "SANTA RITA",
+      "AGUAS ZARCAS",
+      "VENECIA",
+      "CIUDAD QUESADA"
+    ]
+  },
+  "Sarapiquí": {
+    "cabecera": "PUERTO VIEJO DE SARAPIQUÍ",
+    "provincia": "Heredia",
+    "zona": "SAN CARLOS",
+    "centrosCercanos": [
+      "PUERTO VIEJO DE SARAPIQUÍ",
+      "LA VIRGEN",
+      "HORQUETAS",
+      "GUÁPILES",
+      "CIUDAD QUESADA"
+    ]
+  },
+  "Liberia": {
+    "cabecera": "LIBERIA",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "LIBERIA",
+      "FILADELFIA",
+      "BAGACES",
+      "CAÑAS",
+      "PLAYAS DEL COCO"
+    ]
+  },
+  "Nicoya": {
+    "cabecera": "NICOYA",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "NICOYA",
+      "SANTA CRUZ",
+      "MANSIÓN",
+      "SÁMARA",
+      "NOSARA"
+    ]
+  },
+  "Santa Cruz": {
+    "cabecera": "SANTA CRUZ",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "SANTA CRUZ",
+      "HUACAS",
+      "TAMARINDO",
+      "FILADELFIA",
+      "NICOYA",
+      "FLAMINGO"
+    ]
+  },
+  "Bagaces": {
+    "cabecera": "BAGACES",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "BAGACES",
+      "CAÑAS",
+      "LIBERIA",
+      "FORTUNA DE BAGACES"
+    ]
+  },
+  "Carrillo": {
+    "cabecera": "FILADELFIA",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "FILADELFIA",
+      "PLAYAS DEL COCO",
+      "SARDINAL",
+      "BELÉN DE CARRILLO",
+      "LIBERIA"
+    ]
+  },
+  "Cañas": {
+    "cabecera": "CAÑAS",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "CAÑAS",
+      "BAGACES",
+      "TILARÁN",
+      "LIBERIA",
+      "LAS JUNTAS"
+    ]
+  },
+  "Abangares": {
+    "cabecera": "LAS JUNTAS",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "LAS JUNTAS",
+      "CAÑAS",
+      "MIRAMAR",
+      "PUNTARENAS"
+    ]
+  },
+  "Tilarán": {
+    "cabecera": "TILARÁN",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "TILARÁN",
+      "CAÑAS",
+      "TRONADORA",
+      "LA FORTUNA"
+    ]
+  },
+  "Nandayure": {
+    "cabecera": "CARMONA",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "CARMONA",
+      "JICARAL",
+      "HOJANCHA",
+      "NICOYA"
+    ]
+  },
+  "La Cruz": {
+    "cabecera": "LA CRUZ",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "LA CRUZ",
+      "PEÑAS BLANCAS",
+      "LIBERIA",
+      "SANTA CECILIA"
+    ]
+  },
+  "Hojancha": {
+    "cabecera": "HOJANCHA",
+    "provincia": "Guanacaste",
+    "zona": "GUANACASTE",
+    "centrosCercanos": [
+      "HOJANCHA",
+      "NICOYA",
+      "MANSIÓN",
+      "SÁMARA"
+    ]
+  },
+  "Puntarenas": {
+    "cabecera": "PUNTARENAS",
+    "provincia": "Puntarenas",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "PUNTARENAS",
+      "BARRANCA",
+      "EL ROBLE",
+      "ESPARZA",
+      "CALDERA",
+      "PAQUERA",
+      "CÓBANO"
+    ]
+  },
+  "Esparza": {
+    "cabecera": "ESPARZA",
+    "provincia": "Puntarenas",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "ESPARZA",
+      "PUNTARENAS",
+      "BARRANCA",
+      "OROTINA",
+      "SAN RAMÓN"
+    ]
+  },
+  "Montes de Oro": {
+    "cabecera": "MIRAMAR",
+    "provincia": "Puntarenas",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "MIRAMAR",
+      "ESPARZA",
+      "PUNTARENAS",
+      "LAS JUNTAS"
+    ]
+  },
+  "Garabito": {
+    "cabecera": "JACÓ",
+    "provincia": "Puntarenas",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "JACÓ",
+      "HERRADURA",
+      "TÁRCOLES",
+      "PARRITA",
+      "QUEPOS"
+    ]
+  },
+  "Parrita": {
+    "cabecera": "PARRITA",
+    "provincia": "Puntarenas",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "PARRITA",
+      "JACÓ",
+      "QUEPOS"
+    ]
+  },
+  "Quepos": {
+    "cabecera": "QUEPOS",
+    "provincia": "Puntarenas",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "QUEPOS",
+      "MANUEL ANTONIO",
+      "PARRITA",
+      "DOMINICAL",
+      "UVITA"
+    ]
+  },
+  "Monteverde": {
+    "cabecera": "SANTA ELENA",
+    "provincia": "Puntarenas",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "SANTA ELENA",
+      "MONTEVERDE",
+      "LAS JUNTAS",
+      "TILARÁN"
+    ]
+  },
+  "Orotina": {
+    "cabecera": "OROTINA",
+    "provincia": "Alajuela",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "OROTINA",
+      "SAN MATEO",
+      "ESPARZA",
+      "ATENAS",
+      "JACÓ"
+    ]
+  },
+  "San Mateo": {
+    "cabecera": "SAN MATEO",
+    "provincia": "Alajuela",
+    "zona": "PACIFICO CENTRAL",
+    "centrosCercanos": [
+      "SAN MATEO",
+      "OROTINA",
+      "ESPARZA",
+      "ATENAS"
+    ]
+  },
+  "Pococí": {
+    "cabecera": "GUÁPILES",
+    "provincia": "Limón",
+    "zona": "LIMON",
+    "centrosCercanos": [
+      "GUÁPILES",
+      "CARIARI",
+      "LA RITA",
+      "GUÁCIMO",
+      "SIQUIRRES"
+    ]
+  },
+  "Siquirres": {
+    "cabecera": "SIQUIRRES",
+    "provincia": "Limón",
+    "zona": "LIMON",
+    "centrosCercanos": [
+      "SIQUIRRES",
+      "GUÁCIMO",
+      "BATÁN",
+      "MATINA",
+      "LIMÓN"
+    ]
+  },
+  "Limón": {
+    "cabecera": "LIMÓN",
+    "provincia": "Limón",
+    "zona": "LIMON",
+    "centrosCercanos": [
+      "LIMÓN",
+      "MOÍN",
+      "LIVERPOOL",
+      "CAHUITA",
+      "SIQUIRRES"
+    ]
+  },
+  "Talamanca": {
+    "cabecera": "BRIBRI",
+    "provincia": "Limón",
+    "zona": "LIMON",
+    "centrosCercanos": [
+      "BRIBRI",
+      "PUERTO VIEJO",
+      "CAHUITA",
+      "SIXÁOLA",
+      "LIMÓN"
+    ]
+  },
+  "Matina": {
+    "cabecera": "MATINA",
+    "provincia": "Limón",
+    "zona": "LIMON",
+    "centrosCercanos": [
+      "BATÁN",
+      "MATINA",
+      "SIQUIRRES",
+      "LIMÓN"
+    ]
+  },
+  "Guácimo": {
+    "cabecera": "GUÁCIMO",
+    "provincia": "Limón",
+    "zona": "LIMON",
+    "centrosCercanos": [
+      "GUÁCIMO",
+      "GUÁPILES",
+      "SIQUIRRES"
+    ]
+  },
+  "Turrialba": {
+    "cabecera": "TURRIALBA",
+    "provincia": "Cartago",
+    "zona": "TURRIALBA Y CARTAGO",
+    "centrosCercanos": [
+      "TURRIALBA",
+      "LA SUIZA",
+      "SANTA CRUZ DE TURRIALBA",
+      "TUCURRIQUE",
+      "CARTAGO"
+    ]
+  },
+  "Jiménez": {
+    "cabecera": "JUAN VIÑAS",
+    "provincia": "Cartago",
+    "zona": "TURRIALBA Y CARTAGO",
+    "centrosCercanos": [
+      "JUAN VIÑAS",
+      "TURRIALBA",
+      "TUCURRIQUE",
+      "CARTAGO"
+    ]
+  },
+  "Cartago": {
+    "cabecera": "CARTAGO",
+    "provincia": "Cartago",
+    "zona": "TURRIALBA Y CARTAGO",
+    "centrosCercanos": [
+      "CARTAGO",
+      "PARAÍSO",
+      "TEJAR",
+      "TRES RÍOS",
+      "SAN JOSÉ"
+    ]
+  },
+  "Paraíso": {
+    "cabecera": "PARAÍSO",
+    "provincia": "Cartago",
+    "zona": "TURRIALBA Y CARTAGO",
+    "centrosCercanos": [
+      "PARAÍSO",
+      "OROSI",
+      "CARTAGO",
+      "CERVANTES"
+    ]
+  },
+  "Alvarado": {
+    "cabecera": "PACAYAS",
+    "provincia": "Cartago",
+    "zona": "TURRIALBA Y CARTAGO",
+    "centrosCercanos": [
+      "PACAYAS",
+      "CERVANTES",
+      "CARTAGO",
+      "TURRIALBA"
+    ]
+  },
+  "Oreamuno": {
+    "cabecera": "SAN RAFAEL DE OREAMUNO",
+    "provincia": "Cartago",
+    "zona": "TURRIALBA Y CARTAGO",
+    "centrosCercanos": [
+      "SAN RAFAEL",
+      "POTRERO CERRADO",
+      "CARTAGO"
+    ]
+  },
+  "El Guarco": {
+    "cabecera": "TEJAR",
+    "provincia": "Cartago",
+    "zona": "TURRIALBA Y CARTAGO",
+    "centrosCercanos": [
+      "TEJAR",
+      "CARTAGO",
+      "SAN ISIDRO DE EL GENERAL"
+    ]
+  },
+  "La Unión": {
+    "cabecera": "TRES RÍOS",
+    "provincia": "Cartago",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "TRES RÍOS",
+      "CARTAGO",
+      "SAN JOSÉ",
+      "CURRIDABAT"
+    ]
+  },
+  "Tarrazú": {
+    "cabecera": "SAN MARCOS DE TARRAZÚ",
+    "provincia": "San José",
+    "zona": "ZONA DE LOS SANTOS",
+    "centrosCercanos": [
+      "SAN MARCOS DE TARRAZÚ",
+      "SANTA MARÍA DE DOTA",
+      "SAN PABLO DE LEÓN CORTÉS",
+      "CARTAGO",
+      "PÉREZ ZELEDÓN"
+    ]
+  },
+  "Dota": {
+    "cabecera": "SANTA MARÍA DE DOTA",
+    "provincia": "San José",
+    "zona": "ZONA DE LOS SANTOS",
+    "centrosCercanos": [
+      "SANTA MARÍA DE DOTA",
+      "SAN MARCOS DE TARRAZÚ",
+      "SAN PABLO DE LEÓN CORTÉS",
+      "CARTAGO"
+    ]
+  },
+  "León Cortés Castro": {
+    "cabecera": "SAN PABLO DE LEÓN CORTÉS",
+    "provincia": "San José",
+    "zona": "ZONA DE LOS SANTOS",
+    "centrosCercanos": [
+      "SAN PABLO DE LEÓN CORTÉS",
+      "SAN MARCOS DE TARRAZÚ",
+      "SANTA MARÍA DE DOTA",
+      "CARTAGO"
+    ]
+  },
+  "San José": {
+    "cabecera": "SAN JOSÉ",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN JOSÉ",
+      "BARRIO MÉXICO",
+      "PAVAS",
+      "DESAMPARADOS"
+    ]
+  },
+  "Escazú": {
+    "cabecera": "ESCAZÚ",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "ESCAZÚ",
+      "SAN JOSÉ",
+      "SANTA ANA"
+    ]
+  },
+  "Desamparados": {
+    "cabecera": "DESAMPARADOS",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "DESAMPARADOS",
+      "SAN JOSÉ",
+      "ASERRI"
+    ]
+  },
+  "Puriscal": {
+    "cabecera": "PURISCAL",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "PURISCAL",
+      "SANTIAGO DE PURISCAL",
+      "SAN JOSÉ"
+    ]
+  },
+  "Aserrí": {
+    "cabecera": "ASERRÍ",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "ASERRÍ",
+      "DESAMPARADOS",
+      "SAN JOSÉ"
+    ]
+  },
+  "Mora": {
+    "cabecera": "CIUDAD COLÓN",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "CIUDAD COLÓN",
+      "SANTA ANA",
+      "SAN JOSÉ"
+    ]
+  },
+  "Goicoechea": {
+    "cabecera": "CALLE BLANCOS",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "CALLE BLANCOS",
+      "GUADALUPE",
+      "SAN JOSÉ"
+    ]
+  },
+  "Santa Ana": {
+    "cabecera": "SANTA ANA",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SANTA ANA",
+      "ESCAZÚ",
+      "SAN JOSÉ"
+    ]
+  },
+  "Alajuelita": {
+    "cabecera": "ALAJUELITA",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "ALAJUELITA",
+      "SAN JOSÉ"
+    ]
+  },
+  "Vázquez de Coronado": {
+    "cabecera": "CORONADO",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "CORONADO",
+      "MORAVIA",
+      "SAN JOSÉ"
+    ]
+  },
+  "Acosta": {
+    "cabecera": "SAN IGNACIO DE ACOSTA",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN IGNACIO DE ACOSTA",
+      "ASERRÍ",
+      "SAN JOSÉ"
+    ]
+  },
+  "Tibás": {
+    "cabecera": "TIBÁS",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "TIBÁS",
+      "SAN JOSÉ"
+    ]
+  },
+  "Moravia": {
+    "cabecera": "MORAVIA",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "MORAVIA",
+      "GUADALUPE",
+      "SAN JOSÉ"
+    ]
+  },
+  "Montes de Oca": {
+    "cabecera": "SAN PEDRO",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN PEDRO",
+      "SABANILLA",
+      "SAN JOSÉ"
+    ]
+  },
+  "Turrubares": {
+    "cabecera": "SAN PABLO DE TURRUBARES",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN PABLO DE TURRUBARES",
+      "OROTINA",
+      "PURISCAL"
+    ]
+  },
+  "Curridabat": {
+    "cabecera": "CURRIDABAT",
+    "provincia": "San José",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "CURRIDABAT",
+      "SAN JOSÉ",
+      "TRES RÍOS"
+    ]
+  },
+  "Alajuela": {
+    "cabecera": "ALAJUELA",
+    "provincia": "Alajuela",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "ALAJUELA",
+      "SAN JOSÉ",
+      "HEREDIA"
+    ]
+  },
+  "Heredia": {
+    "cabecera": "HEREDIA",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "HEREDIA",
+      "SAN JOSÉ",
+      "ALAJUELA"
+    ]
+  },
+  "Barva": {
+    "cabecera": "BARVA",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "BARVA",
+      "HEREDIA",
+      "SAN JOSÉ"
+    ]
+  },
+  "Santo Domingo": {
+    "cabecera": "SANTO DOMINGO",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SANTO DOMINGO",
+      "HEREDIA",
+      "SAN JOSÉ"
+    ]
+  },
+  "Santa Bárbara": {
+    "cabecera": "SANTA BÁRBARA",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SANTA BÁRBARA",
+      "HEREDIA",
+      "ALAJUELA"
+    ]
+  },
+  "San Rafael": {
+    "cabecera": "SAN RAFAEL",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN RAFAEL",
+      "HEREDIA"
+    ]
+  },
+  "San Isidro": {
+    "cabecera": "SAN ISIDRO",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN ISIDRO",
+      "HEREDIA"
+    ]
+  },
+  "Belén": {
+    "cabecera": "SAN ANTONIO DE BELÉN",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN ANTONIO DE BELÉN",
+      "ALAJUELA",
+      "HEREDIA"
+    ]
+  },
+  "Flores": {
+    "cabecera": "SAN JOAQUÍN DE FLORES",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN JOAQUÍN DE FLORES",
+      "HEREDIA",
+      "ALAJUELA"
+    ]
+  },
+  "San Pablo": {
+    "cabecera": "SAN PABLO",
+    "provincia": "Heredia",
+    "zona": "VALLE CENTRAL",
+    "centrosCercanos": [
+      "SAN PABLO",
+      "HEREDIA"
+    ]
+  }
+}
