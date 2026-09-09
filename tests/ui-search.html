@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prueba de coordenadas del buscador</title>
+<style>
+body{font:16px system-ui;margin:20px;color:#123}pre{white-space:pre-wrap}iframe{height:700px;border:0;display:block}button{padding:10px}
+</style>
+<h1>Prueba de solapamiento del buscador</h1>
+<p>Comprueba el buscador real a 320, 360, 375, 390, 414, 620 y 768 píxeles.
+Para validar Safari de iPhone, ejecute esta misma página desde ese dispositivo.</p>
+<button id="ejecutar" type="button">Ejecutar pruebas</button>
+<pre id="informe" aria-live="polite">Preparando la aplicación…</pre>
+<iframe id="app" title="Directorio bajo prueba" src="../index.html"></iframe>
+<script src="ui-search.js"></script>
+</html>

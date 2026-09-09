@@ -180,7 +180,7 @@
     background: #FFFFFF;
     box-shadow: 0 0 0 3.5px rgba(245, 158, 11, 0.22);
   }
-  .fila-input button {
+  .fila-input > button {
     background: linear-gradient(135deg, #0B2545, #16365C);
     color: white;
     border: none;
@@ -198,12 +198,12 @@
     justify-content: center;
     gap: 6px;
   }
-  .fila-input button:hover {
+  .fila-input > button:hover {
     background: linear-gradient(135deg, #12325E, #1E4474);
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(11, 37, 69, 0.28);
   }
-  .fila-input button:active {
+  .fila-input > button:active {
     transform: translateY(0);
     box-shadow: 0 2px 6px rgba(11, 37, 69, 0.15);
   }
@@ -796,18 +796,25 @@
 
   .input-wrapper {
     position: relative;
+    width: 100%;
     flex: 1;
     display: flex;
     align-items: center;
     min-width: 0;
   }
   .input-wrapper input[type="text"] {
+    box-sizing: border-box;
     width: 100%;
-    padding-right: 36px;
+    min-width: 0;
+    padding-right: 50px !important;
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
   }
-  .btn-clear {
+  .input-wrapper > .btn-clear {
     position: absolute;
-    right: 8px;
+    right: 12px;
+    z-index: 10;
     top: 50%;
     transform: translateY(-50%);
     background: #e2e8f0;
@@ -826,7 +833,7 @@
     transition: background 0.15s;
     user-select: none;
   }
-  .btn-clear:hover { background: #cbd5e1; color: #0f172a; }
+  .input-wrapper > .btn-clear:hover { background: #cbd5e1; color: #0f172a; }
 
   /* Rótulos y Pines Modernos para el Mapa Leaflet */
   .leaflet-pin-bodega {
@@ -1056,7 +1063,9 @@
     .contenedor-buscador { margin: -22px auto 0; padding: 0 12px; }
     .buscador { padding: 14px; border-radius: var(--radius-md); }
     .fila-input { flex-direction: column; gap: 8px; }
-    .fila-input button { width: 100%; padding: 13px 20px; font-size: 15px; }
+    .segmentado { flex-wrap: wrap; }
+    .segmentado label { flex: 1 1 120px; }
+    .fila-input > button { width: 100%; padding: 13px 20px; font-size: 15px; }
 
     #resultados { padding: 16px 12px 40px; }
     .boleto { flex-direction: column; }
@@ -2150,20 +2159,29 @@
     <div class="segmentado">
       <label><input type="radio" name="modo" value="destino" checked onchange="cambiarModo()"><span>📍 Por destino</span></label>
       <label><input type="radio" name="modo" value="transportista" onchange="cambiarModo()"><span>🚚 Por transportista</span></label>
+      <label><input type="radio" name="modo" value="plantel" onchange="cambiarModo()"><span>🏢 Por plantel</span></label>
     </div>
     <div id="filaDestino" class="fila-input">
       <div class="input-wrapper">
         <input type="text" list="listaDestinos" id="inputDestino" placeholder="¿A DÓNDE ENVÍAS? (EJ: PÉREZ ZELEDÓN, LIBERIA...)" autocomplete="off" oninput="debounceBuscar()">
-        <button type="button" class="btn-clear" id="btnClearDestino" onclick="limpiarBuscador('inputDestino')" title="Limpiar búsqueda">✕</button>
+        <button type="button" class="btn-clear" id="btnClearDestino" onclick="limpiarBuscador('inputDestino')" title="Limpiar búsqueda" aria-label="Limpiar búsqueda">✕</button>
       </div>
       <button type="button" id="btnBuscar" onclick="buscar(true)">🔍 BUSCAR</button>
     </div>
     <div id="filaTransportista" class="fila-input" style="display:none;">
       <div class="input-wrapper">
         <input type="text" list="listaTransportistas" id="inputTransportista" placeholder="NOMBRE DE LA EMPRESA..." autocomplete="off" oninput="debounceBuscar()">
-        <button type="button" class="btn-clear" id="btnClearTransportista" onclick="limpiarBuscador('inputTransportista')" title="Limpiar búsqueda">✕</button>
+        <button type="button" class="btn-clear" id="btnClearTransportista" onclick="limpiarBuscador('inputTransportista')" title="Limpiar búsqueda" aria-label="Limpiar búsqueda">✕</button>
       </div>
       <button type="button" id="btnBuscarTransportista" onclick="buscar(true)">🔍 BUSCAR</button>
+    </div>
+
+    <div id="filaPlantel" class="fila-input" style="display:none;">
+      <div class="input-wrapper">
+        <input type="text" id="inputPlantel" placeholder="PLANTEL, BODEGA O TRANSPORTISTA..." autocomplete="off" oninput="debounceBuscar()">
+        <button type="button" class="btn-clear" id="btnClearPlantel" onclick="limpiarBuscador('inputPlantel')" aria-label="Limpiar búsqueda" title="Limpiar búsqueda">✕</button>
+      </div>
+      <button type="button" onclick="buscar(true)">🔍 BUSCAR</button>
     </div>
 
     <!-- Explorador elegante por Categorías: Frecuentes, Zonas y Provincias -->
@@ -2268,10 +2286,11 @@
 
 <script>
   const API_URL = 'https://script.google.com/macros/s/AKfycbziHUb11q9tHuAnqFQY8EG-u18Q763C8a-a4CE0Rwii_iTRNPqmTTzaZvN5PRtx14NqaA/exec';
-  const CACHE_KEY = 'rutas_cr_transportistas_v5';
+  const CACHE_KEY = 'rutas_cr_transportistas_v6_multifactor';
   const CACHE_TIME_KEY = 'rutas_cr_cache_timestamp';
 
   let transportistas = [];
+  let planteles = [];
   let map = null;
   let userMarker = null;
   let marcadores = [];
@@ -2416,6 +2435,129 @@
     return Array.from(porNumero.values());
   }
 
+  function destinosDeFila(fila) {
+    // Solo el array de esta fila: nunca catálogos, empresas vecinas ni planteles.
+    return unirValores([], (Array.isArray(fila.destinos) ? fila.destinos : [])
+      .filter(function (d) { return typeof d === 'string'; })
+      .map(claveFusion)
+      .filter(function (d) {
+        return /[A-ZÁÉÍÓÚÜÑ]/.test(d) &&
+          !/^(?:N\/?A|NULL|UNDEFINED|SIN DATOS|SIN DESTINO|NO ESPECIFICAD[OA]|PENDIENTE|POR DEFINIR|-+)$/.test(d);
+      }), claveFusion);
+  }
+
+  function textoUbicacion(valor) {
+    return claveFusion(valor).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^A-Z0-9]+/g, ' ').trim();
+  }
+
+  function clavesTelefonos(telefonos) {
+    return fusionarTelefonos([], telefonos).map(function (t) {
+      var n = String(t.numero).replace(/\D/g, '');
+      return n.length === 11 && n.startsWith('506') ? n.slice(3) : n;
+    }).filter(function (n) { return n.length >= 8 && n.length <= 15; });
+  }
+
+  function compartenContacto(a, b) {
+    var numeros = new Set(clavesTelefonos(a.telefonos));
+    return clavesTelefonos(b.telefonos).some(function (n) { return numeros.has(n); });
+  }
+
+  function nombreUbicacion(b) {
+    return textoUbicacion(b.nombrePlantel || b.nombreBodega || b.nombre || '');
+  }
+
+  function descripcionesDistintas(a, b) {
+    // Conservador: una dirección diferente no se asume equivalente por cercanía.
+    var na = nombreUbicacion(a), nb = nombreUbicacion(b);
+    var da = textoUbicacion(a.direccion), db = textoUbicacion(b.direccion);
+    return Boolean((na && nb && na !== nb) || (da && db && da !== db));
+  }
+
+  // Resta 0.1 micrómetros para que el redondeo no incluya el límite exacto de 50 m.
+  function mismaBodega(a, b) {
+    return coordenadasValidas(a) && coordenadasValidas(b) &&
+      distanciaBodegasMetros(a, b) < 50 - 1e-7 &&
+      compartenContacto(a, b) && !descripcionesDistintas(a, b);
+  }
+
+  function estructuraCompartida(a, b) {
+    var na = nombreUbicacion(a), nb = nombreUbicacion(b);
+    if (na && nb) return na === nb;
+    var da = textoUbicacion(a.direccion), db = textoUbicacion(b.direccion);
+    if (!da || da !== db) return false;
+    // Una zona o un texto genérico no identifica un edificio compartido.
+    if (/^(?:BARRIO|COLIMA|SAN JOSE|PAVAS|TIBAS|URUCA|CALLE BLANCOS|NO ESPECIFICADA|SIN DIRECCION)\b/.test(da)
+        && !/\b(?:BODEGA|PLANTEL|LOCAL|EDIFICIO|FRENTE|CONTIGUO|PORTON)\b/.test(da)) return false;
+    return da !== textoUbicacion(a.zona) && da !== textoUbicacion(b.zona) && da.split(' ').length >= 2;
+  }
+
+  function agruparPlanteles(datos) {
+    var puntos = [];
+    datos.forEach(function (t) {
+      t.bodegas.filter(coordenadasValidas).forEach(function (b) {
+        puntos.push({ transportista: t, bodega: b });
+      });
+    });
+    // Orden determinista y enlace completo: evita cadenas A-B-C de más de 50 m.
+    puntos.sort(function (a, b) {
+      return a.bodega.lat - b.bodega.lat || a.bodega.lng - b.bodega.lng ||
+        a.transportista.nombre.localeCompare(b.transportista.nombre);
+    });
+    var grupos = [];
+    puntos.forEach(function (p) {
+      var grupo = grupos.find(function (g) {
+        return g.every(function (q) {
+          return distanciaBodegasMetros(p.bodega, q.bodega) < 50 - 1e-7 &&
+            estructuraCompartida(p.bodega, q.bodega);
+        });
+      });
+      if (grupo) grupo.push(p);
+      else grupos.push([p]);
+    });
+    return grupos.filter(function (g) {
+      return new Set(g.map(function (p) { return p.transportista.nombre; })).size > 1;
+    }).map(function (g, i) {
+      var referencia = g[0].bodega;
+      return {
+        id: 'plantel-' + (i + 1),
+        nombre: referencia.nombrePlantel || referencia.nombreBodega || referencia.nombre || referencia.direccion,
+        lat: referencia.lat, lng: referencia.lng,
+        miembros: g,
+        transportistas: Array.from(new Set(g.map(function (p) { return p.transportista; })))
+      };
+    });
+  }
+
+  function buscarPorPlantel() {
+    var consulta = textoUbicacion(document.getElementById('inputPlantel').value);
+    var lista = planteles.filter(function (p) {
+      return !consulta || p.miembros.some(function (m) {
+        return textoUbicacion([p.nombre, m.bodega.zona, m.bodega.direccion,
+          m.transportista.nombre].join(' ')).includes(consulta);
+      });
+    });
+    var cont = document.getElementById('resultados');
+    cont.innerHTML = lista.map(function (p) {
+      var fichas = p.transportistas.map(function (t) {
+        // El perfil mantiene sus destinos; solo restringe las bodegas a este plantel.
+        var bodegas = p.miembros.filter(function (m) { return m.transportista === t; })
+          .map(function (m) { return m.bodega; });
+        var perfil = Object.assign({}, t, { bodegas: bodegas });
+        return { transportista: perfil, bodega: bodegas[0], distancia: null };
+      });
+      return '<section class="plantel-grupo"><h2>🏢 ' + escapeHtml(p.nombre) + '</h2>' +
+        '<p>' + p.transportistas.length + ' transportistas en este plantel</p>' +
+        renderTarjetasTransportistasHtml(fichas) + '</section>';
+    }).join('') || '<p class="vacio">No se encontraron planteles compartidos con ubicación y descripción coincidentes.</p>';
+    var bodegas = [];
+    lista.forEach(function (p) {
+      p.miembros.forEach(function (m) { bodegas.push(Object.assign({}, m.bodega, { transportista: m.transportista })); });
+    });
+    renderMarcadores(bodegas);
+  }
+
+
   function sanitizarDatos(data) {
     if (!Array.isArray(data)) return [];
     var porNombre = new Map();
@@ -2426,9 +2568,7 @@
       if (!clave) return;
       fila.nombre = clave;
       if (fila.horario) fila.horario = claveFusion(fila.horario);
-      var destinos = (Array.isArray(fila.destinos) ? fila.destinos : [])
-        .filter(function (d) { return typeof d === 'string'; })
-        .map(claveFusion).filter(Boolean);
+      var destinos = destinosDeFila(fila);
       var t = porNombre.get(clave);
       if (!t) {
         t = { nombre: fila.nombre, telefonos: [], destinos: [], bodegas: [] };
@@ -2442,7 +2582,8 @@
         b.zona = claveFusion(b.zona);
         b.direccion = claveFusion(b.direccion);
         b.nombreTransportista = t.nombre;
-        b.telefonos = fusionarTelefonos([], b.telefonos);
+        // Teléfonos propios o, si faltan, los de ESTA fila; nunca los ya acumulados.
+        b.telefonos = fusionarTelefonos([], Array.isArray(b.telefonos) ? b.telefonos : fila.telefonos);
         t.telefonos = fusionarTelefonos(t.telefonos, b.telefonos);
         // Sin GPS no se puede afirmar que dos ubicaciones sean la misma.
         if (!coordenadasValidas(b)) {
@@ -2455,8 +2596,7 @@
         t.bodegas.forEach(function (existente) {
           if (!coordenadasValidas(existente)) return;
           var distancia = distanciaBodegasMetros(existente, b);
-          // Tolerancia de 0.1 micrómetros para el redondeo de punto flotante.
-          if (distancia <= 100 + 1e-7 && distancia < distanciaMinima) {
+          if (mismaBodega(existente, b) && distancia < distanciaMinima) {
             cercana = existente;
             distanciaMinima = distancia;
           }
@@ -2510,6 +2650,7 @@
         var parsed = JSON.parse(cached);
         if (Array.isArray(parsed) && parsed.length > 0) {
           transportistas = sanitizarDatos(parsed);
+          planteles = agruparPlanteles(transportistas);
           construirListaDestinos(transportistas);
           construirListaTransportistas(transportistas);
           hayCache = true;
@@ -2534,6 +2675,7 @@
         var datosLimpios = sanitizarDatos(data);
         if (datosLimpios.length > 0) {
           transportistas = datosLimpios;
+          planteles = agruparPlanteles(transportistas);
           try {
             localStorage.setItem(CACHE_KEY, JSON.stringify(transportistas));
             localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
@@ -2541,7 +2683,8 @@
           construirListaDestinos(transportistas);
           construirListaTransportistas(transportistas);
           actualizarBadgeEstado('✅ En línea · ' + transportistas.length + ' empresas verificadas', true, false);
-          if (document.querySelector('#resultados .boleto')) {
+          if (document.querySelector('input[name="modo"]:checked').value === 'plantel') buscarPorPlantel();
+          else if (document.querySelector('#resultados .boleto')) {
             var modoActual = document.querySelector('input[name="modo"]:checked').value;
             var entradaActual = document.getElementById(modoActual === 'destino' ? 'inputDestino' : 'inputTransportista');
             if (entradaActual && entradaActual.value.trim()) buscar(false);
@@ -2624,7 +2767,13 @@
     var modo = document.querySelector('input[name="modo"]:checked').value;
     document.getElementById('filaDestino').style.display = (modo === 'destino') ? 'flex' : 'none';
     document.getElementById('filaTransportista').style.display = (modo === 'transportista') ? 'flex' : 'none';
+    document.getElementById('filaPlantel').style.display = (modo === 'plantel') ? 'flex' : 'none';
+    if (modo === 'plantel') buscarPorPlantel();
   }
+
+  document.getElementById('inputPlantel').addEventListener('keydown', function (evento) {
+    if (evento.key === 'Enter') { evento.preventDefault(); buscarPorPlantel(); }
+  });
 
   document.getElementById('inputDestino').addEventListener('keydown', function (evento) {
     if (evento.key === 'Enter') {
@@ -4311,10 +4460,6 @@
       }
     }
 
-    if (nomNorm.indexOf(bNorm) !== -1) {
-      return true;
-    }
-
     return false;
   }
 
@@ -4468,16 +4613,17 @@
   function debounceBuscar() {
     clearTimeout(timerBusqueda);
     var modo = document.querySelector('input[name="modo"]:checked').value;
-    var idInput = (modo === 'destino') ? 'inputDestino' : 'inputTransportista';
+    var idInput = modo === 'plantel' ? 'inputPlantel' : (modo === 'destino' ? 'inputDestino' : 'inputTransportista');
     var inputElem = document.getElementById(idInput);
     var valor = inputElem ? inputElem.value.trim() : '';
 
-    var btnClear = document.getElementById(modo === 'destino' ? 'btnClearDestino' : 'btnClearTransportista');
+    var btnClear = document.getElementById(modo === 'plantel' ? 'btnClearPlantel' : (modo === 'destino' ? 'btnClearDestino' : 'btnClearTransportista'));
     if (btnClear) {
       btnClear.style.display = valor.length > 0 ? 'flex' : 'none';
     }
 
     if (valor.length === 0) {
+      if (modo === 'plantel') buscarPorPlantel();
       return;
     }
 
@@ -4492,9 +4638,10 @@
     input.value = '';
     input.focus();
     var modo = document.querySelector('input[name="modo"]:checked').value;
-    var btnClear = document.getElementById(modo === 'destino' ? 'btnClearDestino' : 'btnClearTransportista');
+    var btnClear = document.getElementById(modo === 'plantel' ? 'btnClearPlantel' : (modo === 'destino' ? 'btnClearDestino' : 'btnClearTransportista'));
     if (btnClear) btnClear.style.display = 'none';
-    mostrarTodos();
+    if (modo === 'plantel') buscarPorPlantel();
+    else mostrarTodos();
   }
 
   function centrarEnMapa(lat, lng) {
@@ -4583,7 +4730,8 @@
 
   function buscar(esManual) {
     var modo = document.querySelector('input[name="modo"]:checked').value;
-    if (modo === 'transportista') { buscarPorTransportista(Boolean(esManual)); }
+    if (modo === 'plantel') { buscarPorPlantel(); }
+    else if (modo === 'transportista') { buscarPorTransportista(Boolean(esManual)); }
     else { buscarPorDestino(Boolean(esManual)); }
   }
 
@@ -6029,4 +6177,3 @@ function renderTarjetasTransportistasHtml(lista) {
 
 </body>
 </html>
-
