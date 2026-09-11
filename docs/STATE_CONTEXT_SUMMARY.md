@@ -17,7 +17,7 @@ Implementar responsive, X de búsqueda, mapa sin zoom accidental, clustering, me
 ## Hecho
 
 - Clonado repositorio y creado rama aislada; frontend real era Google Maps, no Leaflet como decía README.
-- Lectura real de 5 tablas: 54 transportistas, 74 bodegas, 152 teléfonos, 415 lugares, 1007 VISITA; sin IDs duplicados ni FKs huérfanas.
+- Lectura real de 5 tablas: 54 transportistas, 74 filas de DIRECCION, 152 teléfonos, 415 lugares y 1007 VISITA; sin IDs duplicados, nombres repetidos, pares duplicados ni FKs huérfanas. El JSON público contiene 55 bodegas con zona confirmada, 49 con GPS; 19 filas sin zona quedan excluidas para revisión.
 - Frontend usa JSON estático versionado, render seguro mediante DOM, búsqueda exacta prioritaria y parcial por texto, 15 tarjetas por carga, todas las bodegas por empresa.
 - Input iOS con padding reservado a X, reset nativo desactivado, radio accesible y orientación any.
 - Leaflet 1.9.4 y markercluster 1.5.3 incluidos con licencias. Carga diferida, controles explícitos, rueda bloqueada hasta interacción, reset al salir/blur/Escape, cluster cuenta empresas distintas.
