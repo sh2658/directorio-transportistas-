@@ -62,6 +62,12 @@ function rutasCRRequest_(c, method, suffix, body) {
   // Do not log response bodies, request headers or tokens.
   return {status:status,data:data};
 }
+function rutasCRProbarGitHub() {
+  var c=rutasCRConfig_();
+  var response=rutasCRRequest_(c,'get','/branches/'+encodeURIComponent(c.branch));
+  if(response.status!==200)throw Error('No se pudo acceder a la rama segura. HTTP '+response.status);
+  return {state:'connected',branch:c.branch,syncEnabled:c.p.getProperty('RUTAS_SYNC_ENABLED')==='true'};
+}
 function rutasCRSincronizar() {
   var lock=LockService.getScriptLock();if(!lock.tryLock(1000))return {state:'busy'};
   var c;
