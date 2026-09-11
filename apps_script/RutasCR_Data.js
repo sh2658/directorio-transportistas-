@@ -72,6 +72,8 @@ var RutasCRData = (function () {
       if (!dest.some(function(d){return key(d)===key(name);})) dest.push(name);
     });
     dirs.forEach(function(d){
+      // Public directory only receives warehouse records whose zone was reviewed.
+      if (!d.ZONA) { diagnostics.push({code:'MISSING_ZONE',id:d.IDDDIREECION}); return; }
       var point=gps(d.GPS);
       if (d.GPS && !point) diagnostics.push({code:'INVALID_GPS',id:d.IDDDIREECION});
       if (!d.GPS) diagnostics.push({code:'MISSING_GPS',id:d.IDDDIREECION});
