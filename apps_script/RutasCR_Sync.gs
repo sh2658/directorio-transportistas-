@@ -9,6 +9,18 @@ function rutasCRConfig_() {
   return {p:p,sheet:need('RUTAS_SHEET_ID'),owner:need('RUTAS_GITHUB_OWNER'),repo:need('RUTAS_GITHUB_REPO'),
     branch:branch,path:'data/transportistas.json',token:need('RUTAS_GITHUB_PAT')};
 }
+function rutasCRPrepararConfiguracion() {
+  var p=PropertiesService.getScriptProperties();
+  p.setProperties({
+    RUTAS_SHEET_ID:'1gXtF2KcCuy_cdYRNTbGrulNbB5SYw_mrN-H_AVSXOeA',
+    RUTAS_GITHUB_OWNER:'sh2658',
+    RUTAS_GITHUB_REPO:'directorio-transportistas-',
+    RUTAS_GITHUB_BRANCH:'fix/rutas-cr-integracion-segura',
+    RUTAS_SYNC_ENABLED:'false',
+    RUTAS_PUBLIC_DATA_APPROVED:'false'
+  },false);
+  return {state:'prepared',syncEnabled:false,publicDataApproved:false};
+}
 function rutasCRRead_(id) {
   var ss=SpreadsheetApp.openById(id), tables={};
   ['TRANSPORTISTA','LUGARES','VISITA','DIRECCION','TELEFONOS'].forEach(function(name){
