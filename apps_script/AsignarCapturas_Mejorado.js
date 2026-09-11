@@ -169,7 +169,8 @@ function asignarCapturasAprobadasInterno_() {
     if (conflictoUbicacion) continue;
 
     // Estado final en la hoja CAPTURAS
-    const estadoFinal = esActualizacion ? "Actualizado a última toma" : "Asignado";
+    // Ambos valores existen en la validación/Enum actual de CAPTURAS y AppSheet.
+    const estadoFinal = esActualizacion ? "Procesado" : "Asignado";
     sheetCapturas.getRange(i + 1, idxEstado + 1).setValue(estadoFinal);
     procesados++;
   }
