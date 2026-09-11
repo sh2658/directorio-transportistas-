@@ -32,7 +32,10 @@ function rutasCRBuild_(c) {
   return {json:json,diagnostics:result.diagnostics,hash:rutasCRHash_(json)};
 }
 function rutasCRDiagnosticar() {
-  var c=rutasCRConfig_(), built=rutasCRBuild_(c);
+  var p=PropertiesService.getScriptProperties();
+  var sheet=p.getProperty('RUTAS_SHEET_ID');
+  if(!sheet)throw Error('Falta propiedad RUTAS_SHEET_ID');
+  var built=rutasCRBuild_({p:p,sheet:sheet});
   var result={transportistas:built.json.transportistas.length,hash:built.hash,diagnostics:built.diagnostics};
   console.log(JSON.stringify(result));return result;
 }
