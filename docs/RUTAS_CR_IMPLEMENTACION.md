@@ -31,7 +31,7 @@ El proyecto de sincronización debe ser **independiente** del procesador de capt
 
 Esto NO prueba que el Apps Script desplegado sea idéntico al archivo del repositorio ni establece que Transkaja causó la corrupción. Para determinar esa causa faltan versiones/ejecuciones del proyecto instalado y el historial de cambios de la hoja. La coincidencia temporal por sí sola no es evidencia causal.
 
-Lectura de Sheets de esta revisión: 54 transportistas, 74 bodegas, 152 registros telefónicos, 415 lugares y 1007 relaciones VISITA. Sin claves duplicadas ni referencias huérfanas. 68 bodegas tienen coordenadas aceptadas por el validador y seis quedan sin GPS. Una envolvente geográfica detecta errores obvios; NO verifica que una coordenada esté en la bodega correcta. El teléfono con ID `f865c02e` es de Panamá y se conserva con `507`.
+Lectura de Sheets actualizada: 54 transportistas, 74 filas de DIRECCION, 152 registros telefónicos, 415 lugares y 1007 relaciones VISITA. Sin claves duplicadas, nombres repetidos, relaciones duplicadas ni referencias huérfanas. El JSON público excluye 19 direcciones sin ZONA confirmada y publica 55 bodegas; 49 tienen coordenadas y seis quedan sin GPS. Una envolvente geográfica detecta errores obvios, pero NO verifica que una coordenada esté en la bodega correcta. El teléfono con ID `f865c02e` es de Panamá y se conserva con `507`.
 
 ## Archivos y comportamiento
 
