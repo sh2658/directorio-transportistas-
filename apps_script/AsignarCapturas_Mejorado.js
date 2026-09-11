@@ -106,7 +106,7 @@ function asignarCapturasAprobadasInterno_() {
 
     const listaTelefonos = splitList(row[idxTelefonos]);
     const listaDestinos  = splitList(row[idxDestinos]);
-    const listaBodegas   = splitList(row[idxBodegas]);
+    const listaBodegas   = splitAddressList(row[idxBodegas]);
 
     // 2. TELÉFONOS (agrega nuevos teléfonos si la foto trae números adicionales)
     listaTelefonos.forEach(tel => {
@@ -194,9 +194,12 @@ function actualizarDatosTransportistaExistente_(sheetTransportista, idTransporte
       }
       // Actualizar observaciones si hay notas
       if (nuevasObs && idxObs >= 0) {
-        const obsPrevias = String(data[i][idxObs] || '').trim();
-        const obsFinal = obsPrevias ? `${obsPrevias} | ${nuevasObs}` : nuevasObs;
-        sheetTransportista.getRange(fila, idxObs + 1).setValue(obsFinal);
+        const obsPrevias = String(data[i][idxObs] || "").trim();
+        const partes = obsPrevias ? obsPrevias.split(/\s*\|\s*/).filter(Boolean) : [];
+        if (!partes.some(obs => normalizarTexto(obs) === normalizarTexto(nuevasObs))) {
+          partes.push(nuevasObs);
+          sheetTransportista.getRange(fila, idxObs + 1).setValue(partes.join(" | "));
+        }
       }
       return;
     }
@@ -281,11 +284,26 @@ function getCombinedKeys(sheet, col1, col2) {
 
 function generarId(sheet, prefijo) {
   const lastRow = sheet.getLastRow();
-  const num     = lastRow > 0 ? lastRow : 1;
-  return prefijo + String(num).padStart(4, "0");
-}
+  if (lastRow < 2) return prefijo + "0001";
 
+  const ids = sheet.getRange(2, 1, lastRow - 1, 1).getDisplayValues().flat();
+  let maximo = 0;
+  ids.forEach(id => {
+    const texto = String(id || "").trim();
+    if (!texto.toUpperCase().startsWith(prefijo.toUpperCase())) return;
+    const sufijo = texto.slice(prefijo.length);
+    if (/^\d+$/.test(sufijo)) maximo = Math.max(maximo, Number(sufijo));
+  });
+  return prefijo + String(maximo + 1).padStart(4, "0");
+}
 function splitList(val) {
   if (!val) return [];
   return val.toString().split(/[\n,;]+/).map(s => s.trim().toUpperCase()).filter(Boolean);
+}
+
+// Una dirección puede contener comas; solo una nueva línea o punto y coma
+// representa otra bodega.
+function splitAddressList(val) {
+  if (!val) return [];
+  return val.toString().split(/[\n;]+/).map(s => s.trim().toUpperCase()).filter(Boolean);
 }
