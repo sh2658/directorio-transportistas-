@@ -100,3 +100,9 @@ test('GPS inválido o fuera de Costa Rica se rechaza', () => {
     { lat: 9.951587, lng: -84.089046 }
   );
 });
+
+test('solo escribe estados admitidos actualmente por CAPTURAS y AppSheet', () => {
+  const source = fs.readFileSync('apps_script/AsignarCapturas_Mejorado.js', 'utf8');
+  assert.match(source, /esActualizacion \? "Procesado" : "Asignado"/);
+  assert.doesNotMatch(source, /Actualizado a última toma/);
+});
