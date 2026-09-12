@@ -3,12 +3,12 @@ Fecha inicial: 2026-09-11. Base revisada: d5ffa4ceb79923e0768550dd6436f25d29ff2f
 
 ## Actualización ejecutada — 2026-09-12
 
-Base actual: `main` en `f8998df`; continuación en `fix/cierre-rutas-cr`, PR #2.
+Base actual: `main` en `4112d11`; PR #2 fusionado.
 
 Aplicado y verificado en el editor de **TRANSPORTES Y ENCOMIENDAS**:
 
 - Las referencias existentes de DIRECCION, TELEFONOS y VISITA se conservaron.
-- `CAPTURAS[ESTADO]` incluye `Procesado`, no acepta valores libres y usa
+- `CAPTURAS[ESTADO]` incluye `Procesado` y `Procesando`, no acepta valores libres y usa
   `CONTEXT("ViewType") <> "Form"` como `Editable_If` para impedir cambios manuales
   en formularios sin bloquear las acciones.
 - Se creó la tabla `ZONAS` en la hoja fuente, se conectó a AppSheet y
@@ -28,18 +28,23 @@ Aplicado y verificado en el editor de **TRANSPORTES Y ENCOMIENDAS**:
   preseleccionado. No se guardó ninguna fila de prueba.
 - AppSheet guardó los cambios con **No issues found**.
 
-En la hoja `ZONAS!A1:D13` quedaron 12 claves: BARRIO MÉXICO, BARRIO MEXICO,
-CALLE BLANCOS, GAM, PASEO COLÓN, PAVAS, SAN CARLOS, SAN JOSE, SAN JOSÉ,
-TIBÁS, TIBAS y URUCA. Los alias sin tilde y `GAM` están inactivos y marcados
-para revisión; no se reescribió ningún dato histórico de DIRECCION.
+En la hoja `ZONAS!A1:D15` quedaron 14 claves, incluidas GRECIA y LIBERIA.
+Los alias sin tilde y `GAM` están inactivos y marcados para revisión. Las diez
+variantes sin tilde de DIRECCION se normalizaron a BARRIO MÉXICO, SAN JOSÉ y
+TIBÁS; `GAM` permanece sin reinterpretar porque no identifica una zona concreta.
 
-La corrección V10 para la frontera exacta de 100 m y para detener escrituras
-parciales ante conflicto zona/GPS está en `main`. El refuerzo para no fusionar
-empresas distintas por compartir teléfono está en PR #2 y sus 40 pruebas pasan.
+La corrección V10 para la frontera exacta de 100 m, para detener escrituras
+parciales ante conflicto zona/GPS y para no fusionar empresas distintas por
+compartir teléfono está en `main`. Sus 40 pruebas pasan.
 
-Pendiente de comprobación externa: confirmar qué versión está instalada en el
-proyecto real de Apps Script, completar seis GPS físicos, cerrar las dos alertas
-de credenciales expuestas después de revocarlas y ejecutar la publicación final.
+La revisión del proyecto real confirmó que Apps Script conserva V9; instalar V10
+sigue pendiente. En datos quedan un GPS físico por completar y una zona histórica
+`GAM` por revisar. Se completaron las ocho zonas vacías, se normalizaron diez alias,
+se devolvieron tres capturas estancadas en `Procesando` a `Procesado por IA` y se
+retiró una copia exacta de la visita COCORÍ/BATÁN; la sincronización externa volvió
+a insertar ese par, por lo que la exportación lo deduplica y mantiene el diagnóstico.
+También falta cerrar las dos alertas de credenciales expuestas después de revocarlas,
+seleccionar imágenes públicas y ejecutar la publicación final.
 GitHub Pages continúa desactivado hasta ese cierre.
 
 ## Historial y punto de partida
@@ -214,9 +219,9 @@ Por tanto, Revisado no significa que toda la captura quedó sin aplicar. Comprob
 Conservar estados de entrada de aprobación ya usados por CAPTURAS. Asignado/Procesado/Revisado son salidas; no sustituir todo el Enum por solo esas tres opciones.
 
 ## 8. Pendientes conservados
-Instalación real de V10; aplicación y preview de Ref/formulario/zonas; seis GPS físicos; imágenes públicas seleccionadas; sincronización real con rama segura; revisión multidispositivo.
-No se marca ningún punto del PR como completado dentro de AppSheet.
-Acceso faltante en esta sesión: editor de AppSheet.
+Instalación real de V10; un GPS físico; revisión de la zona `GAM`; imágenes públicas
+seleccionadas; sincronización real; revocación de las dos credenciales expuestas;
+revisión multidispositivo y publicación final.
 
 ## Referencias
 - [Propiedades de columnas y Ref](https://support.google.com/appsheet/answer/10106509?hl=en)
