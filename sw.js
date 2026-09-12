@@ -1,86 +1,14 @@
-// Service Worker para Rutas CR - PWA Offline Support (v21)
-const CACHE_NAME = 'rutas-cr-v21';
-const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './assets/icon-192.png',
-  './assets/icon-512.png',
-  './assets/qrcode.min.js',
-  './assets/cantones_logistica_cr.json',
-  './assets/localidades_dta_cr.json',
-  './assets/localidades_dta_cr.js',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-  'https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap'
-];
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS).catch((err) => {
-        console.warn('Algunos recursos no pudieron ser cacheados en install:', err);
-      });
-    })
-  );
-  self.skipWaiting();
-});
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            console.log('Borrando caché antigua de Service Worker:', key);
-            return caches.delete(key);
-          }
-        })
-      );
-    })
-  );
-  self.clients.claim();
-});
-
-self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') return;
-  if (event.request.url.includes('script.google.com') || event.request.url.includes('google-analytics') || event.request.url.includes('googletagmanager')) {
-    return;
-  }
-
-  // Para el documento HTML principal: Network First (siempre busca la versión más fresca de GitHub Pages)
-  if (event.request.mode === 'navigate' || event.request.url.endsWith('/') || event.request.url.endsWith('index.html')) {
-    event.respondWith(
-      fetch(event.request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
-          const clone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-        }
-        return networkResponse;
-      }).catch(() => {
-        return caches.match('./index.html') || caches.match('./');
-      })
-    );
-    return;
-  }
-
-  // Para recursos estáticos (CSS, JS, iconos, fuentes): Cache First con fallback a red
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-        }
-        return networkResponse;
-      }).catch(() => {
-        return caches.match('./index.html');
-      });
-    })
-  );
+/* Online directory: never resurrect obsolete carrier data from a cache. */
+const CACHE='rutas-cr-shell-v22';
+const SHELL=['./','./index.html','./assets/css/app.css','./assets/js/core.js','./assets/js/app.js','./manifest.json','./assets/icon-192.png','./assets/icon-512.png'];
+self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL))));
+self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('rutas-cr-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
+self.addEventListener('fetch',event=>{
+  const url=new URL(event.request.url),scope=new URL(self.registration.scope);
+  if(event.request.method!=='GET'||url.origin!==scope.origin||!url.pathname.startsWith(scope.pathname)||url.pathname.includes('/data/'))return;
+  const path='./'+url.pathname.slice(scope.pathname.length);
+  if(!SHELL.includes(path))return;
+  event.respondWith(fetch(event.request).then(response=>{
+    if(response.ok){const copy=response.clone();event.waitUntil(caches.open(CACHE).then(c=>c.put(event.request,copy)));}return response;
+  }).catch(async()=>{const cached=await caches.match(event.request);if(cached)return cached;if(event.request.mode==='navigate'){const home=await caches.match('./index.html');if(home)return home;}return Response.error();}));
 });
