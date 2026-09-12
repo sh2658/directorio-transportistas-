@@ -1,7 +1,46 @@
 # Continuación AppSheet — Rutas CR
-Fecha: 2026-09-11. Base revisada: d5ffa4ceb79923e0768550dd6436f25d29ff2f30.
-Rama: fix/rutas-cr-integracion-segura. PR #1 abierto y borrador.
-Estado: configuración preparada; NO aplicada al editor. No se modificaron Sheets, V10 instalado, datos públicos ni Pages.
+Fecha inicial: 2026-09-11. Base revisada: d5ffa4ceb79923e0768550dd6436f25d29ff2f30.
+
+## Actualización ejecutada — 2026-09-12
+
+Base actual: `main` en `f8998df`; continuación en `fix/cierre-rutas-cr`, PR #2.
+
+Aplicado y verificado en el editor de **TRANSPORTES Y ENCOMIENDAS**:
+
+- Las referencias existentes de DIRECCION, TELEFONOS y VISITA se conservaron.
+- `CAPTURAS[ESTADO]` incluye `Procesado`, no acepta valores libres y usa
+  `CONTEXT("ViewType") <> "Form"` como `Editable_If` para impedir cambios manuales
+  en formularios sin bloquear las acciones.
+- Se creó la tabla `ZONAS` en la hoja fuente, se conectó a AppSheet y
+  `DIRECCION[ZONA]` quedó como `Ref -> ZONAS`.
+- `ZONAS[ZONA]` es Key y Label. La tabla quedó de solo lectura en la app.
+- Las formas canónicas quedan activas; los alias históricos siguen siendo claves
+  válidas para no romper filas existentes, pero se excluyen de nuevas altas con
+  el `Valid_If` documentado en la sección 4.
+- Se creó la vista Ref `RutasCR_OtraBodega_Form` para DIRECCION, con orden
+  `IDTRANSPORTE`, `DIRECCION`, `ZONA`, `GPS`.
+- Se creó en TRANSPORTISTA la acción prominente **Agregar otra bodega**, con
+  icono de cajas/bodega y el `LINKTOFORM` documentado en la sección 3.
+- `IDTRANSPORTE` se precarga y no es editable en ese formulario.
+- GPS es obligatorio en ese formulario y su `Valid_If` impide guardar otra fila
+  del mismo transportista cuando existe una dirección a `<= 0.1 km`.
+- El preview confirmó el botón, el formulario correcto y el transportista
+  preseleccionado. No se guardó ninguna fila de prueba.
+- AppSheet guardó los cambios con **No issues found**.
+
+En la hoja `ZONAS!A1:D13` quedaron 12 claves: BARRIO MÉXICO, BARRIO MEXICO,
+CALLE BLANCOS, GAM, PASEO COLÓN, PAVAS, SAN CARLOS, SAN JOSE, SAN JOSÉ,
+TIBÁS, TIBAS y URUCA. Los alias sin tilde y `GAM` están inactivos y marcados
+para revisión; no se reescribió ningún dato histórico de DIRECCION.
+
+La corrección V10 para la frontera exacta de 100 m y para detener escrituras
+parciales ante conflicto zona/GPS está en `main`. El refuerzo para no fusionar
+empresas distintas por compartir teléfono está en PR #2 y sus 40 pruebas pasan.
+
+Pendiente de comprobación externa: confirmar qué versión está instalada en el
+proyecto real de Apps Script, completar seis GPS físicos, cerrar las dos alertas
+de credenciales expuestas después de revocarlas y ejecutar la publicación final.
+GitHub Pages continúa desactivado hasta ese cierre.
 
 ## Historial y punto de partida
 Se revisaron los 18 commits del PR, su descripción y la lista “Pendiente para cuando Santiago llegue a casa”.

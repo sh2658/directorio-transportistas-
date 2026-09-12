@@ -99,6 +99,65 @@ test('los teléfonos identifican al transportista aun con formatos distintos', (
   assert.equal(c.normalizarTelefonoClave_('123'), '');
 });
 
+test('un teléfono compartido nunca fusiona automáticamente nombres diferentes', () => {
+  const c = cargar();
+  const resultado = c.decidirIdentidadTransportista_(
+    'empresa nueva',
+    '',
+    new Map([['empresa existente', 'TRP-0001']]),
+    new Set(['TRP-0001'])
+  );
+  assert.equal(resultado.accion, 'REVISAR');
+  assert.match(resultado.mensaje, /TELÉFONO YA EXISTE/);
+});
+
+test('nombre exacto reutiliza el transportista si los teléfonos son congruentes', () => {
+  const c = cargar();
+  const resultado = c.decidirIdentidadTransportista_(
+    'empresa existente',
+    '',
+    new Map([['empresa existente', 'TRP-0001']]),
+    new Set(['TRP-0001'])
+  );
+  assert.equal(resultado.accion, 'EXISTENTE');
+  assert.equal(resultado.id, 'TRP-0001');
+});
+
+test('un ID explícito permite una variación del nombre pero no un teléfono ajeno', () => {
+  const c = cargar();
+  const mapa = new Map([
+    ['empresa existente', 'TRP-0001'],
+    ['otra empresa', 'TRP-0002']
+  ]);
+  const permitido = c.decidirIdentidadTransportista_(
+    'nombre leído por ia',
+    'TRP-0001',
+    mapa,
+    new Set(['TRP-0001'])
+  );
+  assert.equal(permitido.accion, 'EXISTENTE');
+  assert.equal(permitido.id, 'TRP-0001');
+
+  const conflicto = c.decidirIdentidadTransportista_(
+    'nombre leído por ia',
+    'TRP-0001',
+    mapa,
+    new Set(['TRP-0002'])
+  );
+  assert.equal(conflicto.accion, 'REVISAR');
+});
+
+test('un nombre y teléfono nuevos crean una empresa sin inferencias', () => {
+  const c = cargar();
+  const resultado = c.decidirIdentidadTransportista_(
+    'empresa nueva',
+    '',
+    new Map([['empresa existente', 'TRP-0001']]),
+    new Set()
+  );
+  assert.equal(resultado.accion, 'CREAR');
+});
+
 test('asigna las zonas principales por texto y detecta desacuerdo con GPS', () => {
   const c = cargar();
   assert.equal(c.zonaPorTexto_('Centro de bodegas Transcama, Colima'), 'TIBÁS');
