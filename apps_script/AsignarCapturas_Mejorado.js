@@ -223,6 +223,8 @@ function actualizarDatosTransportistaExistente_(sheetTransportista, idTransporte
 // ======================================================================
 
 const DISTANCIA_MISMO_PREDIO_METROS_ = 100;
+// Absorbe únicamente el error de redondeo de punto flotante en el límite exacto.
+const TOLERANCIA_DISTANCIA_METROS_ = 0.01;
 
 function normalizarTelefonoClave_(tel) {
   let digits = String(tel || "").replace(/\D/g, "");
@@ -306,7 +308,7 @@ function decidirCoincidenciaBodega_(existentes, direccion, gps) {
       const metros = distanciaMetros_(previo, punto);
       if (!mejor || metros < mejor.metros) mejor = { registro: d, metros: metros };
     });
-    if (mejor && mejor.metros <= DISTANCIA_MISMO_PREDIO_METROS_) {
+    if (mejor && mejor.metros <= DISTANCIA_MISMO_PREDIO_METROS_ + TOLERANCIA_DISTANCIA_METROS_) {
       return { accion: "MISMO_PREDIO", registro: mejor.registro, metros: mejor.metros };
     }
     const sinGpsMismaDireccion = mismas.find(d => !parsearGps_(d.gps) &&
