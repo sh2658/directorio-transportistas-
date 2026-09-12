@@ -76,7 +76,9 @@ function rutasCRSincronizar() {
     if(c.p.getProperty('RUTAS_SYNC_ENABLED')!=='true')return {state:'disabled'};
     var built=rutasCRBuild_(c);
     // Require explicit source approval. Repeated names / invalid GPS / invalid phones need correction.
-    var blockers=built.diagnostics.filter(function(d){return ['INVALID_GPS','INVALID_PHONE','REPEATED_NAME','DUPLICATE_VISIT'].indexOf(d.code)>=0;});
+    // Duplicate visits remain diagnostic-only because RutasCRData.build already collapses
+    // repeated transportista/destino pairs in the public snapshot.
+    var blockers=built.diagnostics.filter(function(d){return ['INVALID_GPS','INVALID_PHONE','REPEATED_NAME'].indexOf(d.code)>=0;});
     if(blockers.length)throw Error('Datos requieren revisión: '+JSON.stringify(blockers));
     if(c.p.getProperty('RUTAS_PUBLIC_DATA_APPROVED')!=='true')throw Error('Falta aprobación de datos públicos');
     // Debounce: publish only after identical snapshots observed on successive executions.
