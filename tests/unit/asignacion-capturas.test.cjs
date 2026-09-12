@@ -41,6 +41,28 @@ test('la regla geográfica considera el mismo predio hasta 100 metros', () => {
   assert.equal(lejos.accion, 'NUEVA_DIRECCION');
 });
 
+test('el límite matemático de 100 metros sigue siendo el mismo predio', () => {
+  const c = cargar();
+  const origen = { lat: 9.951587, lng: -84.089046 };
+  const deltaLat = (100 / 6371000) * (180 / Math.PI);
+  const destino = (origen.lat + deltaLat) + ',' + origen.lng;
+
+  const limite = c.decidirCoincidenciaBodega_(
+    [direccion(origen.lat + ',' + origen.lng)],
+    'MISMO PREDIO EN EL LÍMITE',
+    destino
+  );
+  assert.equal(limite.accion, 'MISMO_PREDIO');
+  assert.ok(limite.metros <= 100.01);
+
+  const fuera = c.decidirCoincidenciaBodega_(
+    [direccion(origen.lat + ',' + origen.lng)],
+    'OTRA BODEGA',
+    (origen.lat + ((100.1 / 6371000) * (180 / Math.PI))) + ',' + origen.lng
+  );
+  assert.equal(fuera.accion, 'NUEVA_DIRECCION');
+});
+
 test('una dirección idéntica a más de 100 metros sigue siendo otra bodega', () => {
   const c = cargar();
   const resultado = c.decidirCoincidenciaBodega_(
