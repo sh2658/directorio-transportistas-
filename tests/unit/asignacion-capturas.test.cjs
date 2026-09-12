@@ -112,6 +112,17 @@ test('asigna las zonas principales por texto y detecta desacuerdo con GPS', () =
   assert.equal(conflicto.conflicto, true);
 });
 
+test('un conflicto zona/GPS se detecta antes de preparar cualquier escritura', () => {
+  const c = cargar();
+  const preparacion = c.prepararBodegas_(
+    ['BODEGA EN PAVAS'],
+    '9.951587,-84.089046'
+  );
+  assert.equal(preparacion.items.length, 1);
+  assert.equal(preparacion.conflicto.zonaInfo.zonaTexto, 'PAVAS');
+  assert.equal(preparacion.conflicto.zonaInfo.zonaGps, 'TIBÁS');
+});
+
 test('GPS inválido o fuera de Costa Rica se rechaza', () => {
   const c = cargar();
   assert.equal(c.parsearGps_(''), null);
