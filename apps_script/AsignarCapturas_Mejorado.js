@@ -84,6 +84,15 @@ function asignarCapturasAprobadasInterno_() {
     const listaBodegas   = splitAddressList(row[idxBodegas]);
     const nombreKey = normalizarTexto(nombreTransportista);
 
+    // Validar zona/GPS antes de escribir transportista, teléfonos, destinos o direcciones.
+    const preparacionBodegas = prepararBodegas_(listaBodegas, gpsCaptura);
+    if (preparacionBodegas.conflicto) {
+      const conflicto = preparacionBodegas.conflicto;
+      registrarConflictoCaptura_(sheetCapturas, i + 1, idxEstado, idxObservaciones,
+        `CONFLICTO DE ZONA: DIRECCIÓN ${conflicto.zonaInfo.zonaTexto} / GPS ${conflicto.zonaInfo.zonaGps}`);
+      continue;
+    }
+
     let idTransporte = "";
     let esActualizacion = false;
 
@@ -153,20 +162,16 @@ function asignarCapturasAprobadasInterno_() {
     });
 
     // 4. BODEGAS: <=100 m mismo predio; >100 m otra dirección del mismo transportista.
-    let conflictoUbicacion = false;
-    listaBodegas.forEach((bodega, index) => {
-      if (!bodega) return;
-      const gps = (index === 0) ? gpsCaptura : "";
-      const zonaInfo = resolverZona_(bodega, gps);
-      if (zonaInfo.conflicto) {
-        conflictoUbicacion = true;
-        registrarConflictoCaptura_(sheetCapturas, i + 1, idxEstado, idxObservaciones,
-          `CONFLICTO DE ZONA: DIRECCIÓN ${zonaInfo.zonaTexto} / GPS ${zonaInfo.zonaGps}`);
-        return;
-      }
-      asignarBodegaPorDistancia_(sheetDireccion, direccionesCache, idTransporte, bodega, gps, zonaInfo.zona);
+    preparacionBodegas.items.forEach(item => {
+      asignarBodegaPorDistancia_(
+        sheetDireccion,
+        direccionesCache,
+        idTransporte,
+        item.bodega,
+        item.gps,
+        item.zonaInfo.zona
+      );
     });
-    if (conflictoUbicacion) continue;
 
     // Estado final en la hoja CAPTURAS
     // Ambos valores existen en la validación/Enum actual de CAPTURAS y AppSheet.
@@ -369,6 +374,17 @@ function zonaPorGps_(gps) {
    .filter(c => c.metros <= c.radio)
    .sort((a,b) => a.metros - b.metros);
   return centros.length ? centros[0].zona : "";
+}
+
+function prepararBodegas_(listaBodegas, gpsCaptura) {
+  const items = (listaBodegas || []).filter(Boolean).map((bodega, index) => {
+    const gps = index === 0 ? gpsCaptura : "";
+    return { bodega: bodega, gps: gps, zonaInfo: resolverZona_(bodega, gps) };
+  });
+  return {
+    items: items,
+    conflicto: items.find(item => item.zonaInfo.conflicto) || null
+  };
 }
 
 function resolverZona_(direccion, gps) {
