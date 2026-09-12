@@ -3,7 +3,7 @@ Fecha inicial: 2026-09-11. Base revisada: d5ffa4ceb79923e0768550dd6436f25d29ff2f
 
 ## Actualización ejecutada — 2026-09-12
 
-Base actual: `main` en `4112d11`; PR #2 fusionado.
+Base actual: `main` en `b792742`; PR #2 y PR #3 fusionados.
 
 Aplicado y verificado en el editor de **TRANSPORTES Y ENCOMIENDAS**:
 
@@ -35,16 +35,21 @@ TIBÁS; `GAM` permanece sin reinterpretar porque no identifica una zona concreta
 
 La corrección V10 para la frontera exacta de 100 m, para detener escrituras
 parciales ante conflicto zona/GPS y para no fusionar empresas distintas por
-compartir teléfono está en `main`. Sus 40 pruebas pasan.
+compartir teléfono está en `main`. Sus 41 pruebas pasan.
 
-La revisión del proyecto real confirmó que Apps Script conserva V9; instalar V10
-sigue pendiente. En datos quedan un GPS físico por completar y una zona histórica
+V10 quedó instalado y guardado en el proyecto real `Procesar capturas con Gemini`;
+se verificó el encabezado tras recargar y no se ejecutó la función de asignación.
+El proyecto `Rutas CR - Sincronización GitHub` también quedó actualizado, pero
+continúa sin activadores y sin `RUTAS_GITHUB_PAT`, por lo que no puede publicar.
+Su diagnóstico de solo lectura confirmó 59 transportistas sin nombres repetidos,
+teléfonos inválidos, GPS inválidos ni referencias huérfanas. En datos quedan un
+GPS físico por completar y una zona histórica
 `GAM` por revisar. Se completaron las ocho zonas vacías, se normalizaron diez alias,
 se devolvieron tres capturas estancadas en `Procesando` a `Procesado por IA` y se
 retiró una copia exacta de la visita COCORÍ/BATÁN; la sincronización externa volvió
 a insertar ese par, por lo que la exportación lo deduplica y mantiene el diagnóstico.
-También falta cerrar las dos alertas de credenciales expuestas después de revocarlas,
-seleccionar imágenes públicas y ejecutar la publicación final.
+También falta revocar o comprobar las dos credenciales expuestas, resolver 53
+imágenes internas sin URL pública y ejecutar la publicación final.
 GitHub Pages continúa desactivado hasta ese cierre.
 
 ## Historial y punto de partida
@@ -219,9 +224,9 @@ Por tanto, Revisado no significa que toda la captura quedó sin aplicar. Comprob
 Conservar estados de entrada de aprobación ya usados por CAPTURAS. Asignado/Procesado/Revisado son salidas; no sustituir todo el Enum por solo esas tres opciones.
 
 ## 8. Pendientes conservados
-Instalación real de V10; un GPS físico; revisión de la zona `GAM`; imágenes públicas
-seleccionadas; sincronización real; revocación de las dos credenciales expuestas;
-revisión multidispositivo y publicación final.
+Un GPS físico; revisión de la zona `GAM`; estrategia para 53 imágenes internas;
+credenciales expuestas; configuración segura de sincronización; revisión
+multidispositivo y publicación final.
 
 ## Referencias
 - [Propiedades de columnas y Ref](https://support.google.com/appsheet/answer/10106509?hl=en)
