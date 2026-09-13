@@ -48,10 +48,10 @@
   function phoneDisplay(number){const local=number.slice(3),country=number.slice(0,3);return '+'+country+' '+local.slice(0,4)+'-'+local.slice(4);}
   function contacts(t){
     const panel=el('section',null,'contactos');panel.setAttribute('aria-label','Contactos');
-    t.telefonos.forEach(p=>{const row=el('div',null,'contacto'),display=phoneDisplay(p.numero),label='Llamar al '+display+(p.contacto?' · '+p.contacto:'');
-      const call=link(display,'tel:+'+p.numero,'contacto-enlace','phone');call.setAttribute('aria-label',label);row.append(call);
-      if(p.contacto)row.append(el('span',C.displayName(p.contacto),'contacto-nota'));
-      if(/WHATSAPP/i.test(p.contacto)){const wa=link('', 'https://wa.me/'+p.numero,'icono-boton whatsapp','whatsapp');wa.setAttribute('aria-label','Enviar WhatsApp al '+display);wa.title='WhatsApp';row.append(wa);}panel.append(row);
+    t.telefonos.forEach(p=>{const row=el('div',null,'contacto'),info=el('div',null,'contacto-info'),actions=el('div',null,'contacto-acciones'),display=phoneDisplay(p.numero),label='Llamar al '+display+(p.contacto?' · '+p.contacto:'');
+      info.append(el('strong',display));if(p.contacto)info.append(el('span',C.displayName(p.contacto),'contacto-nota'));row.append(info);
+      if(C.hasWhatsApp(p)){const wa=link('WhatsApp','https://wa.me/'+p.numero,'accion-contacto whatsapp','whatsapp');wa.setAttribute('aria-label','Enviar WhatsApp al '+display);wa.title='Enviar mensaje por WhatsApp';actions.append(wa);}
+      const call=link('Llamar','tel:+'+p.numero,'accion-contacto llamada','phone');call.setAttribute('aria-label',label);call.title='Llamar al '+display;actions.append(call);row.append(actions);panel.append(row);
     });return panel;
   }
   function warehouse(t,item,nearest){
