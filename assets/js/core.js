@@ -13,7 +13,7 @@
       if(!Array.isArray(t.destinos)||t.destinos.some(d=>typeof d!=='string'||!d.trim())||!Array.isArray(t.bodegas)||!Array.isArray(t.telefonos))throw Error('Listas inválidas');
       if(new Set(t.destinos.map(key)).size!==t.destinos.length)throw Error('Destinos duplicados');
       t.bodegas.forEach(b=>{if(!b||typeof b.id!=='string'||!b.id||bids.has(b.id)||typeof b.direccion!=='string'||typeof b.zona!=='string'||!((b.lat===null&&b.lng===null)||validGPS(b)))throw Error('Bodega inválida');bids.add(b.id);});
-      const nums=new Set();t.telefonos.forEach(p=>{if(!p||typeof p.numero!=='string'||!/^(506[2-8]\d{7}|507\d{7,8})$/.test(p.numero)||typeof p.contacto!=='string'||nums.has(p.numero))throw Error('Teléfono inválido');nums.add(p.numero);});
+      const nums=new Set();t.telefonos.forEach(p=>{if(!p||typeof p.numero!=='string'||!/^(506[2-9]\d{7}|507\d{7,8})$/.test(p.numero)||typeof p.contacto!=='string'||nums.has(p.numero))throw Error('Teléfono inválido');nums.add(p.numero);});
     });return data;
   }
   function search(rows,mode,query){const q=key(query);if(!q)return [];const values=t=>mode==='destino'?t.destinos:[t.nombre];const exact=rows.filter(t=>values(t).some(v=>key(v)===q));return exact.length?exact:rows.filter(t=>values(t).some(v=>key(v).includes(q)));}
@@ -21,6 +21,8 @@
   function operatorCount(items){return new Set(items.map(m=>m.carrierId)).size;}
   function initials(name){const ignored=new Set(['DE','DEL','LA','LAS','LOS','Y']);const words=String(name||'').trim().split(/\s+/).filter(w=>w&&!ignored.has(key(w)));return (words.slice(0,2).map(w=>[...w][0]).join('')||'CR').toUpperCase();}
   function displayName(value){const title=String(value||'').toLocaleLowerCase('es-CR').replace(/(^|[\s/(-])([a-záéíóúñ])/g,(m,a,b)=>a+b.toLocaleUpperCase('es-CR'));return title.replace(/\b(De|Del|La|Las|Los|Y|En|El|Al)\b/g,(word,_,offset)=>offset===0?word:word.toLocaleLowerCase('es-CR'));}
+  function phoneType(number){const value=String(number||'');if(/^506[5-9]\d{7}$/.test(value))return 'mobile';if(/^506[2-4]\d{7}$/.test(value))return 'fixed';return 'international';}
+  function hasWhatsApp(phone){return !!phone&&(/WHATSAPP/i.test(String(phone.contacto||''))||phoneType(phone.numero)==='mobile');}
   function warehouseOrder(t,position){return t.bodegas.map((b,index)=>({b,index,km:position&&validGPS(b)?distance(position,b):Infinity})).sort((a,b)=>a.km-b.km||a.index-b.index);}
   function nearestDistance(t,position){return warehouseOrder(t,position)[0]?.km??Infinity;}
   function sortByNearest(rows,position){return rows.map((t,index)=>({t,index,km:nearestDistance(t,position)})).sort((a,b)=>a.km-b.km||a.index-b.index).map(x=>x.t);}
@@ -46,5 +48,5 @@
   }
   function costaRicaClock(date=new Date()){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Costa_Rica',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(date);const get=t=>parts.find(p=>p.type===t)?.value||'';const days={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};return {day:days[get('weekday')],minutes:Number(get('hour'))*60+Number(get('minute'))};}
   function scheduleStatus(t,date){const c=costaRicaClock(date);return scheduleStatusAt(t,c.day,c.minutes);}
-  return {key,validGPS,distance,validate,search,markers,operatorCount,initials,displayName,warehouseOrder,nearestDistance,sortByNearest,scheduleSlots,scheduleStatusAt,scheduleStatus,costaRicaClock,timeLabel};
+  return {key,validGPS,distance,validate,search,markers,operatorCount,initials,displayName,phoneType,hasWhatsApp,warehouseOrder,nearestDistance,sortByNearest,scheduleSlots,scheduleStatusAt,scheduleStatus,costaRicaClock,timeLabel};
 });
