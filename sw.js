@@ -1,6 +1,6 @@
 /* Online directory: never resurrect obsolete carrier data from a cache. */
-const CACHE='rutas-cr-shell-v22';
-const SHELL=['./','./index.html','./assets/css/app.css','./assets/js/core.js','./assets/js/app.js','./manifest.json','./assets/icon-192.png','./assets/icon-512.png'];
+const CACHE='rutas-cr-shell-v23';
+const SHELL=['./','./index.html','./assets/css/app.css','./assets/js/core.js','./assets/js/app.js','./assets/carriers/manifest.json','./manifest.json','./assets/icon-192.png','./assets/icon-512.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL))));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('rutas-cr-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{
