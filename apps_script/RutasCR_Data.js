@@ -59,8 +59,12 @@ var RutasCRData = (function () {
       names.set(key(t.TRANSPORTE),t.IDTRANSPORTE);
       var image = https((options.imageUrls || {})[t.IDTRANSPORTE] || t.IMAGEN);
       if (t.IMAGEN && !image) diagnostics.push({code:'IMAGE_NOT_PUBLIC_URL',id:t.IDTRANSPORTE});
-      out.set(t.IDTRANSPORTE,{id:t.IDTRANSPORTE,nombre:t.TRANSPORTE,horario:t.HORARIO,
-        imagen:image,bodegas:[],telefonos:[],destinos:[]});
+      var carrier={id:t.IDTRANSPORTE,nombre:t.TRANSPORTE,horario:t.HORARIO,
+        imagen:image,bodegas:[],telefonos:[],destinos:[]};
+      ['LV_APERTURA_1','LV_CIERRE_1','LV_APERTURA_2','LV_CIERRE_2','SAB_APERTURA_1','SAB_CIERRE_1'].forEach(function(field){
+        if (Object.prototype.hasOwnProperty.call(t,field)) carrier[field.replace('APERTURA','Apertura').replace('CIERRE','Cierre')]=t[field];
+      });
+      out.set(t.IDTRANSPORTE,carrier);
     });
     var pairs = new Set();
     visits.forEach(function(v){
