@@ -3,7 +3,7 @@
   'use strict';
   const C=window.RutasCore,$=id=>document.getElementById(id);
   let data=[],results=[],visible=0,position=null,map=null,cluster=null,userMarker=null,loadingMap=null;
-  let mode='destino',busy=false,mapActive=false,hasSearch=false,territory=null,territoryPromise=null,searchSequence=0;
+  let mode='destino',busy=false,mapActive=false,hasSearch=false,territory=null,territoryPromise=null,searchSequence=0,nearbyResults=false;
   const PAGE=15,query=$('consulta'),iconPath=name=>'./assets/icons/'+name+'.svg';
   function el(tag,text,cls){const node=document.createElement(tag);if(text!=null)node.textContent=text;if(cls)node.className=cls;return node;}
   function icon(name,alt=''){const img=el('img');img.src=iconPath(name);img.alt=alt;img.width=20;img.height=20;img.className='icono';return img;}
@@ -32,10 +32,10 @@
     return territoryPromise;
   }
   function ordered(rows){const copy=[...rows];return position?C.sortByNearest(copy,position):copy.sort((a,b)=>a.nombre.localeCompare(b.nombre,'es'));}
-  function renderRows(rows,title,summary,focus=true,prefix=null){results=ordered(rows);visible=0;$('tarjetas').replaceChildren();if(prefix)$('tarjetas').append(prefix);$('tituloResultados').textContent=title;$('resumenResultados').textContent=summary+(position&&results.length?' · Ordenados por la bodega más cercana':'');more();renderMap();if(focus)$('tituloResultados').focus();}
+  function renderRows(rows,title,summary,focus=true,prefix=null,isNearby=false){results=ordered(rows);nearbyResults=isNearby;visible=0;$('tarjetas').replaceChildren();if(prefix)$('tarjetas').append(prefix);$('tituloResultados').textContent=title;$('resumenResultados').textContent=summary+(position&&results.length?' · Ordenados por la bodega más cercana':'');more();renderMap();if(focus)$('tituloResultados').focus();}
   function centersList(centers){const list=el('div',null,'territorial-centros');centers.forEach(center=>list.append(el('span',C.displayName(center),'chip')));return list;}
   function territorialNotice(title,message,centers=[]){const box=el('aside',null,'territorial-aviso');box.append(el('strong',title,'territorial-titulo'),el('p',message));if(centers.length)box.append(centersList(centers));return box;}
-  function renderNearby(original,place,focus=true){const centers=place.logistics||[],matches=C.searchNearby(data,centers),where=place.canton+(place.province?' · '+place.province:'');const detail=place.district&&C.key(place.district)!==C.key(place.canton)?' (distrito '+C.displayName(place.district)+')':'';const box=territorialNotice('Sugerencia territorial para '+C.displayName(original),C.displayName(original)+' pertenece a '+C.displayName(place.canton)+detail+', '+C.displayName(place.province)+'. Se muestran transportistas que atienden estos centros logísticos cercanos. Confirme con la empresa si entrega en el punto exacto.',centers);renderRows(matches,matches.length?'Opciones cercanas a '+C.displayName(original):'Sin rutas cercanas registradas',matches.length+' transportista'+(matches.length===1?'':'s')+' relacionado'+(matches.length===1?'':'s')+' con '+where,focus,box);}
+  function renderNearby(original,place,focus=true){const centers=place.logistics||[],matches=C.searchNearby(data,centers),where=place.canton+(place.province?' · '+place.province:'');const detail=place.district&&C.key(place.district)!==C.key(place.canton)?' (distrito '+C.displayName(place.district)+')':'';const box=territorialNotice('Aún no hay servicio confirmado a '+C.displayName(original),'Estos transportistas viajan por localidades cercanas o por el corredor de acceso a '+C.displayName(original)+', que pertenece a '+C.displayName(place.canton)+detail+', '+C.displayName(place.province)+'. Consulte directamente si pueden recibir o entregar su encomienda.',centers);renderRows(matches,matches.length?'Transportistas que viajan por el área':'Sin rutas cercanas registradas',matches.length+' transportista'+(matches.length===1?'':'s')+' relacionado'+(matches.length===1?'':'s')+' con '+where,focus,box,true);}
   function renderAmbiguous(original,resolution,focus){
     results=[];visible=0;renderMap();$('tituloResultados').textContent='Necesitamos precisar el lugar';$('resumenResultados').textContent='Hay '+resolution.locations.length+' lugares llamados «'+original+'» en Costa Rica.';$('mas').hidden=true;
     const box=territorialNotice('Este nombre tiene homónimos','Elija el cantón y la provincia correctos antes de mostrar rutas. Así evitamos recomendar transportistas de otro lugar.'),options=el('div',null,'territorial-opciones');
@@ -45,7 +45,7 @@
   async function search(focus=true){
     const sequence=++searchSequence;
     $('limpiar').hidden=!query.value;hasSearch=!!query.value.trim();
-    if(!hasSearch){results=[];visible=0;$('tarjetas').replaceChildren();$('tituloResultados').textContent='Busque un destino o transportista';$('resumenResultados').textContent='';$('mas').hidden=true;renderMap();query.focus();return;}
+    if(!hasSearch){results=[];nearbyResults=false;visible=0;$('tarjetas').replaceChildren();$('tituloResultados').textContent='Busque un destino o transportista';$('resumenResultados').textContent='';$('mas').hidden=true;$('buscar').disabled=false;$('resultados').removeAttribute('aria-busy');renderMap();query.focus();return;}
     const original=query.value.trim(),matches=C.search(data,mode,original);
     if(mode!=='destino'){renderRows(matches,matches.length?'Transportistas disponibles':'Sin coincidencias',matches.length+' resultado'+(matches.length===1?'':'s')+' para «'+original+'»',focus);return;}
     $('buscar').disabled=true;$('resultados').setAttribute('aria-busy','true');$('tituloResultados').textContent='Consultando referencia territorial…';
@@ -74,7 +74,7 @@
     const panel=el('section',null,'contactos');panel.setAttribute('aria-label','Contactos');
     t.telefonos.forEach(p=>{const row=el('div',null,'contacto'),info=el('div',null,'contacto-info'),actions=el('div',null,'contacto-acciones'),display=phoneDisplay(p.numero),label='Llamar al '+display+(p.contacto?' · '+p.contacto:'');
       info.append(el('strong',display));if(p.contacto)info.append(el('span',C.displayName(p.contacto),'contacto-nota'));row.append(info);
-      if(C.hasWhatsApp(p)){const wa=link('WhatsApp','https://wa.me/'+p.numero,'accion-contacto whatsapp','whatsapp');wa.setAttribute('aria-label','Enviar WhatsApp al '+display);wa.title='Enviar mensaje por WhatsApp';actions.append(wa);}
+      if(C.hasWhatsApp(p)){const wa=link('','https://wa.me/'+p.numero,'accion-contacto whatsapp whatsapp-icono','whatsapp');wa.setAttribute('aria-label','Enviar WhatsApp al '+display);wa.title='Enviar mensaje por WhatsApp';actions.append(wa);}
       const call=link('Llamar','tel:+'+p.numero,'accion-contacto llamada','phone');call.setAttribute('aria-label',label);call.title='Llamar al '+display;actions.append(call);row.append(actions);panel.append(row);
     });return panel;
   }
@@ -90,12 +90,12 @@
     }else section.append(el('p','Ubicación GPS pendiente','aviso-suave'));return section;
   }
   function destinations(t){
-    const details=el('details',null,'destinos'),summary=el('summary','Destinos ('+t.destinos.length+')'),body=el('div',null,'destinos-cuerpo'),chips=el('div',null,'chips');details.append(summary);body.append(chips);
+    const details=el('details',null,'destinos'),summary=el('summary','Destinos ('+t.destinos.length+')'),body=el('div',null,'destinos-cuerpo'),chips=el('div',null,'chips');details.open=true;details.append(summary);body.append(chips);
     const paint=value=>{const q=C.key(value);chips.replaceChildren(...t.destinos.filter(d=>!q||C.key(d).includes(q)).map(d=>el('span',C.displayName(d),'chip')));if(!chips.children.length)chips.append(el('span','Sin coincidencias','chips-vacio'));};
     if(t.destinos.length>12){const label=el('label','Filtrar destinos','filtro-label'),input=el('input');input.type='search';input.placeholder='Ej.: Bagaces';input.className='filtro-destinos';input.setAttribute('aria-label','Filtrar destinos de '+t.nombre);input.addEventListener('input',()=>paint(input.value));body.prepend(label,input);}paint('');details.append(body);return details;
   }
   function card(t){
-    const article=el('article',null,'transportista-card'),head=el('div',null,'card-head'),identity=el('div',null,'card-identidad');identity.append(el('h3',C.displayName(t.nombre)),scheduleBadge(t));head.append(avatar(t),identity);article.append(head);
+    const article=el('article',null,'transportista-card'+(nearbyResults?' sugerencia-card':'')),head=el('div',null,'card-head'),identity=el('div',null,'card-identidad');identity.append(el('h3',C.displayName(t.nombre)),scheduleBadge(t));if(nearbyResults)identity.append(el('span','Viaja por el área · confirme cobertura','cobertura-badge'));head.append(avatar(t),identity);article.append(head);
     if(t.telefonos.length)article.append(contacts(t));
     const details=el('details',null,'bodegas');details.open=true;details.append(el('summary',t.bodegas.length+' bodega'+(t.bodegas.length===1?'':'s')));
     const ordered=C.warehouseOrder(t,position);ordered.forEach((item,index)=>details.append(warehouse(t,item,!!position&&index===0&&Number.isFinite(item.km))));article.append(details,destinations(t));return article;

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-13T01:10:54.598Z",
-  "contentHash": "171736f3b02c9f08a5152f3266c911dc72178ba80a2582451d138313068bf8b0",
+  "generatedAt": "2026-09-13T14:29:10.000Z",
+  "contentHash": "dac0f62e6ff36f7b0c15f27ac8f65c8019ce398cb57f2f611cf7378af677115e",
   "transportistas": [
     {
       "id": "0de57703",
@@ -315,6 +315,10 @@
           "contacto": ""
         },
         {
+          "numero": "50671102236",
+          "contacto": ""
+        },
+        {
           "numero": "50685500323",
           "contacto": ""
         },
@@ -331,8 +335,6 @@
         "BAGACES",
         "CAÑAS",
         "FILADELFIA",
-        "FORTUNA",
-        "GUAYABO BAGACES",
         "LIBERIA",
         "NICOYA",
         "SANTA CRUZ"

@@ -20,16 +20,23 @@
   function levenshtein(a,b){const x=key(a),y=key(b);if(!x)return y.length;if(!y)return x.length;let prev=Array.from({length:y.length+1},(_,i)=>i);for(let i=1;i<=x.length;i++){const next=[i];for(let j=1;j<=y.length;j++)next[j]=Math.min(next[j-1]+1,prev[j]+1,prev[j-1]+(x[i-1]===y[j-1]?0:1));prev=next;}return prev[y.length];}
   function cantonEntry(name,cantons){const wanted=key(name);return Object.entries(cantons||{}).find(([c])=>key(c)===wanted);}
   function logisticsFor(name,cantons){const entry=cantonEntry(name,cantons);if(!entry)return [];const info=entry[1]||{};return [...new Set([info.cabecera,...(info.centrosCercanos||[])].filter(Boolean).map(String))];}
+  const localityCorrections=new Map([['LA GAMBA',{district:'Guaycará'}]]);
   function resolvePlace(query,localities,homonyms,cantons){
     const q=key(query),lookup=q.toLocaleLowerCase('es-CR');if(!q)return {type:'unknown'};
     const ambiguous=(homonyms||{})[lookup];
     if(Array.isArray(ambiguous)&&ambiguous.length>1)return {type:'ambiguous',name:String(query).trim(),locations:ambiguous.map(item=>{const canton=Array.isArray(item)?item[0]:item.canton,province=Array.isArray(item)?item[1]:item.provincia;return {canton,province,logistics:logisticsFor(canton,cantons)};})};
     const place=(localities||{})[lookup];
-    if(Array.isArray(place)&&place.length>=2)return {type:'locality',name:String(query).trim(),canton:place[0],province:place[1],district:place[2]||'',logistics:logisticsFor(place[0],cantons)};
+    if(Array.isArray(place)&&place.length>=2){const correction=localityCorrections.get(q)||{};return {type:'locality',name:String(query).trim(),canton:place[0],province:place[1],district:correction.district||place[2]||'',logistics:logisticsFor(place[0],cantons)};}
     const canton=cantonEntry(query,cantons);if(canton){const info=canton[1]||{};return {type:'canton',name:canton[0],canton:canton[0],province:info.provincia||'',district:'',logistics:logisticsFor(canton[0],cantons)};}
     return {type:'unknown',name:String(query).trim()};
   }
-  function destinationMatches(value,center){const a=key(value),b=key(center);if(!a||!b)return false;if(a===b||a.includes(b)||b.includes(a))return true;return Math.min(a.length,b.length)>=6&&levenshtein(a,b)<=1;}
+  const destinationAliases=new Map([
+    ['CIUDAD NEILLY','CIUDAD NEILY'],
+    ['SAN ISIDRO DE EL GENERAL','SAN ISIDRO DEL GENERAL'],
+    ['UPALA CENTRO','UPALA']
+  ]);
+  function canonicalDestination(value){const normalized=key(value);return destinationAliases.get(normalized)||normalized;}
+  function destinationMatches(value,center){const a=canonicalDestination(value),b=canonicalDestination(center);return !!a&&a===b;}
   function searchNearby(rows,centers){const useful=[...new Set((centers||[]).map(key).filter(Boolean))];return rows.filter(t=>t.destinos.some(d=>useful.some(c=>destinationMatches(d,c))));}
   function lexicalDestinations(rows,query,limit=5){const q=key(query),unique=new Map();if(!q)return [];rows.flatMap(t=>t.destinos).forEach(value=>{const k=key(value);if(k&&!unique.has(k))unique.set(k,value);});return [...unique.values()].map(value=>({value,score:levenshtein(value,q)})).sort((a,b)=>a.score-b.score||String(a.value).localeCompare(String(b.value),'es')).slice(0,limit).map(item=>item.value);}
   function markers(rows){return rows.flatMap(t=>t.bodegas.filter(validGPS).map(b=>({carrierId:t.id,nombre:t.nombre,bodega:b})));}
@@ -63,5 +70,5 @@
   }
   function costaRicaClock(date=new Date()){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Costa_Rica',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(date);const get=t=>parts.find(p=>p.type===t)?.value||'';const days={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};return {day:days[get('weekday')],minutes:Number(get('hour'))*60+Number(get('minute'))};}
   function scheduleStatus(t,date){const c=costaRicaClock(date);return scheduleStatusAt(t,c.day,c.minutes);}
-  return {key,validGPS,distance,validate,search,levenshtein,resolvePlace,searchNearby,lexicalDestinations,markers,operatorCount,initials,displayName,phoneType,hasWhatsApp,warehouseOrder,nearestDistance,sortByNearest,scheduleSlots,scheduleStatusAt,scheduleStatus,costaRicaClock,timeLabel};
+  return {key,validGPS,distance,validate,search,levenshtein,canonicalDestination,destinationMatches,resolvePlace,searchNearby,lexicalDestinations,markers,operatorCount,initials,displayName,phoneType,hasWhatsApp,warehouseOrder,nearestDistance,sortByNearest,scheduleSlots,scheduleStatusAt,scheduleStatus,costaRicaClock,timeLabel};
 });
