@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "generatedAt": "2026-09-13T01:10:54.598Z",
-  "contentHash": "d98563c7d17b234e5e7a7d2968d26f6cbba337df3343345bf283fb0c51d6294f",
+  "contentHash": "171736f3b02c9f08a5152f3266c911dc72178ba80a2582451d138313068bf8b0",
   "transportistas": [
     {
       "id": "0de57703",
@@ -142,7 +142,7 @@
         {
           "id": "911a64f4",
           "direccion": "BODEGA ANAY",
-          "zona": "TIBÁS",
+          "zona": "URUCA",
           "lat": 9.955199,
           "lng": -84.105963
         }
@@ -236,10 +236,6 @@
         {
           "numero": "50688251303",
           "contacto": "GUSTAVO ROSALES VARGAS"
-        },
-        {
-          "numero": "50689927283",
-          "contacto": ""
         }
       ],
       "destinos": [
@@ -2117,13 +2113,6 @@
       "horario": "NO ESPECIFICADO EN LA IMAGEN",
       "imagen": "",
       "bodegas": [
-        {
-          "id": "DIR-0075",
-          "direccion": "NO ESPECIFICADA EN LA IMAGEN (TELÉFONO DE OFICINA COMPARTIDA: 2235-4733)",
-          "zona": "TIBÁS",
-          "lat": 9.951434,
-          "lng": -84.089139
-        },
         {
           "id": "DIR-TC-002",
           "direccion": "BODEGAS TRANSCAMA, COLIMA DE TÍBAS, 100 MTS ESTE DEL PLANTEL DEL I.C.E.",
