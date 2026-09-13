@@ -20,7 +20,7 @@
   function markers(rows){return rows.flatMap(t=>t.bodegas.filter(validGPS).map(b=>({carrierId:t.id,nombre:t.nombre,bodega:b})));}
   function operatorCount(items){return new Set(items.map(m=>m.carrierId)).size;}
   function initials(name){const ignored=new Set(['DE','DEL','LA','LAS','LOS','Y']);const words=String(name||'').trim().split(/\s+/).filter(w=>w&&!ignored.has(key(w)));return (words.slice(0,2).map(w=>[...w][0]).join('')||'CR').toUpperCase();}
-  function displayName(value){return String(value||'').toLocaleLowerCase('es-CR').replace(/(^|[\s/(-])([a-záéíóúñ])/g,(m,a,b)=>a+b.toLocaleUpperCase('es-CR'));}
+  function displayName(value){const title=String(value||'').toLocaleLowerCase('es-CR').replace(/(^|[\s/(-])([a-záéíóúñ])/g,(m,a,b)=>a+b.toLocaleUpperCase('es-CR'));return title.replace(/\b(De|Del|La|Las|Los|Y|En|El|Al)\b/g,(word,_,offset)=>offset===0?word:word.toLocaleLowerCase('es-CR'));}
   function warehouseOrder(t,position){return t.bodegas.map((b,index)=>({b,index,km:position&&validGPS(b)?distance(position,b):Infinity})).sort((a,b)=>a.km-b.km||a.index-b.index);}
   function nearestDistance(t,position){return warehouseOrder(t,position)[0]?.km??Infinity;}
   function sortByNearest(rows,position){return rows.map((t,index)=>({t,index,km:nearestDistance(t,position)})).sort((a,b)=>a.km-b.km||a.index-b.index).map(x=>x.t);}
