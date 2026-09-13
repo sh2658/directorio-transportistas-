@@ -3,7 +3,7 @@
   'use strict';
   const C=window.RutasCore,$=id=>document.getElementById(id);
   let data=[],results=[],visible=0,position=null,map=null,cluster=null,userMarker=null,loadingMap=null;
-  let mode='destino',busy=false,mapActive=false,hasSearch=false;
+  let mode='destino',busy=false,mapActive=false,hasSearch=false,territory=null,territoryPromise=null,searchSequence=0;
   const PAGE=15,query=$('consulta'),iconPath=name=>'./assets/icons/'+name+'.svg';
   function el(tag,text,cls){const node=document.createElement(tag);if(text!=null)node.textContent=text;if(cls)node.className=cls;return node;}
   function icon(name,alt=''){const img=el('img');img.src=iconPath(name);img.alt=alt;img.width=20;img.height=20;img.className='icono';return img;}
@@ -26,13 +26,37 @@
     finally{clearTimeout(timer);busy=false;}
   }
   function suggestions(){const vals=mode==='destino'?data.flatMap(t=>t.destinos):data.map(t=>t.nombre);const unique=new Map();vals.forEach(v=>{if(!unique.has(C.key(v)))unique.set(C.key(v),v);});const frag=document.createDocumentFragment();[...unique.values()].sort((a,b)=>a.localeCompare(b,'es')).forEach(v=>{const o=el('option');o.value=v;frag.append(o);});$('sugerencias').replaceChildren(frag);}
-  function search(focus=true){
+  async function loadTerritory(){
+    if(territory)return territory;if(territoryPromise)return territoryPromise;
+    territoryPromise=Promise.all(['localidades_dta_cr.json','cantones_logistica_cr.json','homonimos_dta_cr.json'].map(async file=>{const response=await fetch(new URL('./assets/'+file,document.baseURI),{cache:'force-cache',credentials:'omit'});if(!response.ok)throw Error(file+' HTTP '+response.status);const value=await response.json();if(!value||Array.isArray(value)||typeof value!=='object')throw Error(file+' inválido');return value;})).then(([localities,cantons,homonyms])=>(territory={localities,cantons,homonyms})).catch(error=>{territoryPromise=null;throw error;});
+    return territoryPromise;
+  }
+  function ordered(rows){const copy=[...rows];return position?C.sortByNearest(copy,position):copy.sort((a,b)=>a.nombre.localeCompare(b.nombre,'es'));}
+  function renderRows(rows,title,summary,focus=true,prefix=null){results=ordered(rows);visible=0;$('tarjetas').replaceChildren();if(prefix)$('tarjetas').append(prefix);$('tituloResultados').textContent=title;$('resumenResultados').textContent=summary+(position&&results.length?' · Ordenados por la bodega más cercana':'');more();renderMap();if(focus)$('tituloResultados').focus();}
+  function centersList(centers){const list=el('div',null,'territorial-centros');centers.forEach(center=>list.append(el('span',C.displayName(center),'chip')));return list;}
+  function territorialNotice(title,message,centers=[]){const box=el('aside',null,'territorial-aviso');box.append(el('strong',title,'territorial-titulo'),el('p',message));if(centers.length)box.append(centersList(centers));return box;}
+  function renderNearby(original,place,focus=true){const centers=place.logistics||[],matches=C.searchNearby(data,centers),where=place.canton+(place.province?' · '+place.province:'');const detail=place.district&&C.key(place.district)!==C.key(place.canton)?' (distrito '+C.displayName(place.district)+')':'';const box=territorialNotice('Sugerencia territorial para '+C.displayName(original),C.displayName(original)+' pertenece a '+C.displayName(place.canton)+detail+', '+C.displayName(place.province)+'. Se muestran transportistas que atienden estos centros logísticos cercanos. Confirme con la empresa si entrega en el punto exacto.',centers);renderRows(matches,matches.length?'Opciones cercanas a '+C.displayName(original):'Sin rutas cercanas registradas',matches.length+' transportista'+(matches.length===1?'':'s')+' relacionado'+(matches.length===1?'':'s')+' con '+where,focus,box);}
+  function renderAmbiguous(original,resolution,focus){
+    results=[];visible=0;renderMap();$('tituloResultados').textContent='Necesitamos precisar el lugar';$('resumenResultados').textContent='Hay '+resolution.locations.length+' lugares llamados «'+original+'» en Costa Rica.';$('mas').hidden=true;
+    const box=territorialNotice('Este nombre tiene homónimos','Elija el cantón y la provincia correctos antes de mostrar rutas. Así evitamos recomendar transportistas de otro lugar.'),options=el('div',null,'territorial-opciones');
+    resolution.locations.forEach(place=>{const button=el('button','Ver rutas cerca de '+C.displayName(place.canton)+' · '+C.displayName(place.province),'territorial-opcion');button.type='button';button.addEventListener('click',()=>renderNearby(original,place));options.append(button);});box.append(options);$('tarjetas').replaceChildren(box);if(focus)$('tituloResultados').focus();
+  }
+  function renderLexical(original,focus){const choices=C.lexicalDestinations(data,original),box=territorialNotice('No encontramos ese lugar en la referencia territorial',choices.length?'Puede intentar con uno de estos destinos registrados:':'Revise la escritura o pruebe con el cantón más cercano.');if(choices.length){const options=el('div',null,'territorial-opciones');choices.forEach(value=>{const button=el('button',C.displayName(value),'territorial-opcion');button.type='button';button.addEventListener('click',()=>{query.value=value;search();});options.append(button);});box.append(options);}renderRows([],'Sin coincidencias','0 resultados para «'+original+'»',focus,box);}
+  async function search(focus=true){
+    const sequence=++searchSequence;
     $('limpiar').hidden=!query.value;hasSearch=!!query.value.trim();
     if(!hasSearch){results=[];visible=0;$('tarjetas').replaceChildren();$('tituloResultados').textContent='Busque un destino o transportista';$('resumenResultados').textContent='';$('mas').hidden=true;renderMap();query.focus();return;}
-    const matches=C.search(data,mode,query.value);results=position?C.sortByNearest(matches,position):matches.sort((a,b)=>a.nombre.localeCompare(b.nombre,'es'));
-    $('tituloResultados').textContent=results.length?'Transportistas disponibles':'Sin coincidencias';
-    $('resumenResultados').textContent=results.length+' resultado'+(results.length===1?'':'s')+' para «'+query.value.trim()+'»'+(position?' · Ordenados por la bodega más cercana':'');
-    visible=0;$('tarjetas').replaceChildren();more();renderMap();if(focus)$('tituloResultados').focus();
+    const original=query.value.trim(),matches=C.search(data,mode,original);
+    if(mode!=='destino'){renderRows(matches,matches.length?'Transportistas disponibles':'Sin coincidencias',matches.length+' resultado'+(matches.length===1?'':'s')+' para «'+original+'»',focus);return;}
+    $('buscar').disabled=true;$('resultados').setAttribute('aria-busy','true');$('tituloResultados').textContent='Consultando referencia territorial…';
+    try{
+      const ref=await loadTerritory();if(sequence!==searchSequence)return;const resolution=C.resolvePlace(original,ref.localities,ref.homonyms,ref.cantons);
+      if(resolution.type==='ambiguous'){renderAmbiguous(original,resolution,focus);return;}
+      if(matches.length){renderRows(matches,'Transportistas disponibles',matches.length+' resultado'+(matches.length===1?'':'s')+' para «'+original+'»',focus);return;}
+      if((resolution.type==='locality'||resolution.type==='canton')&&resolution.logistics.length){renderNearby(original,resolution,focus);return;}
+      renderLexical(original,focus);
+    }catch(error){if(sequence!==searchSequence)return;console.warn('Referencia territorial:',error.message);renderRows(matches,matches.length?'Transportistas disponibles':'Sin coincidencias',matches.length+' resultado'+(matches.length===1?'':'s')+' para «'+original+'»',focus,matches.length?null:territorialNotice('Referencia territorial temporalmente no disponible','Puede buscar un destino registrado mientras se recupera la guía de localidades.'));}
+    finally{if(sequence===searchSequence){$('buscar').disabled=false;$('resultados').removeAttribute('aria-busy');}}
   }
   function avatar(t){
     const wrap=el('div',null,'avatar'),src=safeImage(t.imagen);
