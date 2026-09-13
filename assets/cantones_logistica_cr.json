@@ -6,9 +6,9 @@
     "centrosCercanos": [
       "GOLFITO",
       "RÍO CLARO",
-      "CIUDAD NEILLY",
+      "CIUDAD NEILY",
       "PASO CANOAS",
-      "PALMAR NORTE"
+      "LA FRONTERA"
     ]
   },
   "Corredores": {
@@ -16,7 +16,7 @@
     "provincia": "Puntarenas",
     "zona": "ZONA SUR",
     "centrosCercanos": [
-      "CIUDAD NEILLY",
+      "CIUDAD NEILY",
       "PASO CANOAS",
       "RÍO CLARO",
       "LAUREL",
