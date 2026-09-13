@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-11T12:04:40.361Z",
-  "contentHash": "660a38c7ab91d253a5b4130fec6838014af0807ff60220d514b7509f643df59a",
+  "generatedAt": "2026-09-13T01:10:54.598Z",
+  "contentHash": "d98563c7d17b234e5e7a7d2968d26f6cbba337df3343345bf283fb0c51d6294f",
   "transportistas": [
     {
       "id": "0de57703",
@@ -13,8 +13,8 @@
           "id": "fbf0497d",
           "direccion": "BARRIO MEXICO PULLMITAN DE LIBERIA",
           "zona": "BARRIO MÉXICO",
-          "lat": 9.938711,
-          "lng": -84.08864
+          "lat": 9.938922,
+          "lng": -84.088901
         }
       ],
       "telefonos": [
@@ -70,13 +70,6 @@
       "imagen": "",
       "bodegas": [
         {
-          "id": "e8d8dd23",
-          "direccion": "",
-          "zona": "CALLE BLANCOS",
-          "lat": 9.948534,
-          "lng": -84.064575
-        },
-        {
           "id": "ef21f971",
           "direccion": "DIRECCIÓN A 200 MTS. ESTE DE LA PLAZA DE DEPORTES, LOCAL N 4, CALLE BLANCOS, GOICOECHEA, SAN JOSÉ, COSTA RICA",
           "zona": "CALLE BLANCOS",
@@ -120,8 +113,8 @@
           "id": "712d4e66",
           "direccion": "SAN JOSE, BARRIO MÉXICO 350 MTS NORTE DE LA TORRE MERCEDES, COSTADO SUR DE LOS BUSES DE PULMITAN LIBERIA SAN JOSÉTRANSPORTES CORDERO, BARRIO MEXICO",
           "zona": "BARRIO MÉXICO",
-          "lat": 9.955206,
-          "lng": -84.105925
+          "lat": 9.938922,
+          "lng": -84.088901
         }
       ],
       "telefonos": [
@@ -148,10 +141,10 @@
       "bodegas": [
         {
           "id": "911a64f4",
-          "direccion": "BODEGA TRANSCAMA TIBAS",
+          "direccion": "BODEGA ANAY",
           "zona": "TIBÁS",
-          "lat": 9.955937,
-          "lng": -84.108832
+          "lat": 9.955199,
+          "lng": -84.105963
         }
       ],
       "telefonos": [
@@ -204,7 +197,29 @@
       "nombre": "CARGAS Y ENCOMIENDAS PACIFICO EXPRESS",
       "horario": "08:00-17:00",
       "imagen": "",
-      "bodegas": [],
+      "bodegas": [
+        {
+          "id": "d496c99a",
+          "direccion": "BODEGA VARGAS",
+          "zona": "PAVAS",
+          "lat": 9.944257,
+          "lng": -84.138206
+        },
+        {
+          "id": "e1af2f37",
+          "direccion": "BODEGA TRANSCAMA",
+          "zona": "TIBÁS",
+          "lat": 9.951587,
+          "lng": -84.089046
+        },
+        {
+          "id": "e4c973bc",
+          "direccion": "BODEGA CORDERO",
+          "zona": "BARRIO MÉXICO",
+          "lat": 9.938922,
+          "lng": -84.088901
+        }
+      ],
       "telefonos": [
         {
           "numero": "50622211628",
@@ -221,6 +236,10 @@
         {
           "numero": "50688251303",
           "contacto": "GUSTAVO ROSALES VARGAS"
+        },
+        {
+          "numero": "50689927283",
+          "contacto": ""
         }
       ],
       "destinos": [
@@ -284,10 +303,10 @@
       "bodegas": [
         {
           "id": "9c82fb7c",
-          "direccion": "200 SUR DE METALCO, SAN JOSÉ, SAN JUAN DE TIBAS",
+          "direccion": "200 SUR DE LA METALCO, SAN JOSE, SAN JUAN DE TIBAS",
           "zona": "TIBÁS",
-          "lat": 9.952884,
-          "lng": -84.087484
+          "lat": 9.952497,
+          "lng": -84.087623
         }
       ],
       "telefonos": [
@@ -333,8 +352,8 @@
           "id": "df3df0b1",
           "direccion": "BARRIO MEXICO CONTIGUO A ENCOMIENDAS TEMPISQUE",
           "zona": "BARRIO MÉXICO",
-          "lat": 9.940526,
-          "lng": -84.083758
+          "lat": 9.940501,
+          "lng": -84.083727
         }
       ],
       "telefonos": [
@@ -539,7 +558,15 @@
       "nombre": "TRANSPORTES MAU JIMENEZ",
       "horario": "08:00- 17:00 JORNADA CONTINUA",
       "imagen": "",
-      "bodegas": [],
+      "bodegas": [
+        {
+          "id": "586fc606",
+          "direccion": "50 AL ESTE DE CORPORACION CEK TIBAS",
+          "zona": "TIBÁS",
+          "lat": 9.950492,
+          "lng": -84.08405
+        }
+      ],
       "telefonos": [
         {
           "numero": "50622394087",
@@ -575,10 +602,10 @@
       "bodegas": [
         {
           "id": "0eb8d377",
-          "direccion": "COMPLEJO DE BODEGAS TRANSCAMA EN COLIMA DE TIBAS, 100 MTS ESTE DEL PLANTEL DEL ICE.",
+          "direccion": "BODEGAS TRANSCAMA, COLIMA DE TÍBAS, 100 MTS ESTE DEL PLANTEL DEL I.C.E.",
           "zona": "TIBÁS",
-          "lat": 9.951587,
-          "lng": -84.089046
+          "lat": null,
+          "lng": null
         }
       ],
       "telefonos": [
@@ -609,8 +636,8 @@
           "id": "b78f198f",
           "direccion": "SAN JOSE, BARRIO MÉXICO 350 MTS NORTE DE LA TORRE MERCEDES, COSTADO SUR DE LOS BUSES DE PULMITAN LIBERIA SAN JOSÉTRANSPORTES CORDERO, BARRIO MEXICO",
           "zona": "BARRIO MÉXICO",
-          "lat": 9.938711,
-          "lng": -84.08864
+          "lat": 9.938922,
+          "lng": -84.088901
         }
       ],
       "telefonos": [
@@ -659,8 +686,8 @@
           "id": "b1ecef3f",
           "direccion": "200 SUR DE LA METALCO, SAN JOSE, SAN JUAN DE TIBAS",
           "zona": "TIBÁS",
-          "lat": 9.952607,
-          "lng": -84.087706
+          "lat": 9.952497,
+          "lng": -84.087623
         }
       ],
       "telefonos": [
@@ -694,40 +721,6 @@
       ]
     },
     {
-      "id": "69833490",
-      "nombre": "DAMAKA",
-      "horario": "L-V 08:00 12:00 13:00 17:00",
-      "imagen": "",
-      "bodegas": [
-        {
-          "id": "DIR-TC-003",
-          "direccion": "BODEGAS TRANSCAMA, COLIMA DE TÍBAS, 100 MTS ESTE DEL PLANTEL DEL I.C.E.",
-          "zona": "TIBÁS",
-          "lat": 9.951587,
-          "lng": -84.089046
-        }
-      ],
-      "telefonos": [
-        {
-          "numero": "50687160954",
-          "contacto": "BODEGA TIBAS"
-        },
-        {
-          "numero": "50689882357",
-          "contacto": "BODEGA TIBAS"
-        }
-      ],
-      "destinos": [
-        "GRECIA",
-        "LA GARITA",
-        "NARANJO",
-        "PALMARES",
-        "SAN RAMÓN",
-        "SARCHI",
-        "TURRUCARES"
-      ]
-    },
-    {
       "id": "6bde4f14",
       "nombre": "TRANSPORTES SANCARLEÑOS",
       "horario": "L-V 08:00 12:00 13:00 17:00",
@@ -735,7 +728,7 @@
       "bodegas": [
         {
           "id": "897befe1",
-          "direccion": "BODEGA TIBAS EN TRANSCAMA",
+          "direccion": "BODEGAS TRANSCAMA, COLIMA DE TÍBAS, 100 MTS ESTE DEL PLANTEL DEL I.C.E.",
           "zona": "TIBÁS",
           "lat": 9.951587,
           "lng": -84.089046
@@ -794,11 +787,37 @@
       "nombre": "CURUBANDE EXPRESS",
       "horario": "L-V 08:00 12:00 13:00 17:00 S 08:00 12:00",
       "imagen": "",
-      "bodegas": [],
+      "bodegas": [
+        {
+          "id": "1e2465fd",
+          "direccion": "GRECIA, 800 OESTE DEL MAS X MENOS PREDIO CAMIONES ASTRO",
+          "zona": "GRECIA",
+          "lat": 10.059466,
+          "lng": -84.333006
+        },
+        {
+          "id": "8150b873",
+          "direccion": "LA URUCA, 175 AL ESTE DE LA ENTRADA PRINCIPAL DE MIGRACIÓN, DIAGONAL A TANGO INDIA",
+          "zona": "URUCA",
+          "lat": 9.956153,
+          "lng": -84.112895
+        },
+        {
+          "id": "bcfb9c77",
+          "direccion": "LIBERIA, BARRIO EL CAPULIN, DE WALMART 150 NORTE Y 200 ESTE",
+          "zona": "LIBERIA",
+          "lat": 10.628234,
+          "lng": -85.446688
+        }
+      ],
       "telefonos": [
         {
           "numero": "50622915712",
           "contacto": "URUCA"
+        },
+        {
+          "numero": "50622915736",
+          "contacto": "CENTRAL TELEFONICA"
         },
         {
           "numero": "50626650323",
@@ -861,6 +880,41 @@
       ]
     },
     {
+      "id": "81c6c80d",
+      "nombre": "TRANS-BRUNCA",
+      "horario": "",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "ca656da4",
+          "direccion": "BODEGA CORDERO",
+          "zona": "BARRIO MÉXICO",
+          "lat": 9.938922,
+          "lng": -84.088901
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50622965913",
+          "contacto": "SAN JOSE"
+        },
+        {
+          "numero": "50627710505",
+          "contacto": "PEREZ ZELEDON"
+        },
+        {
+          "numero": "50688594945",
+          "contacto": "RONNY VALVERDE S."
+        }
+      ],
+      "destinos": [
+        "BUENOS AIRES",
+        "CIUDAD CORTES",
+        "PALMAR NORTE",
+        "UVITA"
+      ]
+    },
+    {
       "id": "88a21f93",
       "nombre": "TRANSPORTES VEGA DEL NORTE",
       "horario": "L-V 08:00 12:00 13:00 17:00",
@@ -868,10 +922,10 @@
       "bodegas": [
         {
           "id": "e0377493",
-          "direccion": "COLIMA TIBAS, BODEGA BARQUERO",
+          "direccion": "50 AL ESTE DE CORPORACION CEK TIBAS",
           "zona": "TIBÁS",
-          "lat": 9.955937,
-          "lng": -84.108832
+          "lat": 9.950492,
+          "lng": -84.08405
         }
       ],
       "telefonos": [
@@ -912,10 +966,10 @@
       "bodegas": [
         {
           "id": "c64fe810",
-          "direccion": "BODEGA BARQUERO, COLIMA TIBAS",
+          "direccion": "50 AL ESTE DE CORPORACION CEK TIBAS",
           "zona": "TIBÁS",
-          "lat": 9.95048,
-          "lng": -84.084016
+          "lat": 9.950492,
+          "lng": -84.08405
         }
       ],
       "telefonos": [
@@ -946,8 +1000,8 @@
           "id": "6d9b5503",
           "direccion": "BARRIO MEXICO",
           "zona": "BARRIO MÉXICO",
-          "lat": 9.939576,
-          "lng": -84.085291
+          "lat": 9.938922,
+          "lng": -84.088901
         }
       ],
       "telefonos": [
@@ -981,8 +1035,8 @@
           "id": "bb77bea3",
           "direccion": "CONTIGUO TRANSPORTES CORDERO",
           "zona": "BARRIO MÉXICO",
-          "lat": 9.938831,
-          "lng": -84.088598
+          "lat": 9.938922,
+          "lng": -84.088901
         }
       ],
       "telefonos": [
@@ -1022,9 +1076,9 @@
         {
           "id": "256de72d",
           "direccion": "400 SUR. 25 ESTE DEL P.A.N.I. BARRIO LUJÁN, SAN JOSÉ, COSTA RICA",
-          "zona": "SAN JOSE",
-          "lat": 9.938711,
-          "lng": -84.08864
+          "zona": "SAN JOSÉ",
+          "lat": 9.922859,
+          "lng": -84.069612
         }
       ],
       "telefonos": [
@@ -1059,7 +1113,7 @@
       "bodegas": [
         {
           "id": "9f583928",
-          "direccion": "TIBAS, TRANSCAMA",
+          "direccion": "BODEGAS TRANSCAMA, COLIMA DE TÍBAS, 100 MTS ESTE DEL PLANTEL DEL I.C.E.",
           "zona": "TIBÁS",
           "lat": 9.951587,
           "lng": -84.089046
@@ -1087,6 +1141,1137 @@
       ]
     },
     {
+      "id": "TRP-0036",
+      "nombre": "TRANSPORTES VILLALOBOS",
+      "horario": "NO ESPECIFICADO",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-0048",
+          "direccion": "BODEGA EL MACHO CALLE BLANCOS SAN JOSÉ",
+          "zona": "CALLE BLANCOS",
+          "lat": 9.946002,
+          "lng": -84.065916
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50686985733",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "AGUA BUENA",
+        "BUENOS AIRES",
+        "BUENOS AIRES CENTRO",
+        "CIUDAD NEILY",
+        "CONTE",
+        "CORREDORES",
+        "COTO BRUS",
+        "FILA TIGRE",
+        "FRONTERA LA UNIÓN",
+        "FRONTERA RÍO SERENO",
+        "GOLFITO",
+        "LA ADMINISTRACIÓN",
+        "LA VIRGEN",
+        "LAUREL",
+        "PASO REAL",
+        "PLAYA ZANCUDO",
+        "POTRERO GRANDE",
+        "RIO CLARO",
+        "SABALITO",
+        "SAN VITO"
+      ]
+    },
+    {
+      "id": "TRP-0037",
+      "nombre": "TRANSPORTES BARQUERO",
+      "horario": "",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-0049",
+          "direccion": "500 SUR PARROQUIA MARIA REINA DEL UNIVERSO",
+          "zona": "PAVAS",
+          "lat": 9.944259,
+          "lng": -84.138237
+        },
+        {
+          "id": "DIR-0052",
+          "direccion": "300M AL SUR DE LA PLAZA DE FÚTBOL EN CALLE BLANCOS",
+          "zona": "CALLE BLANCOS",
+          "lat": 9.946002,
+          "lng": -84.065916
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50660505052",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "AGUAS ZARCAS",
+        "ALTO MONTERREY",
+        "BAJO RODRÍGUEZ",
+        "CERRO CORTÉZ",
+        "CHACHAGUA",
+        "CIUDAD QUESADA",
+        "EL TANQUE LA FORTUNA",
+        "FLORENCIA",
+        "FORTUNA",
+        "LA CRUZ",
+        "LA MARINA",
+        "LA PALMERA",
+        "LA TIGRA",
+        "LOS ANGELES DE FORTUNA",
+        "LOS CHILES DE AGUAS ZARCAS",
+        "MONTERREY",
+        "MUELLE",
+        "PEÑAS BLANCAS",
+        "PITAL",
+        "SAN FRANCISCO LA PALMERA",
+        "SAN JOSÉ",
+        "SANTA CLARA",
+        "SANTA ROSA DE POCOSOL",
+        "SANTA ROSA LA PALMERA",
+        "VALLE AZUL",
+        "VENECIA",
+        "ZARCERO"
+      ]
+    },
+    {
+      "id": "TRP-0038",
+      "nombre": "TRANSPORTES 2021",
+      "horario": "SERVICIO DIARIO",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-0053",
+          "direccion": "BODEGA CORDERO Y BODEGA EL MACHO",
+          "zona": "CALLE BLANCOS",
+          "lat": 9.946082,
+          "lng": -84.066216
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50622211628",
+          "contacto": ""
+        },
+        {
+          "numero": "50684960402",
+          "contacto": ""
+        },
+        {
+          "numero": "50685241293",
+          "contacto": ""
+        },
+        {
+          "numero": "50686404654",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "ESTERILLOS",
+        "HERRADURA",
+        "JACO",
+        "MANUEL ANTONIO",
+        "NARANJITO",
+        "PARRITA",
+        "QUEBRADA GANADO",
+        "QUEPOS",
+        "TARCOLES"
+      ]
+    },
+    {
+      "id": "TRP-0039",
+      "nombre": "TRANSPORTES MYM EXPRESS",
+      "horario": "L-V 8:00- 17:00",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-0054",
+          "direccion": "BODEGA CORDERO",
+          "zona": "BARRIO MÉXICO",
+          "lat": 9.938922,
+          "lng": -84.088901
+        },
+        {
+          "id": "DIR-0055",
+          "direccion": "BODEGA ANAY",
+          "zona": "URUCA",
+          "lat": 9.955199,
+          "lng": -84.105963
+        },
+        {
+          "id": "DIR-0056",
+          "direccion": "BODEGA EL MACHO",
+          "zona": "CALLE BLANCOS",
+          "lat": 9.946002,
+          "lng": -84.065916
+        },
+        {
+          "id": "DIR-0057",
+          "direccion": "BODEGA VARGAS",
+          "zona": "PAVAS",
+          "lat": 9.944257,
+          "lng": -84.138206
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50661843945",
+          "contacto": ""
+        },
+        {
+          "numero": "50662862865",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "27 DE ABRIL",
+        "BARCO QUEBRADO",
+        "BELÉN",
+        "CAIMITAL",
+        "CURIME",
+        "DULCE NOMBRE",
+        "ESTRADA",
+        "GUANACASTE",
+        "LA ESPERANZA",
+        "LAGUNILLA",
+        "MAQUENCO",
+        "MARBELLA",
+        "NICOYA",
+        "NOSARA",
+        "OSTIONAL",
+        "PARAISO STA. CRUZ",
+        "PLAYA AZUL",
+        "PLAYA GARZA",
+        "PLAYA GUIONES",
+        "PLAYA LAGARTO",
+        "PLAYA PELADA",
+        "PTO. CARRILLO",
+        "RIO MONTAÑA",
+        "SAN JOSÉ",
+        "SAN JUANILLO",
+        "SÁMARA",
+        "TERCIOPELO",
+        "VENADO"
+      ]
+    },
+    {
+      "id": "TRP-0040",
+      "nombre": "TRANSPORTES CORCOVADO",
+      "horario": "L-V 07:00 A.M. 05:00 P.M.",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "7e7c3d83",
+          "direccion": "BODEGA EL MACHO",
+          "zona": "CALLE BLANCOS",
+          "lat": 9.946082,
+          "lng": -84.066216
+        },
+        {
+          "id": "a9b5e0cc",
+          "direccion": "BODEGA VARGAS",
+          "zona": "PAVAS",
+          "lat": 9.944257,
+          "lng": -84.138206
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50683084202",
+          "contacto": ""
+        },
+        {
+          "numero": "50689777111",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "PUERTO JIMÉNEZ",
+        "SAN JOSÉ"
+      ]
+    },
+    {
+      "id": "TRP-0045",
+      "nombre": "ENCOMIENDAS CASTILLO",
+      "horario": "",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-5D37C439",
+          "direccion": "50 AL ESTE DE CORPORACION CEK TIBAS",
+          "zona": "TIBÁS",
+          "lat": 9.950492,
+          "lng": -84.08405
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50622351893",
+          "contacto": ""
+        },
+        {
+          "numero": "50688672222",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "CARIARI",
+        "GUACIMO",
+        "GUAPILES",
+        "JIMENEZ",
+        "POCORA",
+        "SAN JOSÉ",
+        "SIQUIRRES"
+      ]
+    },
+    {
+      "id": "TRP-0046",
+      "nombre": "BODEGA GOLFO EXPRESS",
+      "horario": "LUNES A VIERNES DE 8 AM A 5 PM",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-0070",
+          "direccion": "Barrio México, contiguo a Partes de Chasis, frente a antigua Bótica Solera",
+          "zona": "BARRIO MÉXICO",
+          "lat": 9.94026,
+          "lng": -84.082896
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50622210338",
+          "contacto": ""
+        },
+        {
+          "numero": "50683210966",
+          "contacto": ""
+        },
+        {
+          "numero": "50683403547",
+          "contacto": ""
+        },
+        {
+          "numero": "50683759370",
+          "contacto": ""
+        },
+        {
+          "numero": "50687377373",
+          "contacto": ""
+        },
+        {
+          "numero": "50688149106",
+          "contacto": ""
+        },
+        {
+          "numero": "50689309711",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "AGUA BUENA",
+        "AGUA CALIENTE",
+        "BIJAGUA",
+        "BIRRISITO",
+        "BUENOS AIRES",
+        "CABECERAS DE TILARAN",
+        "CABUYA",
+        "CANALETE",
+        "CAPELLADES",
+        "CARTAGO",
+        "CERVANTES",
+        "CHITARA",
+        "COBANO",
+        "COLONIA DE UPALA",
+        "GUACIMAL",
+        "JABILLOS",
+        "JUAN VILLAS",
+        "LA PITAYA",
+        "LA SUIZA",
+        "MAL PAÍS",
+        "MANZANILLO",
+        "MONTEVERDE",
+        "MONTEZUMA",
+        "OREAMUNO",
+        "OROSI",
+        "PACAYAS",
+        "PAQUERA",
+        "PARAÍSO",
+        "PAVONES",
+        "PEJIBAYE",
+        "POTRERO GRANDE",
+        "RIO NARANJO",
+        "SABALITO",
+        "SAN JOSE DE UPALA",
+        "SAN RAFAEL DE ABANGARES",
+        "SAN VITO",
+        "SANTA CRUZ",
+        "SANTA ELENA",
+        "SANTA TERESA",
+        "SARDINAL DE PUNTARENAS",
+        "TAMBOR",
+        "TEJAS",
+        "TIERRA BLANCA",
+        "TRES EQUIS",
+        "TUCURRIQUE",
+        "TUIS",
+        "TURRIALBA",
+        "Taras",
+        "UPALA CENTRO"
+      ]
+    },
+    {
+      "id": "TRP-0047",
+      "nombre": "ENCOMIENDAS GOLFO EXPRESS",
+      "horario": "HORARIO CONTINUO DE LUNES A VIERNES DE 8 AM A 5 PM",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-0073",
+          "direccion": "Barrio México, contiguo a Partes de Chasis, frente a antigua Bótica Solera",
+          "zona": "BARRIO MÉXICO",
+          "lat": 9.94026,
+          "lng": -84.082896
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50622210338",
+          "contacto": ""
+        },
+        {
+          "numero": "50671670849",
+          "contacto": "ALEX"
+        },
+        {
+          "numero": "50683210966",
+          "contacto": "ALEXANDER"
+        },
+        {
+          "numero": "50688086789",
+          "contacto": "ALEXANDER"
+        }
+      ],
+      "destinos": [
+        "CABUYA",
+        "COBANO",
+        "LUGARES ALEDAÑOS",
+        "MAL PAÍS",
+        "MANZANILLO",
+        "MONTEZUMA",
+        "PAQUERA",
+        "SANTA TERESA",
+        "TAMBOR"
+      ]
+    },
+    {
+      "id": "TRP-0048",
+      "nombre": "TRANSPORTE RODRIGUEZ SERRANO",
+      "horario": "HORARIO CONTINUO DE LUNES A VIERNES DE 8 AM A 5 PM",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-0076",
+          "direccion": "BARRIO MÉXICO, CONTIGUO A PARTES DE CHASIS, FRENTE A ANTIGUA BÓTICA SOLERA",
+          "zona": "BARRIO MÉXICO",
+          "lat": 9.94026,
+          "lng": -84.082896
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50622210338",
+          "contacto": ""
+        },
+        {
+          "numero": "50683759370",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "CABECERAS DE TILARAN",
+        "GUACIMAL",
+        "OTROS LUGARES",
+        "SAN RAFAEL DE ABANGARES",
+        "SANTA ELENA MONTEVERDE",
+        "SARDINAL DE PUNTARENAS"
+      ]
+    },
+    {
+      "id": "TRP-0050",
+      "nombre": "TRANS SACO",
+      "horario": "HORARIO CONTINUO DE LUNES A VIERNES DE 8 AM A 5 PM",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-0082",
+          "direccion": "Barrio México, contiguo a Partes de Chasis, frente a antigua Bótica Solera",
+          "zona": "BARRIO MÉXICO",
+          "lat": 9.94026,
+          "lng": -84.082896
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50622210338",
+          "contacto": ""
+        },
+        {
+          "numero": "50688149106",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "AGUA BUENA",
+        "BUENOS AIRES",
+        "OTROS LUGARES",
+        "POTRERO GRANDE",
+        "SABALITO",
+        "SAN VITO"
+      ]
+    },
+    {
+      "id": "TRP-0051",
+      "nombre": "TRANSPORTES UPALA EXPRESS",
+      "horario": "HORARIO CONTINUO DE LUNES A VIERNES DE 8 AM A 5 PM",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-0085",
+          "direccion": "Barrio México, contiguo a Partes de Chasis, frente a antigua Bótica Solera",
+          "zona": "BARRIO MÉXICO",
+          "lat": 9.94026,
+          "lng": -84.082896
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50622210338",
+          "contacto": ""
+        },
+        {
+          "numero": "50687377373",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "ALREDEDORES",
+        "BIJAGUA",
+        "CANALETE",
+        "COLONIA DE UPALA",
+        "RIO NARANJO",
+        "SAN JOSE DE UPALA",
+        "UPALA CENTRO"
+      ]
+    },
+    {
+      "id": "TRP-0052",
+      "nombre": "ENCOMIENDAS Y MUDANZAS CENTENO JUNIOR",
+      "horario": "HORARIO CONTINUO DE LUNES A VIERNES DE 8 AM A 5 PM",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "94215768",
+          "direccion": "BODEGA VARGAS PAVAS",
+          "zona": "PAVAS",
+          "lat": 9.944257,
+          "lng": -84.138206
+        },
+        {
+          "id": "DIR-0088",
+          "direccion": "Barrio México, contiguo a Partes de Chasis, frente a antigua Bótica Solera",
+          "zona": "BARRIO MÉXICO",
+          "lat": 9.94026,
+          "lng": -84.082896
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50622210338",
+          "contacto": ""
+        },
+        {
+          "numero": "50683403547",
+          "contacto": ""
+        },
+        {
+          "numero": "50689309711",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "AGUA CALIENTE",
+        "BIRRISITO",
+        "CAPELLADES",
+        "CARTAGO",
+        "CERVANTES",
+        "CHITARA",
+        "JABILLOS",
+        "JUAN VILLAS",
+        "LA PITAYA",
+        "LA SUIZA",
+        "LUGARES ALEDAÑOS",
+        "LUGARES CERCANOS",
+        "OREAMUNO",
+        "OROSI",
+        "PACAYAS",
+        "PARAÍSO",
+        "PAVONES",
+        "PEJIBAYE",
+        "SANTA CRUZ",
+        "TEJAS",
+        "TIERRA BLANCA",
+        "TRES EQUIS",
+        "TUCURRIQUE",
+        "TUIS",
+        "TURRIALBA",
+        "Taras"
+      ]
+    },
+    {
+      "id": "TRP-0053",
+      "nombre": "ENCOMIENDAS DAMAKA",
+      "horario": "NO ESPECIFICADO",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-0089",
+          "direccion": "BODEGAS TRANSCAMA, COLIMA DE TÍBAS, 100 MTS ESTE DEL PLANTEL DEL I.C.E.",
+          "zona": "TIBÁS",
+          "lat": 9.951587,
+          "lng": -84.089046
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50671590772",
+          "contacto": ""
+        },
+        {
+          "numero": "50687160954",
+          "contacto": ""
+        },
+        {
+          "numero": "50689882357",
+          "contacto": "BODEGA TIBAS"
+        }
+      ],
+      "destinos": [
+        "ATENAS",
+        "GRECIA",
+        "LA GARITA",
+        "NARANJO",
+        "PALMARES",
+        "SAN RAMÓN",
+        "SARCHI",
+        "TODO EL PAÍS",
+        "TURRUCARES"
+      ]
+    },
+    {
+      "id": "TRP-0054",
+      "nombre": "ENCOMIENDAS TRANSKAJA LA COSTA",
+      "horario": "SERVICIOS DE ENCOMIENDAS DIARIOS",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-TK-001",
+          "direccion": "BODEGAS TRANSCAMA, COLIMA DE TÍBAS, 100 MTS ESTE DEL PLANTEL DEL I.C.E.",
+          "zona": "TIBÁS",
+          "lat": 9.951587,
+          "lng": -84.089046
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50660290018",
+          "contacto": ""
+        },
+        {
+          "numero": "50688490088",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "27 DE ABRIL",
+        "BELEN DE CARRILLO",
+        "BRASILITO",
+        "CARTAGENA",
+        "EL LLANO",
+        "FILADELFIA",
+        "FLAMINGO",
+        "HOJANCHA",
+        "HUACAS",
+        "JICARAL",
+        "MANSIÓN DE NICOYA",
+        "MATAPALO",
+        "NANDAYURE",
+        "NICOYA",
+        "PLAYA POTRERO",
+        "PLAYAS DEL COCO",
+        "PORTE GOLPE",
+        "SANTA CRUZ",
+        "SARDINAL",
+        "TAMARINDO",
+        "VILLA REAL"
+      ]
+    },
+    {
+      "id": "TRP-0057",
+      "nombre": "TRANSPORTES SERRANO",
+      "horario": "NO ESPECIFICADO",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-0066",
+          "direccion": "200 SUR DE LA METALCO, SAN JOSE, SAN JUAN DE TIBAS",
+          "zona": "TIBÁS",
+          "lat": 9.952497,
+          "lng": -84.087623
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50662341509",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "AGUAS ZARCAS",
+        "CARRIZAL (ALAJUELA)",
+        "CHILAMATE",
+        "HORQUETAS",
+        "LA GUARÍA",
+        "LA VIRGEN (SARAPIQUÍ)",
+        "PITAL",
+        "PUERTO VIEJO (SARAPIQUÍ)",
+        "RÍO CUARTO",
+        "RÍO FRÍO",
+        "SAN JOSÉ",
+        "SAN MIGUEL",
+        "SAN RAFAEL",
+        "SANTA FÉ (AZ)",
+        "SANTA RITA",
+        "VARA BLANCA",
+        "VENECIA"
+      ]
+    },
+    {
+      "id": "TRP-0058",
+      "nombre": "TRANSPORTES BARUC CR",
+      "horario": "NO ESPECIFICADO",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-0067",
+          "direccion": "200 SUR DE LA METALCO, SAN JOSE, SAN JUAN DE TIBAS",
+          "zona": "TIBÁS",
+          "lat": 9.952497,
+          "lng": -84.087623
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50664307024",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "ALAJUELA",
+        "ATENAS",
+        "BARRANCA",
+        "CALDERA",
+        "EL ROBLE",
+        "ESPARZA",
+        "GRECIA",
+        "MIRAMAR",
+        "NARANJO",
+        "OROTINA",
+        "PALMARES",
+        "POÁS",
+        "PUNTARENAS",
+        "SAN MATEO",
+        "SAN RAMÓN",
+        "SARCHI",
+        "TURRUCARES"
+      ]
+    },
+    {
+      "id": "TRP-0059",
+      "nombre": "VARMA TRANSPORTE Y ENCOMIENDAS",
+      "horario": "SERVICIO DIARIO",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "254aa800",
+          "direccion": "BODEGA ANAY",
+          "zona": "URUCA",
+          "lat": 9.955199,
+          "lng": -84.105963
+        }
+      ],
+      "telefonos": [],
+      "destinos": [
+        "CORONADO",
+        "DOMINICAL",
+        "OJOCHAL",
+        "PÉREZ ZELEDÓN",
+        "UVITA"
+      ]
+    },
+    {
+      "id": "TRP-3C53E761",
+      "nombre": "ENCOMIENDAS TAVO",
+      "horario": "",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "e32dabcf",
+          "direccion": "",
+          "zona": "CALLE BLANCOS",
+          "lat": 9.944712,
+          "lng": -84.075117
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50622212200",
+          "contacto": ""
+        },
+        {
+          "numero": "50622560105",
+          "contacto": ""
+        },
+        {
+          "numero": "50684588383",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "CARIARI",
+        "CRUCE DE GUÁPILES",
+        "CRUCE DE RÍO FRÍO",
+        "GUACIMO",
+        "GUAPILES",
+        "LA CRUZ",
+        "LIMON",
+        "PEÑAS BLANCAS",
+        "PUERTO VIEJO",
+        "RÍO FRÍO",
+        "SIQUIRRES"
+      ]
+    },
+    {
+      "id": "TRP-A6326302",
+      "nombre": "Transportes UZ",
+      "horario": "",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-325C9C26",
+          "direccion": "DE TORRE MERCEDES, PASEO COLÓN 500 MTS. NORTE Y 50 AL OESTE (EN BODEGA TRANSPURIS)",
+          "zona": "PASEO COLÓN",
+          "lat": 9.939935,
+          "lng": -84.088638
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50683145342",
+          "contacto": "Barrio México"
+        },
+        {
+          "numero": "50686319023",
+          "contacto": "Camión"
+        }
+      ],
+      "destinos": [
+        "ASERRÍ CENTRO",
+        "CORRALILLO SAN JUAN NORTE",
+        "DOTA",
+        "FRAILES",
+        "LA FILA",
+        "LEÓN CORTÉS",
+        "SAN CRISTÓBAL NORTE",
+        "SAN CRISTÓBAL SUR",
+        "SAN GABRIEL DE ASERRÍ",
+        "SAN IGNACIO DE ACOSTA",
+        "SAN JUAN SUR",
+        "TARRAZÚ",
+        "VUELTA DEL JORCO"
+      ]
+    },
+    {
+      "id": "TRP-A8FFEDEA",
+      "nombre": "ENCOMIENDAS CENTENO",
+      "horario": "Lunes a viernes de 8 am a 5 pm",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-389452BD",
+          "direccion": "Barrio México, contiguo a Partes de Chasis, frente a antigua Bótica Solera",
+          "zona": "BARRIO MÉXICO",
+          "lat": 9.94026,
+          "lng": -84.082896
+        },
+        {
+          "id": "d44dcf7a",
+          "direccion": "TRANSPORTES CORDERO",
+          "zona": "BARRIO MÉXICO",
+          "lat": 9.938922,
+          "lng": -84.088901
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50622210338",
+          "contacto": ""
+        },
+        {
+          "numero": "50683210966",
+          "contacto": "Encomiendas Golfo Express"
+        },
+        {
+          "numero": "50683403547",
+          "contacto": "Encomiendas y Mudanzas Centeno Junior"
+        },
+        {
+          "numero": "50683759370",
+          "contacto": "Transporte Rodriguez Serrano"
+        },
+        {
+          "numero": "50687377373",
+          "contacto": "Transportes Upala Express"
+        },
+        {
+          "numero": "50688149106",
+          "contacto": "Trans Saco"
+        },
+        {
+          "numero": "50689309711",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "AGUA BUENA",
+        "AGUA CALIENTE",
+        "ATIRRO",
+        "BIJAGUA",
+        "BIRRISITO",
+        "BUENOS AIRES",
+        "CABECERAS DE TILARAN",
+        "CABUYA",
+        "CANALETE",
+        "CAPELLADES",
+        "CARTAGO",
+        "CERVANTES",
+        "CHITARA",
+        "COBANO",
+        "ESLABÓN",
+        "GUACIMAL",
+        "JABILLOS",
+        "JUAN VILLAS",
+        "JUAN VIÑAS",
+        "LA PITAYA",
+        "LA SUIZA",
+        "MAL PAÍS",
+        "MANZANILLO",
+        "MONTEVERDE",
+        "MONTEZUMA",
+        "OREAMUNO",
+        "OROSI",
+        "PACAYAS",
+        "PAQUERA",
+        "PARAÍSO",
+        "PAVONES",
+        "PEJIBAYE",
+        "POTRERO GRANDE",
+        "RIO NARANJO",
+        "SABALITO",
+        "SAN RAFAEL DE ABANGARES",
+        "SAN VITO",
+        "SANTA CRUZ",
+        "SANTA ELENA",
+        "SANTA TERESA",
+        "SARDINAL DE PUNTARENAS",
+        "TAMBOR",
+        "TEJAS",
+        "TIERRA BLANCA",
+        "TRES EQUIS",
+        "TUCURRIQUE",
+        "TUIS",
+        "TURRIALBA",
+        "Taras",
+        "UPALA CENTRO"
+      ]
+    },
+    {
+      "id": "TRP-COCORI",
+      "nombre": "TRANSPORTES COCORÍ",
+      "horario": "NO ESPECIFICADO EN LA IMAGEN",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-0075",
+          "direccion": "NO ESPECIFICADA EN LA IMAGEN (TELÉFONO DE OFICINA COMPARTIDA: 2235-4733)",
+          "zona": "TIBÁS",
+          "lat": 9.951434,
+          "lng": -84.089139
+        },
+        {
+          "id": "DIR-TC-002",
+          "direccion": "BODEGAS TRANSCAMA, COLIMA DE TÍBAS, 100 MTS ESTE DEL PLANTEL DEL I.C.E.",
+          "zona": "TIBÁS",
+          "lat": 9.951587,
+          "lng": -84.089046
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50622354733",
+          "contacto": ""
+        },
+        {
+          "numero": "50688856959",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "BATAAN",
+        "BATÁN",
+        "BETANIA",
+        "BUFALO",
+        "CAIRO",
+        "CIENEGUITA",
+        "GUACIMO",
+        "LA ALEGRIA",
+        "LIMON",
+        "LIVERPOOL",
+        "MATINA",
+        "SIQUIRRES"
+      ]
+    },
+    {
+      "id": "TRP-E0C73E19",
+      "nombre": "CARGAS ENCOMIENDAS LA NOSAREÑA",
+      "horario": "LUNES A VIERNES 8:00 A 12:00 , 1:00 A 5:00",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-0D875184",
+          "direccion": "Colima Tibás, Waze: La Nosareña",
+          "zona": "TIBÁS",
+          "lat": null,
+          "lng": null
+        },
+        {
+          "id": "DIR-53800CBD",
+          "direccion": "PAVAS, BODEGAS VARGAS",
+          "zona": "PAVAS",
+          "lat": 9.944257,
+          "lng": -84.138206
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50686603888",
+          "contacto": ""
+        },
+        {
+          "numero": "50687788483",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "AEROPUERTO NOSARA",
+        "ARENALES",
+        "BARCO QUEBRADO",
+        "BELÉN",
+        "CAIMITAL",
+        "CUESTA GRANDE",
+        "CURIME",
+        "GARZA",
+        "GUIONES",
+        "MAQUENCO",
+        "NICOYA",
+        "NOSARA CENTRO",
+        "PLAYA PELADA CRUCE",
+        "PORTAL DE BELÉN",
+        "SAN FERNANDO",
+        "SAN PEDRO"
+      ]
+    },
+    {
+      "id": "TRP-E27C5CF6",
+      "nombre": "TRANSRODEN EXPRESS S.A",
+      "horario": "LUNES A VIERNES 7:30AM - 5:00PM , SÁBADOS 8:00AM - 12:00MD",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-92C1867A",
+          "direccion": "SAN JOSÉ",
+          "zona": "GAM",
+          "lat": 9.938922,
+          "lng": -84.088901
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50683517969",
+          "contacto": "San José"
+        },
+        {
+          "numero": "50685293405",
+          "contacto": ""
+        },
+        {
+          "numero": "50689218389",
+          "contacto": "Pérez Zeledón"
+        },
+        {
+          "numero": "50689233405",
+          "contacto": "Sinpe Móvil"
+        }
+      ],
+      "destinos": [
+        "BARÚ",
+        "BUENOS AIRES",
+        "CIUDAD CORTES",
+        "DOMINICAL",
+        "PALMAR NORTE",
+        "PALMAR SUR",
+        "PEJIBAYE",
+        "PÉREZ ZELEDÓN",
+        "SABALITO",
+        "SAN JOSÉ",
+        "SAN VITO",
+        "UVITA"
+      ]
+    },
+    {
+      "id": "TRP-RAP-UPALA",
+      "nombre": "LOS RÁPIDOS DE UPALA",
+      "horario": "NO ESPECIFICADO EN LA IMAGEN",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "DIR-TC-005",
+          "direccion": "BODEGAS TRANSCAMA, COLIMA DE TÍBAS, 100 MTS ESTE DEL PLANTEL DEL I.C.E.",
+          "zona": "TIBÁS",
+          "lat": 9.951587,
+          "lng": -84.089046
+        }
+      ],
+      "telefonos": [],
+      "destinos": []
+    },
+    {
       "id": "b1cbf101",
       "nombre": "ENCOMIENDAS LOS TOROS DE SAN CARLOS",
       "horario": "L-V 08:00 17:00",
@@ -1096,22 +2281,22 @@
           "id": "915c03dd",
           "direccion": "SAN JOSE, PAVAS, BODEGA VARGAS",
           "zona": "PAVAS",
-          "lat": 9.940785,
-          "lng": -84.135552
+          "lat": 9.944257,
+          "lng": -84.138206
         },
         {
           "id": "963fadb3",
-          "direccion": "SAN JOSE, TIBAS BODEGA MIRAVALLES",
+          "direccion": "50 AL ESTE DE CORPORACION CEK TIBAS",
           "zona": "TIBÁS",
-          "lat": 9.950446,
-          "lng": -84.084019
+          "lat": 9.950492,
+          "lng": -84.08405
         },
         {
           "id": "b10e4d15",
           "direccion": "DEL LICEO DE CIUDAD QUESADA 150 MTS SUR., CIUDAD QUESADA, COSTA RICA, 21001",
           "zona": "SAN CARLOS",
-          "lat": null,
-          "lng": null
+          "lat": 10.330974,
+          "lng": -84.427316
         }
       ],
       "telefonos": [
@@ -1245,23 +2430,23 @@
       "bodegas": [
         {
           "id": "7599724b",
-          "direccion": "BODEGA TRANSCAMA TIBAS",
+          "direccion": "BODEGAS TRANSCAMA, COLIMA DE TÍBAS, 100 MTS ESTE DEL PLANTEL DEL I.C.E.",
           "zona": "TIBÁS",
           "lat": 9.951587,
           "lng": -84.089046
         },
         {
           "id": "a87b66bd",
-          "direccion": "100 MTS SUR Y 25 MTS OESTE DE LA PLAZA DE DEPORTES DE PAVAS CENTRO.",
+          "direccion": "BODEGA VARGAS PAVAS",
           "zona": "PAVAS",
-          "lat": 9.940783,
-          "lng": -84.135547
+          "lat": 9.944257,
+          "lng": -84.138206
         }
       ],
       "telefonos": [
         {
           "numero": "50622203536",
-          "contacto": "BODEGA TREJOS PAVAS"
+          "contacto": "BODEGA VARGAS PAVAS"
         },
         {
           "numero": "50622351173",
@@ -1287,15 +2472,22 @@
           "id": "5be2249d",
           "direccion": "BODEGA BARRIO MEXICO, BODEGA CORDERO",
           "zona": "BARRIO MÉXICO",
-          "lat": 9.938711,
-          "lng": -84.08864
+          "lat": 9.938922,
+          "lng": -84.088901
         },
         {
           "id": "870a6656",
-          "direccion": "BODEGA ANAY URUCA",
+          "direccion": "CONTIGUO A LA NEON NIETO, SAN JOSÉ PROVINCE, SAN JOSÉ, LA FLORENTINA",
           "zona": "URUCA",
-          "lat": 9.955206,
-          "lng": -84.105925
+          "lat": 9.955199,
+          "lng": -84.105963
+        },
+        {
+          "id": "be967cdb",
+          "direccion": "BODEGA OCAMPO, TIBAS",
+          "zona": "TIBÁS",
+          "lat": 9.951498,
+          "lng": -84.089787
         }
       ],
       "telefonos": [
@@ -1341,6 +2533,8 @@
         "OROTINA",
         "PARRITA",
         "PLAYA HERMOSA",
+        "PLAYA HERRADURA",
+        "PUNTARENAS",
         "QUEBRADA GANADO",
         "QUEPOS",
         "SAN MATEO",
@@ -1358,8 +2552,8 @@
           "id": "12d8d389",
           "direccion": "BODEGA VARGAS PAVAS",
           "zona": "PAVAS",
-          "lat": 9.94081,
-          "lng": -84.135538
+          "lat": 9.944257,
+          "lng": -84.138206
         }
       ],
       "telefonos": [
@@ -1377,6 +2571,68 @@
       ]
     },
     {
+      "id": "e26aafaf",
+      "nombre": "TRANSPORTES PICAME",
+      "horario": "",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "da32e0f8",
+          "direccion": "AVE 7 Y 9 CALLE 16",
+          "zona": "BARRIO MÉXICO",
+          "lat": 9.93913,
+          "lng": -84.085407
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50622220870",
+          "contacto": ""
+        },
+        {
+          "numero": "50688561173",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "AGUA BUENA",
+        "RÍO SERENO",
+        "SABALITO",
+        "SAN VITO"
+      ]
+    },
+    {
+      "id": "ef4aa4ef",
+      "nombre": "TRANS PURIS",
+      "horario": "",
+      "imagen": "",
+      "bodegas": [
+        {
+          "id": "efa89ff6",
+          "direccion": "500 NORTE Y 50 OESTE TORRE MERCEDES PASEO COLON",
+          "zona": "BARRIO MÉXICO",
+          "lat": 9.939935,
+          "lng": -84.088638
+        }
+      ],
+      "telefonos": [
+        {
+          "numero": "50622577452",
+          "contacto": ""
+        },
+        {
+          "numero": "50683473015",
+          "contacto": ""
+        }
+      ],
+      "destinos": [
+        "CIUDAD COLON",
+        "PALMICHAL",
+        "PURISCAL",
+        "TABARCIA DE MORA"
+      ]
+    },
+    {
       "id": "transp1",
       "nombre": "TRANSCAMA",
       "horario": "L-V 8:00- 17:00",
@@ -1384,7 +2640,7 @@
       "bodegas": [
         {
           "id": "DIR-TC-001",
-          "direccion": "50 M ESTE DEL PLANTEL DEL I.C.E., COLIMA DE TÍBAS, SAN JOSÉ, COSTA RICA. CÓDIGO POSTAL 11305",
+          "direccion": "BODEGAS TRANSCAMA, COLIMA DE TÍBAS, 100 MTS ESTE DEL PLANTEL DEL I.C.E.",
           "zona": "TIBÁS",
           "lat": 9.951587,
           "lng": -84.089046
@@ -1446,7 +2702,15 @@
       "nombre": "BODEGA ANAY",
       "horario": "L-V 8:00- 17:00",
       "imagen": "",
-      "bodegas": [],
+      "bodegas": [
+        {
+          "id": "b210d15b",
+          "direccion": "CONTIGUO A LA NEON NIETO, SAN JOSÉ PROVINCE, SAN JOSÉ, LA FLORENTINA",
+          "zona": "URUCA",
+          "lat": 9.955199,
+          "lng": -84.105963
+        }
+      ],
       "telefonos": [
         {
           "numero": "50622908315",
@@ -1586,7 +2850,15 @@
       "nombre": "ENCOMIENDAS EL MACHO S.R.L",
       "horario": "L-V 8:00- 17:00",
       "imagen": "",
-      "bodegas": [],
+      "bodegas": [
+        {
+          "id": "ce1d94ce",
+          "direccion": "CALLE BLANCOS , SAN JOSE",
+          "zona": "CALLE BLANCOS",
+          "lat": 9.946002,
+          "lng": -84.065916
+        }
+      ],
       "telefonos": [
         {
           "numero": "50622367579",
@@ -1626,7 +2898,15 @@
       "nombre": "ENCOMIENDAS TEMPISQUE",
       "horario": "L-V 8:00- 17:30 SAB 8:00-12:00 MD",
       "imagen": "",
-      "bodegas": [],
+      "bodegas": [
+        {
+          "id": "27cfed6e",
+          "direccion": "AV. 11, SAN JOSÉ, BARRIO MÉXICO",
+          "zona": "BARRIO MÉXICO",
+          "lat": 9.940507,
+          "lng": -84.084058
+        }
+      ],
       "telefonos": [
         {
           "numero": "50622213541",
@@ -1679,962 +2959,6 @@
         "TAMARINDO",
         "VILLA REAL"
       ]
-    },
-    {
-      "id": "TRP-0036",
-      "nombre": "TRANSPORTES VILLALOBOS",
-      "horario": "NO ESPECIFICADO",
-      "imagen": "",
-      "bodegas": [
-        {
-          "id": "DIR-0048",
-          "direccion": "CALLE BLANCOS SAN JOSÉ",
-          "zona": "CALLE BLANCOS",
-          "lat": 9.945921,
-          "lng": -84.066203
-        }
-      ],
-      "telefonos": [
-        {
-          "numero": "50686985733",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "AGUA BUENA",
-        "BUENOS AIRES",
-        "BUENOS AIRES CENTRO",
-        "CIUDAD NEILY",
-        "CONTE",
-        "CORREDORES",
-        "COTO BRUS",
-        "FILA TIGRE",
-        "FRONTERA LA UNIÓN",
-        "FRONTERA RÍO SERENO",
-        "GOLFITO",
-        "LA ADMINISTRACIÓN",
-        "LA VIRGEN",
-        "LAUREL",
-        "PASO REAL",
-        "PLAYA ZANCUDO",
-        "POTRERO GRANDE",
-        "RIO CLARO",
-        "SABALITO",
-        "SAN VITO"
-      ]
-    },
-    {
-      "id": "TRP-0037",
-      "nombre": "TRANSPORTES BARQUERO",
-      "horario": "",
-      "imagen": "",
-      "bodegas": [
-        {
-          "id": "DIR-0049",
-          "direccion": "500 SUR PARROQUIA MARIA REINA DEL UNIVERSO",
-          "zona": "PAVAS",
-          "lat": 9.944259,
-          "lng": -84.138237
-        },
-        {
-          "id": "DIR-0052",
-          "direccion": "300M AL SUR DE LA PLAZA DE FÚTBOL EN CALLE BLANCOS",
-          "zona": "CALLE BLANCOS",
-          "lat": 9.946069,
-          "lng": -84.065955
-        }
-      ],
-      "telefonos": [
-        {
-          "numero": "50660505052",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "AGUAS ZARCAS",
-        "ALTO MONTERREY",
-        "BAJO RODRÍGUEZ",
-        "CERRO CORTÉZ",
-        "CHACHAGUA",
-        "CIUDAD QUESADA",
-        "EL TANQUE LA FORTUNA",
-        "FLORENCIA",
-        "FORTUNA",
-        "LA CRUZ",
-        "LA MARINA",
-        "LA PALMERA",
-        "LA TIGRA",
-        "LOS ANGELES DE FORTUNA",
-        "LOS CHILES DE AGUAS ZARCAS",
-        "MONTERREY",
-        "MUELLE",
-        "PEÑAS BLANCAS",
-        "PITAL",
-        "SAN FRANCISCO LA PALMERA",
-        "SAN JOSÉ",
-        "SANTA CLARA",
-        "SANTA ROSA DE POCOSOL",
-        "SANTA ROSA LA PALMERA",
-        "VALLE AZUL",
-        "VENECIA",
-        "ZARCERO"
-      ]
-    },
-    {
-      "id": "TRP-0038",
-      "nombre": "TRANSPORTES 2021",
-      "horario": "SERVICIO DIARIO",
-      "imagen": "",
-      "bodegas": [
-        {
-          "id": "DIR-0053",
-          "direccion": "BODEGA CORDERO Y BODEGA EL MACHO",
-          "zona": "CALLE BLANCOS",
-          "lat": 9.946082,
-          "lng": -84.066216
-        }
-      ],
-      "telefonos": [
-        {
-          "numero": "50622211628",
-          "contacto": ""
-        },
-        {
-          "numero": "50684960402",
-          "contacto": ""
-        },
-        {
-          "numero": "50685241293",
-          "contacto": ""
-        },
-        {
-          "numero": "50686404654",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "ESTERILLOS",
-        "HERRADURA",
-        "JACO",
-        "MANUEL ANTONIO",
-        "NARANJITO",
-        "PARRITA",
-        "QUEBRADA GANADO",
-        "QUEPOS",
-        "TARCOLES"
-      ]
-    },
-    {
-      "id": "TRP-0039",
-      "nombre": "TRANSPORTES MYM EXPRESS",
-      "horario": "L-V 8:00- 17:00",
-      "imagen": "",
-      "bodegas": [
-        {
-          "id": "DIR-0054",
-          "direccion": "BODEGA CORDERO",
-          "zona": "BARRIO MÉXICO",
-          "lat": 9.946121,
-          "lng": -84.066306
-        },
-        {
-          "id": "DIR-0055",
-          "direccion": "BODEGA ANAY",
-          "zona": "URUCA",
-          "lat": 9.955206,
-          "lng": -84.105925
-        },
-        {
-          "id": "DIR-0056",
-          "direccion": "BODEGA EL MACHO",
-          "zona": "CALLE BLANCOS",
-          "lat": 9.945981,
-          "lng": -84.066023
-        },
-        {
-          "id": "DIR-0057",
-          "direccion": "BODEGA VARGAS",
-          "zona": "PAVAS",
-          "lat": 9.944252,
-          "lng": -84.138231
-        }
-      ],
-      "telefonos": [
-        {
-          "numero": "50661843945",
-          "contacto": ""
-        },
-        {
-          "numero": "50662862865",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "27 DE ABRIL",
-        "BARCO QUEBRADO",
-        "BELÉN",
-        "CAIMITAL",
-        "CURIME",
-        "DULCE NOMBRE",
-        "ESTRADA",
-        "GUANACASTE",
-        "LA ESPERANZA",
-        "LAGUNILLA",
-        "MAQUENCO",
-        "MARBELLA",
-        "NICOYA",
-        "NOSARA",
-        "OSTIONAL",
-        "PARAISO STA. CRUZ",
-        "PLAYA AZUL",
-        "PLAYA GARZA",
-        "PLAYA GUIONES",
-        "PLAYA LAGARTO",
-        "PLAYA PELADA",
-        "PTO. CARRILLO",
-        "RIO MONTAÑA",
-        "SAN JOSÉ",
-        "SAN JUANILLO",
-        "SÁMARA",
-        "TERCIOPELO",
-        "VENADO"
-      ]
-    },
-    {
-      "id": "TRP-0040",
-      "nombre": "TRANSPORTES CORCOVADO",
-      "horario": "L-V 07:00 A.M. 05:00 P.M.",
-      "imagen": "",
-      "bodegas": [
-        {
-          "id": "7e7c3d83",
-          "direccion": "BODEGA EL MACHO",
-          "zona": "CALLE BLANCOS",
-          "lat": 9.946034,
-          "lng": -84.066076
-        },
-        {
-          "id": "a9b5e0cc",
-          "direccion": "BODEGA VARGAS",
-          "zona": "PAVAS",
-          "lat": 9.944229,
-          "lng": -84.138208
-        }
-      ],
-      "telefonos": [
-        {
-          "numero": "50683084202",
-          "contacto": ""
-        },
-        {
-          "numero": "50689777111",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "PUERTO JIMÉNEZ",
-        "SAN JOSÉ"
-      ]
-    },
-    {
-      "id": "TRP-0045",
-      "nombre": "ENCOMIENDAS CASTILLO",
-      "horario": "",
-      "imagen": "",
-      "bodegas": [
-        {
-          "id": "DIR-0064",
-          "direccion": "COLIMA DE TIBÁS",
-          "zona": "TIBÁS",
-          "lat": 9.950432,
-          "lng": -84.084909
-        },
-        {
-          "id": "DIR-5D37C439",
-          "direccion": "Colima de Tibás, donde están los Toros del Norte, Transp. Mau. Jiménez, Vega del Norte",
-          "zona": "TIBÁS",
-          "lat": null,
-          "lng": null
-        }
-      ],
-      "telefonos": [
-        {
-          "numero": "50622351893",
-          "contacto": ""
-        },
-        {
-          "numero": "50688672222",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "CARIARI",
-        "GUACIMO",
-        "GUAPILES",
-        "JIMENEZ",
-        "POCORA",
-        "SAN JOSÉ",
-        "SIQUIRRES"
-      ]
-    },
-    {
-      "id": "TRP-0046",
-      "nombre": "BODEGA GOLFO EXPRESS",
-      "horario": "LUNES A VIERNES DE 8 AM A 5 PM",
-      "imagen": "",
-      "bodegas": [
-        {
-          "id": "DIR-EC3862F3",
-          "direccion": "Barrio México, contiguo a Partes de Chasis, frente a antigua Bótica Solera",
-          "zona": "San José",
-          "lat": 9.951587,
-          "lng": -84.089046
-        }
-      ],
-      "telefonos": [
-        {
-          "numero": "50622210338",
-          "contacto": ""
-        },
-        {
-          "numero": "50683210966",
-          "contacto": ""
-        },
-        {
-          "numero": "50683403547",
-          "contacto": ""
-        },
-        {
-          "numero": "50683759370",
-          "contacto": ""
-        },
-        {
-          "numero": "50687377373",
-          "contacto": ""
-        },
-        {
-          "numero": "50688149106",
-          "contacto": ""
-        },
-        {
-          "numero": "50689309711",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "AGUA BUENA",
-        "AGUA CALIENTE",
-        "BIJAGUA",
-        "BIRRISITO",
-        "BUENOS AIRES",
-        "CABECERAS DE TILARAN",
-        "CABUYA",
-        "CANALETE",
-        "CAPELLADES",
-        "CARTAGO",
-        "CERVANTES",
-        "CHITARA",
-        "COBANO",
-        "COLONIA DE UPALA",
-        "GUACIMAL",
-        "JABILLOS",
-        "JUAN VILLAS",
-        "LA PITAYA",
-        "LA SUIZA",
-        "MAL PAÍS",
-        "MANZANILLO",
-        "MONTEVERDE",
-        "MONTEZUMA",
-        "OREAMUNO",
-        "OROSI",
-        "PACAYAS",
-        "PAQUERA",
-        "PARAÍSO",
-        "PAVONES",
-        "PEJIBAYE",
-        "POTRERO GRANDE",
-        "RIO NARANJO",
-        "SABALITO",
-        "SAN JOSE DE UPALA",
-        "SAN RAFAEL DE ABANGARES",
-        "SAN VITO",
-        "SANTA CRUZ",
-        "SANTA ELENA",
-        "SANTA TERESA",
-        "SARDINAL DE PUNTARENAS",
-        "TAMBOR",
-        "TEJAS",
-        "TIERRA BLANCA",
-        "TRES EQUIS",
-        "TUCURRIQUE",
-        "TUIS",
-        "TURRIALBA",
-        "Taras",
-        "UPALA CENTRO"
-      ]
-    },
-    {
-      "id": "TRP-0047",
-      "nombre": "ENCOMIENDAS GOLFO EXPRESS",
-      "horario": "HORARIO CONTINUO DE LUNES A VIERNES DE 8 AM A 5 PM",
-      "imagen": "",
-      "bodegas": [],
-      "telefonos": [
-        {
-          "numero": "50622210338",
-          "contacto": ""
-        },
-        {
-          "numero": "50683210966",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "CABUYA",
-        "COBANO",
-        "LUGARES ALEDAÑOS",
-        "MAL PAÍS",
-        "MANZANILLO",
-        "MONTEZUMA",
-        "PAQUERA",
-        "SANTA TERESA",
-        "TAMBOR"
-      ]
-    },
-    {
-      "id": "TRP-0048",
-      "nombre": "TRANSPORTE RODRIGUEZ SERRANO",
-      "horario": "HORARIO CONTINUO DE LUNES A VIERNES DE 8 AM A 5 PM",
-      "imagen": "",
-      "bodegas": [],
-      "telefonos": [
-        {
-          "numero": "50622210338",
-          "contacto": ""
-        },
-        {
-          "numero": "50683759370",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "CABECERAS DE TILARAN",
-        "GUACIMAL",
-        "OTROS LUGARES",
-        "SAN RAFAEL DE ABANGARES",
-        "SANTA ELENA MONTEVERDE",
-        "SARDINAL DE PUNTARENAS"
-      ]
-    },
-    {
-      "id": "TRP-0050",
-      "nombre": "TRANS SACO",
-      "horario": "HORARIO CONTINUO DE LUNES A VIERNES DE 8 AM A 5 PM",
-      "imagen": "",
-      "bodegas": [],
-      "telefonos": [
-        {
-          "numero": "50622210338",
-          "contacto": ""
-        },
-        {
-          "numero": "50688149106",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "AGUA BUENA",
-        "BUENOS AIRES",
-        "OTROS LUGARES",
-        "POTRERO GRANDE",
-        "SABALITO",
-        "SAN VITO"
-      ]
-    },
-    {
-      "id": "TRP-0051",
-      "nombre": "TRANSPORTES UPALA EXPRESS",
-      "horario": "HORARIO CONTINUO DE LUNES A VIERNES DE 8 AM A 5 PM",
-      "imagen": "",
-      "bodegas": [],
-      "telefonos": [
-        {
-          "numero": "50622210338",
-          "contacto": ""
-        },
-        {
-          "numero": "50687377373",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "ALREDEDORES",
-        "BIJAGUA",
-        "CANALETE",
-        "COLONIA DE UPALA",
-        "RIO NARANJO",
-        "SAN JOSE DE UPALA",
-        "UPALA CENTRO"
-      ]
-    },
-    {
-      "id": "TRP-0052",
-      "nombre": "ENCOMIENDAS Y MUDANZAS CENTENO JUNIOR",
-      "horario": "HORARIO CONTINUO DE LUNES A VIERNES DE 8 AM A 5 PM",
-      "imagen": "",
-      "bodegas": [],
-      "telefonos": [
-        {
-          "numero": "50622210338",
-          "contacto": ""
-        },
-        {
-          "numero": "50683403547",
-          "contacto": ""
-        },
-        {
-          "numero": "50689309711",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "AGUA CALIENTE",
-        "BIRRISITO",
-        "CAPELLADES",
-        "CARTAGO",
-        "CERVANTES",
-        "CHITARA",
-        "JABILLOS",
-        "JUAN VILLAS",
-        "LA PITAYA",
-        "LA SUIZA",
-        "LUGARES ALEDAÑOS",
-        "LUGARES CERCANOS",
-        "OREAMUNO",
-        "OROSI",
-        "PACAYAS",
-        "PARAÍSO",
-        "PAVONES",
-        "PEJIBAYE",
-        "SANTA CRUZ",
-        "TEJAS",
-        "TIERRA BLANCA",
-        "TRES EQUIS",
-        "TUCURRIQUE",
-        "TUIS",
-        "TURRIALBA",
-        "Taras"
-      ]
-    },
-    {
-      "id": "TRP-0053",
-      "nombre": "ENCOMIENDAS DAMAKA",
-      "horario": "NO ESPECIFICADO",
-      "imagen": "",
-      "bodegas": [],
-      "telefonos": [
-        {
-          "numero": "50671590772",
-          "contacto": ""
-        },
-        {
-          "numero": "50687160954",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "ATENAS",
-        "GRECIA",
-        "LA GARITA",
-        "NARANJO",
-        "PALMARES",
-        "SAN RAMÓN",
-        "SARCHI",
-        "TODO EL PAÍS",
-        "TURRUCARES"
-      ]
-    },
-    {
-      "id": "TRP-0054",
-      "nombre": "ENCOMIENDAS TRANSKAJA LA COSTA",
-      "horario": "SERVICIOS DE ENCOMIENDAS DIARIOS",
-      "imagen": "",
-      "bodegas": [
-        {
-          "id": "DIR-TK-001",
-          "direccion": "COLIMA DE TÍBAS, 100 MTS ESTE DEL PLANTEL DEL I.C.E., EN BODEGAS TRANSCAMA, BODEGA NÚMERO 6",
-          "zona": "TIBÁS",
-          "lat": 9.951587,
-          "lng": -84.089046
-        }
-      ],
-      "telefonos": [
-        {
-          "numero": "50660290018",
-          "contacto": ""
-        },
-        {
-          "numero": "50688490088",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "27 DE ABRIL",
-        "BELEN DE CARRILLO",
-        "BRASILITO",
-        "CARTAGENA",
-        "EL LLANO",
-        "FILADELFIA",
-        "FLAMINGO",
-        "HOJANCHA",
-        "HUACAS",
-        "JICARAL",
-        "MANSIÓN DE NICOYA",
-        "MATAPALO",
-        "NANDAYURE",
-        "NICOYA",
-        "PLAYA POTRERO",
-        "PLAYAS DEL COCO",
-        "PORTE GOLPE",
-        "SANTA CRUZ",
-        "SARDINAL",
-        "TAMARINDO",
-        "VILLA REAL"
-      ]
-    },
-    {
-      "id": "TRP-3C53E761",
-      "nombre": "ENCOMIENDAS TAVO",
-      "horario": "",
-      "imagen": "",
-      "bodegas": [
-        {
-          "id": "e32dabcf",
-          "direccion": "",
-          "zona": "CALLE BLANCOS",
-          "lat": 9.944712,
-          "lng": -84.075117
-        }
-      ],
-      "telefonos": [
-        {
-          "numero": "50622212200",
-          "contacto": ""
-        },
-        {
-          "numero": "50622560105",
-          "contacto": ""
-        },
-        {
-          "numero": "50684588383",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "CARIARI",
-        "CRUCE DE GUÁPILES",
-        "CRUCE DE RÍO FRÍO",
-        "GUACIMO",
-        "GUAPILES",
-        "LA CRUZ",
-        "LIMON",
-        "PEÑAS BLANCAS",
-        "PUERTO VIEJO",
-        "RÍO FRÍO",
-        "SIQUIRRES"
-      ]
-    },
-    {
-      "id": "TRP-A6326302",
-      "nombre": "Transportes UZ",
-      "horario": "",
-      "imagen": "",
-      "bodegas": [
-        {
-          "id": "DIR-325C9C26",
-          "direccion": "De Torre Mercedes, Paseo Colón 500 Mts. norte y 50 al oeste (en Bodega Transpuris)",
-          "zona": "Paseo Colón",
-          "lat": null,
-          "lng": null
-        }
-      ],
-      "telefonos": [
-        {
-          "numero": "50683145342",
-          "contacto": "Barrio México"
-        },
-        {
-          "numero": "50686319023",
-          "contacto": "Camión"
-        }
-      ],
-      "destinos": [
-        "ASERRÍ CENTRO",
-        "CORRALILLO SAN JUAN NORTE",
-        "DOTA",
-        "FRAILES",
-        "LA FILA",
-        "LEÓN CORTÉS",
-        "SAN CRISTÓBAL NORTE",
-        "SAN CRISTÓBAL SUR",
-        "SAN GABRIEL DE ASERRÍ",
-        "SAN IGNACIO DE ACOSTA",
-        "SAN JUAN SUR",
-        "TARRAZÚ",
-        "VUELTA DEL JORCO"
-      ]
-    },
-    {
-      "id": "TRP-A8FFEDEA",
-      "nombre": "ENCOMIENDAS CENTENO",
-      "horario": "Lunes a viernes de 8 am a 5 pm",
-      "imagen": "",
-      "bodegas": [
-        {
-          "id": "d44dcf7a",
-          "direccion": "TRANSPORTES CORDERO",
-          "zona": "BARRIO MÉXICO",
-          "lat": 9.938737,
-          "lng": -84.088684
-        },
-        {
-          "id": "DIR-389452BD",
-          "direccion": "Barrio México, contiguo a Partes de Chasis, frente a antigua Bótica Solera",
-          "zona": "BARRIO MÉXICO",
-          "lat": 9.940303,
-          "lng": -84.082919
-        }
-      ],
-      "telefonos": [
-        {
-          "numero": "50622210338",
-          "contacto": ""
-        },
-        {
-          "numero": "50683210966",
-          "contacto": "Encomiendas Golfo Express"
-        },
-        {
-          "numero": "50683403547",
-          "contacto": "Encomiendas y Mudanzas Centeno Junior"
-        },
-        {
-          "numero": "50683759370",
-          "contacto": "Transporte Rodriguez Serrano"
-        },
-        {
-          "numero": "50687377373",
-          "contacto": "Transportes Upala Express"
-        },
-        {
-          "numero": "50688149106",
-          "contacto": "Trans Saco"
-        },
-        {
-          "numero": "50689309711",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "AGUA BUENA",
-        "AGUA CALIENTE",
-        "ATIRRO",
-        "BIJAGUA",
-        "BIRRISITO",
-        "BUENOS AIRES",
-        "CABECERAS DE TILARAN",
-        "CABUYA",
-        "CANALETE",
-        "CAPELLADES",
-        "CARTAGO",
-        "CERVANTES",
-        "CHITARA",
-        "COBANO",
-        "ESLABÓN",
-        "GUACIMAL",
-        "JABILLOS",
-        "JUAN VILLAS",
-        "JUAN VIÑAS",
-        "LA PITAYA",
-        "LA SUIZA",
-        "MAL PAÍS",
-        "MANZANILLO",
-        "MONTEVERDE",
-        "MONTEZUMA",
-        "OREAMUNO",
-        "OROSI",
-        "PACAYAS",
-        "PAQUERA",
-        "PARAÍSO",
-        "PAVONES",
-        "PEJIBAYE",
-        "POTRERO GRANDE",
-        "RIO NARANJO",
-        "SABALITO",
-        "SAN RAFAEL DE ABANGARES",
-        "SAN VITO",
-        "SANTA CRUZ",
-        "SANTA ELENA",
-        "SANTA TERESA",
-        "SARDINAL DE PUNTARENAS",
-        "TAMBOR",
-        "TEJAS",
-        "TIERRA BLANCA",
-        "TRES EQUIS",
-        "TUCURRIQUE",
-        "TUIS",
-        "TURRIALBA",
-        "Taras",
-        "UPALA CENTRO"
-      ]
-    },
-    {
-      "id": "TRP-COCORI",
-      "nombre": "TRANSPORTES COCORÍ",
-      "horario": "",
-      "imagen": "",
-      "bodegas": [
-        {
-          "id": "DIR-TC-002",
-          "direccion": "BODEGAS TRANSCAMA, COLIMA DE TÍBAS, 100 MTS ESTE DEL PLANTEL DEL I.C.E.",
-          "zona": "TIBÁS",
-          "lat": 9.951587,
-          "lng": -84.089046
-        }
-      ],
-      "telefonos": [
-        {
-          "numero": "50688856959",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "BATAAN",
-        "BETANIA",
-        "BUFALO",
-        "CAIRO",
-        "CIENEGUITA",
-        "GUACIMO",
-        "LA ALEGRIA",
-        "LIMON",
-        "LIVERPOOL",
-        "MATINA",
-        "SIQUIRRES"
-      ]
-    },
-    {
-      "id": "TRP-E0C73E19",
-      "nombre": "Cargas Encomiendas La Nosareña",
-      "horario": "Lunes a Viernes 8:00 A 12:00, 1:00 A 5:00",
-      "imagen": "",
-      "bodegas": [
-        {
-          "id": "DIR-0D875184",
-          "direccion": "Colima Tibás, Waze: La Nosareña",
-          "zona": "TIBÁS",
-          "lat": null,
-          "lng": null
-        },
-        {
-          "id": "DIR-53800CBD",
-          "direccion": "Pavas, Bodegas Vargas, WAZE: Complejos Marvin",
-          "zona": "PAVAS",
-          "lat": null,
-          "lng": null
-        }
-      ],
-      "telefonos": [
-        {
-          "numero": "50686603888",
-          "contacto": ""
-        },
-        {
-          "numero": "50687788483",
-          "contacto": ""
-        }
-      ],
-      "destinos": [
-        "AEROPUERTO NOSARA",
-        "ARENALES",
-        "BARCO QUEBRADO",
-        "BELÉN",
-        "CAIMITAL",
-        "CUESTA GRANDE",
-        "CURIME",
-        "GARZA",
-        "GUIONES",
-        "MAQUENCO",
-        "NICOYA",
-        "NOSARA CENTRO",
-        "PLAYA PELADA CRUCE",
-        "PORTAL DE BELÉN",
-        "SAN FERNANDO",
-        "SAN PEDRO"
-      ]
-    },
-    {
-      "id": "TRP-E27C5CF6",
-      "nombre": "TRANSRODEN EXPRESS S.A",
-      "horario": "Lunes a viernes 7:30am - 5:00pm, Sábados 8:00am - 12:00md",
-      "imagen": "",
-      "bodegas": [
-        {
-          "id": "DIR-92C1867A",
-          "direccion": "San José",
-          "zona": "GAM",
-          "lat": null,
-          "lng": null
-        }
-      ],
-      "telefonos": [
-        {
-          "numero": "50683517969",
-          "contacto": "San José"
-        },
-        {
-          "numero": "50685293405",
-          "contacto": ""
-        },
-        {
-          "numero": "50689218389",
-          "contacto": "Pérez Zeledón"
-        },
-        {
-          "numero": "50689233405",
-          "contacto": "Sinpe Móvil"
-        }
-      ],
-      "destinos": [
-        "BARÚ",
-        "BUENOS AIRES",
-        "CIUDAD CORTES",
-        "DOMINICAL",
-        "PALMAR NORTE",
-        "PALMAR SUR",
-        "PEJIBAYE",
-        "PÉREZ ZELEDÓN",
-        "SABALITO",
-        "SAN JOSÉ",
-        "SAN VITO",
-        "UVITA"
-      ]
-    },
-    {
-      "id": "TRP-RAP-UPALA",
-      "nombre": "LOS RÁPIDOS DE UPALA",
-      "horario": "",
-      "imagen": "",
-      "bodegas": [
-        {
-          "id": "DIR-TC-005",
-          "direccion": "BODEGAS TRANSCAMA, COLIMA DE TÍBAS, 100 MTS ESTE DEL PLANTEL DEL I.C.E.",
-          "zona": "TIBÁS",
-          "lat": 9.951587,
-          "lng": -84.089046
-        }
-      ],
-      "telefonos": [],
-      "destinos": []
     }
   ]
 }
