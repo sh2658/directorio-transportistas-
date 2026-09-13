@@ -1,6 +1,6 @@
 # Rutas CR
 
-Directorio de transportistas y encomiendas de Costa Rica. **Revisión en ensayo: GitHub Pages sigue suspendido.**
+Directorio de transportistas y encomiendas de Costa Rica publicado mediante GitHub Pages.
 
 Google Sheets es la fuente; AppSheet administra las cinco tablas relacionadas. Apps Script exporta una proyección pública validada a `data/transportistas.json` mediante GitHub REST. Actions comprueba el código y el JSON antes de publicar. El frontend no necesita claves ni consultar Apps Script al abrirse.
 
@@ -17,7 +17,8 @@ python -m http.server 8765 --directory .local/site
 
 - `index.html`, `assets/css/app.css`, `assets/js/`: frontend accesible, mapa opcional y clusters por empresa.
 - `apps_script/RutasCR_Data.js`: contrato de exportación, sin modificar Sheets.
-- `apps_script/RutasCR_Sync.gs`: sincronización, bloqueo, validación y commits mediante SHA.
+- `apps_script/RutasCR_Sync.gs`: sincronización cada cinco minutos, bloqueo, validación y commits mediante SHA.
+- `apps_script/RutasCR_Images.gs`: copias públicas versionadas de imágenes privadas de AppSheet, sin cambiar permisos en Drive.
 - `apps_script/appsscript.sync.json`: manifiesto para un proyecto independiente.
 - `data/transportistas.json`: snapshot para revisión con IDs estables.
 - `tests/`: pruebas de contrato, DOM y transporte REST simulado.
@@ -27,6 +28,6 @@ Las fuentes históricas en `apps_script/` no equivalen a la versión instalada. 
 
 ## Estado
 
-Implementado y probado localmente; integración con credenciales reales y revisión visual multidispositivo pendientes. 48 imágenes internas de AppSheet requieren URLs públicas de copias seleccionadas y seis bodegas tienen GPS pendiente. Un GPS numéricamente válido todavía requiere verificación física. No se afirma compatibilidad perfecta sin completar la matriz de pruebas.
+La web pública y su canal de despliegue están activos. La automatización queda preparada para instalarse en un proyecto independiente de Apps Script: requiere un token de GitHub de alcance mínimo y el ID de la carpeta raíz de imágenes. Las eliminaciones de destinos y teléfonos pueden reconciliarse automáticamente; las bajas de transportistas o bodegas permanecen protegidas. Un GPS numéricamente válido todavía requiere verificación física.
 
 No activar Pages por publicación de rama: usar GitHub Actions para que la puerta de verificación tenga efecto.

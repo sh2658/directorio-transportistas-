@@ -32,8 +32,8 @@ var RutasCRData = (function () {
   }
   function phone(raw) {
     var n = text(raw).replace(/[\s()+.-]/g, '');
-    if (/^[2-8]\d{7}$/.test(n)) return '506' + n;
-    if (/^506[2-8]\d{7}$/.test(n) || /^507\d{7,8}$/.test(n)) return n;
+    if (/^[2-9]\d{7}$/.test(n)) return '506' + n;
+    if (/^506[2-9]\d{7}$/.test(n) || /^507\d{7,8}$/.test(n)) return n;
     return '';
   }
   function https(raw) { return /^https:\/\/[^\s<>"\\]+$/i.test(text(raw)) ? text(raw) : ''; }
@@ -60,7 +60,7 @@ var RutasCRData = (function () {
       var image = https((options.imageUrls || {})[t.IDTRANSPORTE] || t.IMAGEN);
       if (t.IMAGEN && !image) diagnostics.push({code:'IMAGE_NOT_PUBLIC_URL',id:t.IDTRANSPORTE});
       var carrier={id:t.IDTRANSPORTE,nombre:t.TRANSPORTE,horario:t.HORARIO,
-        imagen:image,bodegas:[],telefonos:[],destinos:[]};
+        imagen:image,bodegas:[],telefonos:[],destinos:[],destinosDetalle:[]};
       ['LV_APERTURA_1','LV_CIERRE_1','LV_APERTURA_2','LV_CIERRE_2','SAB_APERTURA_1','SAB_CIERRE_1'].forEach(function(field){
         if (Object.prototype.hasOwnProperty.call(t,field)) carrier[field.replace('APERTURA','Apertura').replace('CIERRE','Cierre')]=t[field];
       });
@@ -72,8 +72,10 @@ var RutasCRData = (function () {
       var pair = JSON.stringify([v.IDTRANSPORTE,v.IDLUGARES]);
       if (pairs.has(pair)) diagnostics.push({code:'DUPLICATE_VISIT',id:v.IDVISITA});
       pairs.add(pair);
-      var dest = out.get(v.IDTRANSPORTE).destinos, name=lm.get(v.IDLUGARES).LUGAR;
+      var place=lm.get(v.IDLUGARES),carrier=out.get(v.IDTRANSPORTE),dest=carrier.destinos,name=place.LUGAR;
       if (!dest.some(function(d){return key(d)===key(name);})) dest.push(name);
+      if(!carrier.destinosDetalle.some(function(d){return key(d.nombre)===key(name)&&key(d.canton)===key(place.CANTON)&&key(d.provincia)===key(place.PROVINCIA)&&key(d.distrito)===key(place.DISTRITO);}))
+        carrier.destinosDetalle.push({nombre:name,canton:place.CANTON||'',provincia:place.PROVINCIA||'',distrito:place.DISTRITO||''});
     });
     dirs.forEach(function(d){
       // Public directory only receives warehouse records whose zone was reviewed.
@@ -93,7 +95,7 @@ var RutasCRData = (function () {
     });
     var carriers=Array.from(out.values()).sort(function(a,b){return a.id<b.id?-1:a.id>b.id?1:0;});
     carriers.forEach(function(t){
-      t.destinos.sort(); t.bodegas.sort(function(a,b){return a.id<b.id?-1:1;});
+      t.destinos.sort();t.destinosDetalle.sort(function(a,b){return key(a.nombre)<key(b.nombre)?-1:1;});t.bodegas.sort(function(a,b){return a.id<b.id?-1:1;});
       t.telefonos.sort(function(a,b){return a.numero<b.numero?-1:1;});
     });
     return {schemaVersion:1,transportistas:carriers,diagnostics:diagnostics};

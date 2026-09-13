@@ -11,6 +11,7 @@
       for(const f of ['horario','imagen'])if(typeof t[f]!=='string')throw Error('Campo inválido: '+f);
       for(const f of slotFields)if(f in t&&typeof t[f]!=='string')throw Error('Bloque horario inválido: '+f);
       if(!Array.isArray(t.destinos)||t.destinos.some(d=>typeof d!=='string'||!d.trim())||!Array.isArray(t.bodegas)||!Array.isArray(t.telefonos))throw Error('Listas inválidas');
+      if('destinosDetalle' in t&&(!Array.isArray(t.destinosDetalle)||t.destinosDetalle.some(d=>!d||typeof d.nombre!=='string'||typeof d.canton!=='string'||typeof d.provincia!=='string'||typeof d.distrito!=='string')))throw Error('Detalle territorial inválido');
       if(new Set(t.destinos.map(key)).size!==t.destinos.length)throw Error('Destinos duplicados');
       t.bodegas.forEach(b=>{if(!b||typeof b.id!=='string'||!b.id||bids.has(b.id)||typeof b.direccion!=='string'||typeof b.zona!=='string'||!((b.lat===null&&b.lng===null)||validGPS(b)))throw Error('Bodega inválida');bids.add(b.id);});
       const nums=new Set();t.telefonos.forEach(p=>{if(!p||typeof p.numero!=='string'||!/^(506[2-9]\d{7}|507\d{7,8})$/.test(p.numero)||typeof p.contacto!=='string'||nums.has(p.numero))throw Error('Teléfono inválido');nums.add(p.numero);});
@@ -37,6 +38,14 @@
   ]);
   function canonicalDestination(value){const normalized=key(value);return destinationAliases.get(normalized)||normalized;}
   function destinationMatches(value,center){const a=canonicalDestination(value),b=canonicalDestination(center);return !!a&&a===b;}
+  function searchExactPlace(rows,name,place){
+    const q=canonicalDestination(name),c=key(place&&place.canton),p=key(place&&place.province);
+    return rows.filter(t=>{
+      const detail=(t.destinosDetalle||[]).filter(d=>canonicalDestination(d.nombre)===q&&(key(d.canton)||key(d.provincia)));
+      if(detail.length)return detail.some(d=>(!c||key(d.canton)===c)&&(!p||key(d.provincia)===p));
+      return c===q&&t.destinos.some(d=>destinationMatches(d,name));
+    });
+  }
   function searchNearby(rows,centers){const useful=[...new Set((centers||[]).map(key).filter(Boolean))];return rows.filter(t=>t.destinos.some(d=>useful.some(c=>destinationMatches(d,c))));}
   function lexicalDestinations(rows,query,limit=5){const q=key(query),unique=new Map();if(!q)return [];rows.flatMap(t=>t.destinos).forEach(value=>{const k=key(value);if(k&&!unique.has(k))unique.set(k,value);});return [...unique.values()].map(value=>({value,score:levenshtein(value,q)})).sort((a,b)=>a.score-b.score||String(a.value).localeCompare(String(b.value),'es')).slice(0,limit).map(item=>item.value);}
   function markers(rows){return rows.flatMap(t=>t.bodegas.filter(validGPS).map(b=>({carrierId:t.id,nombre:t.nombre,bodega:b})));}
@@ -45,6 +54,7 @@
   function displayName(value){const title=String(value||'').toLocaleLowerCase('es-CR').replace(/(^|[\s/(-])([a-záéíóúñ])/g,(m,a,b)=>a+b.toLocaleUpperCase('es-CR'));return title.replace(/\b(De|Del|La|Las|Los|Y|En|El|Al)\b/g,(word,_,offset)=>offset===0?word:word.toLocaleLowerCase('es-CR'));}
   function phoneType(number){const value=String(number||'');if(/^506[5-9]\d{7}$/.test(value))return 'mobile';if(/^506[2-4]\d{7}$/.test(value))return 'fixed';return 'international';}
   function hasWhatsApp(phone){return !!phone&&(/WHATSAPP/i.test(String(phone.contacto||''))||phoneType(phone.numero)==='mobile');}
+  function formatPhone(number){const n=String(number||'').replace(/\D/g,'');if(/^506\d{8}$/.test(n))return '+506 '+n.slice(3,7)+'-'+n.slice(7);if(/^507\d{7,8}$/.test(n))return '+507 '+n.slice(3,7)+'-'+n.slice(7);return String(number||'');}
   function warehouseOrder(t,position){return t.bodegas.map((b,index)=>({b,index,km:position&&validGPS(b)?distance(position,b):Infinity})).sort((a,b)=>a.km-b.km||a.index-b.index);}
   function nearestDistance(t,position){return warehouseOrder(t,position)[0]?.km??Infinity;}
   function sortByNearest(rows,position){return rows.map((t,index)=>({t,index,km:nearestDistance(t,position)})).sort((a,b)=>a.km-b.km||a.index-b.index).map(x=>x.t);}
@@ -70,5 +80,5 @@
   }
   function costaRicaClock(date=new Date()){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Costa_Rica',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(date);const get=t=>parts.find(p=>p.type===t)?.value||'';const days={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};return {day:days[get('weekday')],minutes:Number(get('hour'))*60+Number(get('minute'))};}
   function scheduleStatus(t,date){const c=costaRicaClock(date);return scheduleStatusAt(t,c.day,c.minutes);}
-  return {key,validGPS,distance,validate,search,levenshtein,canonicalDestination,destinationMatches,resolvePlace,searchNearby,lexicalDestinations,markers,operatorCount,initials,displayName,phoneType,hasWhatsApp,warehouseOrder,nearestDistance,sortByNearest,scheduleSlots,scheduleStatusAt,scheduleStatus,costaRicaClock,timeLabel};
+  return {key,validGPS,distance,validate,search,levenshtein,canonicalDestination,destinationMatches,searchExactPlace,resolvePlace,searchNearby,lexicalDestinations,markers,operatorCount,initials,displayName,phoneType,hasWhatsApp,formatPhone,warehouseOrder,nearestDistance,sortByNearest,scheduleSlots,scheduleStatusAt,scheduleStatus,costaRicaClock,timeLabel};
 });
