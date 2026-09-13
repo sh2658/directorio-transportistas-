@@ -39,8 +39,9 @@
   function renderAmbiguous(original,resolution,focus){
     results=[];visible=0;renderMap();$('tituloResultados').textContent='Necesitamos precisar el lugar';$('resumenResultados').textContent='Hay '+resolution.locations.length+' lugares llamados «'+original+'» en Costa Rica.';$('mas').hidden=true;
     const box=territorialNotice('Este nombre tiene homónimos','Elija el cantón y la provincia correctos antes de mostrar rutas. Así evitamos recomendar transportistas de otro lugar.'),options=el('div',null,'territorial-opciones');
-    resolution.locations.forEach(place=>{const button=el('button','Ver rutas cerca de '+C.displayName(place.canton)+' · '+C.displayName(place.province),'territorial-opcion');button.type='button';button.addEventListener('click',()=>renderNearby(original,place));options.append(button);});box.append(options);$('tarjetas').replaceChildren(box);if(focus)$('tituloResultados').focus();
+    resolution.locations.forEach(place=>{const button=el('button','Buscar '+C.displayName(original)+' en '+C.displayName(place.canton)+' · '+C.displayName(place.province),'territorial-opcion');button.type='button';button.addEventListener('click',()=>renderExactHomonym(original,place));options.append(button);});box.append(options);$('tarjetas').replaceChildren(box);if(focus)$('tituloResultados').focus();
   }
+  function renderExactHomonym(original,place){const matches=C.searchExactPlace(data,original,place),where=C.displayName(place.canton)+' · '+C.displayName(place.province);const box=territorialNotice(matches.length?'Asignación exacta confirmada':'Sin asignación territorial confirmada',matches.length?'Se muestran únicamente transportistas asignados exactamente a '+C.displayName(original)+'. No se incluyeron empresas por viajar a toda la provincia.':'No se mostrarán transportistas de '+C.displayName(place.province)+' únicamente por viajar a esa provincia. Para confirmar este homónimo, el lugar debe tener cantón y provincia registrados en AppSheet.');renderRows(matches,matches.length?'Transportistas para '+C.displayName(original):'Sin transportistas confirmados',matches.length+' resultado'+(matches.length===1?'':'s')+' exacto'+(matches.length===1?'':'s')+' en '+where,true,box);}
   function renderLexical(original,focus){const choices=C.lexicalDestinations(data,original),box=territorialNotice('No encontramos ese lugar en la referencia territorial',choices.length?'Puede intentar con uno de estos destinos registrados:':'Revise la escritura o pruebe con el cantón más cercano.');if(choices.length){const options=el('div',null,'territorial-opciones');choices.forEach(value=>{const button=el('button',C.displayName(value),'territorial-opcion');button.type='button';button.addEventListener('click',()=>{query.value=value;search();});options.append(button);});box.append(options);}renderRows([],'Sin coincidencias','0 resultados para «'+original+'»',focus,box);}
   async function search(focus=true){
     const sequence=++searchSequence;
@@ -69,7 +70,7 @@
     box.append(el('strong',status.label),el('span',status.detail));return box;
   }
   function updateScheduleBadges(){document.querySelectorAll('.horario-badge').forEach(box=>{const t=data.find(row=>row.id===box.dataset.carrier);if(!t)return;const s=C.scheduleStatus(t);box.className='horario-badge '+s.state;box.replaceChildren(el('strong',s.label),el('span',s.detail));});}
-  function phoneDisplay(number){const local=number.slice(3),country=number.slice(0,3);return '+'+country+' '+local.slice(0,4)+'-'+local.slice(4);}
+  function phoneDisplay(number){return C.formatPhone(number);}
   function contacts(t){
     const panel=el('section',null,'contactos');panel.setAttribute('aria-label','Contactos');
     t.telefonos.forEach(p=>{const row=el('div',null,'contacto'),info=el('div',null,'contacto-info'),actions=el('div',null,'contacto-acciones'),display=phoneDisplay(p.numero),label='Llamar al '+display+(p.contacto?' · '+p.contacto:'');

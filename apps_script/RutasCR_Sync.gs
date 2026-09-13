@@ -12,14 +12,27 @@ function rutasCRConfig_() {
 function rutasCRPrepararConfiguracion() {
   var p=PropertiesService.getScriptProperties();
   p.setProperties({
-    RUTAS_SHEET_ID:'1gXtF2KcCuy_cdYRNTbGrulNbB5SYw_mrN-H_AVSXOeA',
     RUTAS_GITHUB_OWNER:'sh2658',
     RUTAS_GITHUB_REPO:'directorio-transportistas-',
-    RUTAS_GITHUB_BRANCH:'fix/rutas-cr-integracion-segura',
+    RUTAS_GITHUB_BRANCH:'main',
     RUTAS_SYNC_ENABLED:'false',
-    RUTAS_PUBLIC_DATA_APPROVED:'false'
+    RUTAS_PUBLIC_DATA_APPROVED:'false',
+    RUTAS_AUTO_DESTINATION_REMOVALS:'true',
+    RUTAS_AUTO_PHONE_REMOVALS:'true',
+    RUTAS_IMAGE_SYNC_ENABLED:'false'
   },false);
-  return {state:'prepared',syncEnabled:false,publicDataApproved:false};
+  return {state:'prepared',syncEnabled:false,publicDataApproved:false,sheetConfigured:!!p.getProperty('RUTAS_SHEET_ID')};
+}
+function rutasCREstado() {
+  var p=PropertiesService.getScriptProperties();
+  return {syncEnabled:p.getProperty('RUTAS_SYNC_ENABLED')==='true',imageSyncEnabled:p.getProperty('RUTAS_IMAGE_SYNC_ENABLED')==='true',publicDataApproved:p.getProperty('RUTAS_PUBLIC_DATA_APPROVED')==='true',branch:p.getProperty('RUTAS_GITHUB_BRANCH')||'',tokenConfigured:!!p.getProperty('RUTAS_GITHUB_PAT'),imageFolderConfigured:!!p.getProperty('RUTAS_APPSHEET_IMAGE_FOLDER_ID'),lastOk:p.getProperty('RUTAS_LAST_OK')||'',lastCommit:p.getProperty('RUTAS_LAST_COMMIT')||'',lastError:p.getProperty('RUTAS_LAST_ERROR')||'',imagesLastOk:p.getProperty('RUTAS_IMAGES_LAST_OK')||'',imagesLastError:p.getProperty('RUTAS_IMAGES_LAST_ERROR')||''};
+}
+function rutasCRActivar() {
+  var c=rutasCRConfig_(),test=rutasCRRequest_(c,'get','/branches/'+encodeURIComponent(c.branch));
+  if(test.status!==200)throw Error('No se pudo validar GitHub. HTTP '+test.status);
+  c.p.setProperties({RUTAS_PUBLIC_DATA_APPROVED:'true',RUTAS_SYNC_ENABLED:'true'});
+  rutasCRInstalar();
+  return rutasCREstado();
 }
 function rutasCRRead_(id) {
   var ss=SpreadsheetApp.openById(id), tables={};
@@ -105,8 +118,10 @@ function rutasCRSincronizar() {
         // Block accidental deletions; allow exactly one reviewed snapshot by its hash.
         var oldDest=previous.transportistas.reduce(function(n,t){return n+(t.destinos||[]).length;},0);
         var newDest=built.json.transportistas.reduce(function(n,t){return n+t.destinos.length;},0);
-        var lostChild=previous.transportistas.some(function(t){var next=built.json.transportistas.find(function(n){return n.id===t.id;});return !next || (t.destinos||[]).some(function(d){return next.destinos.indexOf(d)<0;}) || (t.bodegas||[]).some(function(b){return !next.bodegas.some(function(n){return n.id===b.id;});}) || (t.telefonos||[]).some(function(p){return !next.telefonos.some(function(n){return n.numero===p.numero;});});});
-        if((lostChild || removed.length || after<before || newDest<oldDest) && c.p.getProperty('RUTAS_APPROVED_DELETION_HASH')!==built.hash)
+        var removedDest=false,removedWarehouse=false,removedPhone=false;
+        previous.transportistas.forEach(function(t){var next=built.json.transportistas.find(function(n){return n.id===t.id;});if(!next)return;(t.destinos||[]).forEach(function(d){if(next.destinos.indexOf(d)<0)removedDest=true;});(t.bodegas||[]).forEach(function(b){if(!next.bodegas.some(function(n){return n.id===b.id;}))removedWarehouse=true;});(t.telefonos||[]).forEach(function(p){if(!next.telefonos.some(function(n){return n.numero===p.numero;}))removedPhone=true;});});
+        var protectedReduction=removed.length||after<before||removedWarehouse||(removedDest&&c.p.getProperty('RUTAS_AUTO_DESTINATION_REMOVALS')!=='true')||(removedPhone&&c.p.getProperty('RUTAS_AUTO_PHONE_REMOVALS')!=='true');
+        if(protectedReduction && c.p.getProperty('RUTAS_APPROVED_DELETION_HASH')!==built.hash)
           throw Error('Reducción de datos bloqueada; revisar hash '+built.hash);
       }
       var snapshot={schemaVersion:1,generatedAt:new Date().toISOString(),contentHash:built.hash,transportistas:built.json.transportistas};
@@ -129,16 +144,21 @@ function rutasCRSincronizar() {
 }
 function rutasCRAlEditar(e) {
   if(!e || !e.range)return;
-  if(['TRANSPORTISTA','LUGARES','VISITA','DIRECCION','TELEFONOS'].indexOf(e.range.getSheet().getName())>=0)rutasCRSincronizar();
+  if(['TRANSPORTISTA','LUGARES','VISITA','DIRECCION','TELEFONOS'].indexOf(e.range.getSheet().getName())>=0)rutasCRCiclo();
 }
 // Optional AppSheet Automation > Call a script; same source edits also picked up by clock.
-function rutasCRDesdeAppSheet() { return rutasCRSincronizar(); }
+function rutasCRDesdeAppSheet() { return rutasCRCiclo(); }
+function rutasCRCiclo() {
+  var result={datos:rutasCRSincronizar(),imagenes:{state:'not-installed'}};
+  if(typeof rutasCRSincronizarImagenes==='function')try{result.imagenes=rutasCRSincronizarImagenes();}catch(e){PropertiesService.getScriptProperties().setProperty('RUTAS_IMAGES_LAST_ERROR',new Date().toISOString()+' '+e.message);result.imagenes={state:'error',message:e.message};}
+  return result;
+}
 function rutasCRInstalar() {
   var c=rutasCRConfig_();
-  ['rutasCRSincronizar','rutasCRAlEditar'].forEach(function(name){
+  ['rutasCRSincronizar','rutasCRCiclo','rutasCRAlEditar'].forEach(function(name){
     ScriptApp.getProjectTriggers().filter(function(t){return t.getHandlerFunction()===name;}).forEach(function(t){ScriptApp.deleteTrigger(t);});
   });
-  ScriptApp.newTrigger('rutasCRSincronizar').timeBased().everyMinutes(5).create();
+  ScriptApp.newTrigger('rutasCRCiclo').timeBased().everyMinutes(5).create();
   ScriptApp.newTrigger('rutasCRAlEditar').forSpreadsheet(c.sheet).onEdit().create();
   // Does not change RUTAS_SYNC_ENABLED; installation alone never starts publication.
 }
