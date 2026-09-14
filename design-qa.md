@@ -7,10 +7,10 @@
 - Implemented characteristics: circular 1:1 images with initials fallback; charcoal typography; dynamic schedule badge; phone plus icon-only WhatsApp; Waze and Google Maps SVG buttons; destination chips and per-card filter; nearby-service badge.
 - Functional checks: La Gamba corridor resolution, homonym disambiguation, exact destination matching, restored search controls, and AppSheet-derived carrier updates.
 - Automated evidence: 58/58 tests passed; production build passed with 59 carriers and 74 GPS warehouses.
-- Full-view evidence: pending public release because the isolated browser blocks `terminal.local` with `ERR_BLOCKED_BY_CLIENT`.
-- Focused comparison: pending final public screenshot after deployment.
+- Full-view evidence: release `99f5d4ff` inspected in the cloud browser at 1348 px width. The complete search header, territorial notice and carrier-card hierarchy render without overlap or clipping.
+- Focused comparison: the published La Gamba result was visually compared with the supplied card reference. It preserves the circular image, company/status hierarchy, compact contact row, navigation icons, open destination chips and restrained card styling. The implementation intentionally retains the existing Rutas CR navy/amber identity.
 - Iteration history: corrected overly broad destination matching, removed Palmar Norte from the La Gamba example corridor, added explicit nearby-coverage messaging, reduced WhatsApp to its recognizable icon, and restored the search control state.
 
-final result: blocked
+final result: passed
 
-Blocking reason: the cloud browser cannot access the isolated local preview. This document must be updated to `passed` only after visual inspection of the deployed release.
+Public checks also confirmed the Miravalles phone `7110-2236`, removal of its Fortuna and Guayabo assignments, icon-only WhatsApp links with accessible names, the five-center La Gamba corridor, and four-way Playa Hermosa disambiguation.
