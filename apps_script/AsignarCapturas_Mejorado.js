@@ -58,6 +58,7 @@ function asignarCapturasAprobadasInterno_() {
   if (idxEstado === -1) return 0;
 
   const mapTransportistas = getMapPorColumnas(sheetTransportista, 1, 0);
+  const setIdsTransportistas = getSetIds_(sheetTransportista, 0);
   const mapLugares        = getMapPorColumnas(sheetLugares, 1, 0);
   const setTelefonos      = getCombinedKeys(sheetTelefonos, 1, 2);
   const setVisitas        = getCombinedKeysExactos_(sheetVisita, 1, 2);
@@ -83,6 +84,7 @@ function asignarCapturasAprobadasInterno_() {
     const listaDestinos  = splitList(row[idxDestinos]);
     const listaBodegas   = splitAddressList(row[idxBodegas]);
     const nombreKey = normalizarTexto(nombreTransportista);
+    const idCaptura = (idxIdTransporte !== -1) ? String(row[idxIdTransporte] || "").trim() : "";
 
     // Validar zona/GPS antes de escribir transportista, teléfonos, destinos o direcciones.
     const preparacionBodegas = prepararBodegas_(listaBodegas, gpsCaptura);
@@ -96,11 +98,25 @@ function asignarCapturasAprobadasInterno_() {
     let idTransporte = "";
     let esActualizacion = false;
 
-    // 1. IDENTIDAD: nombre exacto normalizado y, como respaldo, teléfono.
-    if (mapTransportistas.has(nombreKey)) {
+    // 1. IDENTIDAD.
+    // Si la captura ya tiene IDTRANSPORTE, ese Ref es la evidencia más fuerte.
+    // Nunca se sustituye por GPS, bodega o coincidencia parcial de texto.
+    if (idCaptura) {
+      if (!setIdsTransportistas.has(idCaptura)) {
+        registrarConflictoCaptura_(sheetCapturas, i + 1, idxEstado, idxObservaciones,
+          "CONFLICTO: EL IDTRANSPORTE DE LA CAPTURA NO EXISTE");
+        continue;
+      }
+      if (nombreKey && mapTransportistas.has(nombreKey) && mapTransportistas.get(nombreKey) !== idCaptura) {
+        registrarConflictoCaptura_(sheetCapturas, i + 1, idxEstado, idxObservaciones,
+          "CONFLICTO: EL NOMBRE Y EL IDTRANSPORTE APUNTAN A EMPRESAS DISTINTAS");
+        continue;
+      }
+      idTransporte = idCaptura;
+      esActualizacion = true;
+    } else if (mapTransportistas.has(nombreKey)) {
       idTransporte = mapTransportistas.get(nombreKey);
       esActualizacion = true;
-      actualizarDatosTransportistaExistente_(sheetTransportista, idTransporte, horario, fotoCaptura, observaciones);
     } else if (nombreTransportista) {
       const idsPorTelefono = obtenerIdsPorTelefonos_(listaTelefonos, mapTelefonoAIds);
       if (idsPorTelefono.size > 1) {
@@ -112,14 +128,18 @@ function asignarCapturasAprobadasInterno_() {
         idTransporte = Array.from(idsPorTelefono)[0];
         esActualizacion = true;
         mapTransportistas.set(nombreKey, idTransporte);
-        actualizarDatosTransportistaExistente_(sheetTransportista, idTransporte, horario, fotoCaptura, observaciones);
       } else {
         idTransporte = generarId(sheetTransportista, "TRP-");
         sheetTransportista.appendRow([idTransporte, nombreTransportista, horario, observaciones, fotoCaptura, "", "", ""]);
         mapTransportistas.set(nombreKey, idTransporte);
+        setIdsTransportistas.add(idTransporte);
       }
     } else {
       continue;
+    }
+
+    if (esActualizacion) {
+      actualizarDatosTransportistaExistente_(sheetTransportista, idTransporte, horario, fotoCaptura, observaciones);
     }
 
     // Vincular IDTRANSPORTE en la hoja CAPTURAS
@@ -203,10 +223,11 @@ function actualizarDatosTransportistaExistente_(sheetTransportista, idTransporte
   for (let i = 1; i < data.length; i++) {
     if (String(data[i][idxId] || "").trim() === idTransporte) {
       const fila = i + 1;
-      if (nuevoHorario && idxHorario >= 0 && !String(data[i][idxHorario] || "").trim()) {
+      if (esDatoCapturadoUtil_(nuevoHorario) && idxHorario >= 0 &&
+          normalizarTexto(data[i][idxHorario]) !== normalizarTexto(nuevoHorario)) {
         sheetTransportista.getRange(fila, idxHorario + 1).setValue(nuevoHorario);
       }
-      if (nuevaFoto && idxImg >= 0 && !String(data[i][idxImg] || "").trim()) {
+      if (nuevaFoto && idxImg >= 0 && String(data[i][idxImg] || "").trim() !== nuevaFoto) {
         sheetTransportista.getRange(fila, idxImg + 1).setValue(nuevaFoto);
       }
       // Actualizar observaciones si hay notas
@@ -415,6 +436,22 @@ function normalizarTexto(texto) {
               .replace(/[\u0300-\u036f]/g, "")
               .toLowerCase()
               .trim();
+}
+
+function esDatoCapturadoUtil_(valor) {
+  const k = normalizarTexto(valor);
+  if (!k) return false;
+  return !/^(no indica|no indicado|no indicada|no especificado|no especificada|sin especificar|desconocido|n\/a)$/.test(k);
+}
+
+function getSetIds_(sheet, col) {
+  const data = sheet.getDataRange().getDisplayValues();
+  const ids = new Set();
+  for (let i = 1; i < data.length; i++) {
+    const id = String(data[i][col] || "").trim();
+    if (id) ids.add(id);
+  }
+  return ids;
 }
 
 function normalizarTelefono(tel) {
