@@ -60,7 +60,7 @@ function asignarCapturasAprobadasInterno_() {
   const mapTransportistas = getMapPorColumnas(sheetTransportista, 1, 0);
   const mapLugares        = getMapPorColumnas(sheetLugares, 1, 0);
   const setTelefonos      = getCombinedKeys(sheetTelefonos, 1, 2);
-  const setVisitas        = getCombinedKeys(sheetVisita, 1, 2);
+  const setVisitas        = getCombinedKeysExactos_(sheetVisita, 1, 2);
   const mapTelefonoAIds   = crearMapaTelefonoAIds_(sheetTelefonos);
   const direccionesCache  = leerDirecciones_(sheetDireccion);
 
@@ -153,7 +153,7 @@ function asignarCapturasAprobadasInterno_() {
         mapLugares.set(destinoKey, idLugares);
       }
 
-      const claveVisita = `${idTransporte}_${idLugares}`;
+      const claveVisita = claveRelacion_(idTransporte, idLugares);
       if (!setVisitas.has(claveVisita)) {
         const idVisita = generarId(sheetVisita, "VIS-");
         sheetVisita.appendRow([idVisita, idTransporte, idLugares]);
@@ -450,6 +450,21 @@ function getMapPorColumnas(sheet, colKey, colValue) {
     if (key && val) map.set(key, val);
   }
   return map;
+}
+
+function claveRelacion_(id1, id2) {
+  return String(id1 || "").trim() + "_" + String(id2 || "").trim();
+}
+
+function getCombinedKeysExactos_(sheet, col1, col2) {
+  const keys = new Set();
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    const v1 = String(data[i][col1] || "").trim();
+    const v2 = String(data[i][col2] || "").trim();
+    if (v1 && v2) keys.add(claveRelacion_(v1, v2));
+  }
+  return keys;
 }
 
 function getCombinedKeys(sheet, col1, col2) {
