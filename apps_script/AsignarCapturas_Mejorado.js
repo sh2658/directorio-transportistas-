@@ -1,6 +1,6 @@
 /**
  * ====================================================================
- * SISTEMA DE ASIGNACIÓN Y DISTRIBUCIÓN DE CAPTURAS APROBADAS (V10)
+ * SISTEMA DE STAGING, COMPARACIÓN Y ASIGNACIÓN DE CAPTURAS (V11)
  * ====================================================================
  * - IDTRANSPORTE es la identidad de la empresa. Teléfono, GPS, dirección,
  *   bodega, propietario o cercanía NO identifican ni fusionan transportistas.
@@ -39,155 +39,193 @@ function asignarCapturasAprobadasInterno_() {
     return 0;
   }
 
+  asegurarColumnasStagingCapturas_(sheetCapturas);
+
   const capturasData = sheetCapturas.getDataRange().getValues();
   if (capturasData.length <= 1) return 0;
 
-  const rawHeaders = capturasData[0];
-  const headers = rawHeaders.map(h => h.toString().trim());
+  const headers = capturasData[0].map(h => h.toString().trim());
+  const idx = {
+    estado: findHeaderIndex(headers, ["ESTADO", "Estado"]),
+    idTransporte: findHeaderIndex(headers, ["IDTRANSPORTE", "ID TRANSPORTE"]),
+    transportista: findHeaderIndex(headers, ["NOMBRE DEL TRANSPORTISTA", "TRANSPORTISTA"]),
+    telefonos: findHeaderIndex(headers, ["TELEFONOS", "Teléfonos"]),
+    destinos: findHeaderIndex(headers, ["LUGARES O DESTINOS", "DESTINOS"]),
+    bodegas: findHeaderIndex(headers, ["DIRECCIONES O BODEGAS", "BODEGAS"]),
+    horario: findHeaderIndex(headers, ["HORARIO", "Horario"]),
+    observaciones: findHeaderIndex(headers, ["OBSERVACIONES", "Observaciones"]),
+    gps: findHeaderIndex(headers, ["GPS"]),
+    foto: findHeaderIndex(headers, ["FOTO", "Foto"]),
+    usuario: findHeaderIndex(headers, ["USUARIO"]),
+    estadoIdentidad: findHeaderIndex(headers, ["ESTADO IDENTIDAD"]),
+    estadoComparacion: findHeaderIndex(headers, ["ESTADO COMPARACION", "ESTADO COMPARACIÓN"]),
+    alcance: findHeaderIndex(headers, ["ALCANCE CAPTURA"]),
+    cambios: findHeaderIndex(headers, ["CAMBIOS DETECTADOS"]),
+    fechaProceso: findHeaderIndex(headers, ["FECHA PROCESAMIENTO"]),
+    procesadoPor: findHeaderIndex(headers, ["PROCESADO POR"]),
+    hash: findHeaderIndex(headers, ["HASH CAPTURA"])
+  };
 
-  const idxEstado         = findHeaderIndex(headers, ["ESTADO", "Estado"]);
-  const idxIdTransporte   = findHeaderIndex(headers, ["IDTRANSPORTE", "ID TRANSPORTE"]);
-  const idxTransportista  = findHeaderIndex(headers, ["NOMBRE DEL TRANSPORTISTA", "TRANSPORTISTA"]);
-  const idxTelefonos      = findHeaderIndex(headers, ["TELEFONOS", "Teléfonos"]);
-  const idxDestinos       = findHeaderIndex(headers, ["LUGARES O DESTINOS", "DESTINOS"]);
-  const idxBodegas        = findHeaderIndex(headers, ["DIRECCIONES O BODEGAS", "BODEGAS"]);
-  const idxHorario        = findHeaderIndex(headers, ["HORARIO", "Horario"]);
-  const idxObservaciones  = findHeaderIndex(headers, ["OBSERVACIONES", "Observaciones"]);
-  const idxGps            = findHeaderIndex(headers, ["GPS"]);
-  const idxFoto           = findHeaderIndex(headers, ["FOTO", "Foto"]);
-
-  if (idxEstado === -1) return 0;
+  if (idx.estado === -1 || idx.transportista === -1) return 0;
 
   const mapTransportistas = crearMapaNombreAIds_(sheetTransportista);
   const idsTransportistas = crearSetIdsTransportistas_(sheetTransportista);
-  const mapLugares        = getMapPorColumnas(sheetLugares, 1, 0);
-  const setTelefonos      = getCombinedKeys(sheetTelefonos, 1, 2);
-  const setVisitas        = getCombinedKeys(sheetVisita, 1, 2);
-  const direccionesCache  = leerDirecciones_(sheetDireccion);
+  const transportistasPorId = leerTransportistasPorId_(sheetTransportista);
+  const mapLugares = getMapPorColumnas(sheetLugares, 1, 0);
+  const lugaresPorId = leerLugaresPorId_(sheetLugares);
+  const setTelefonos = getCombinedKeys(sheetTelefonos, 1, 2);
+  const telefonosPorId = leerTelefonosPorId_(sheetTelefonos);
+  const setVisitas = getCombinedKeys(sheetVisita, 1, 2);
+  const destinosPorId = leerDestinosPorId_(sheetVisita, lugaresPorId);
+  const direccionesCache = leerDirecciones_(sheetDireccion);
 
   let procesados = 0;
 
   for (let i = 1; i < capturasData.length; i++) {
     const row = capturasData[i];
-    const estado = normalizarTexto(row[idxEstado]);
+    const fila = i + 1;
+    const estado = normalizarTexto(row[idx.estado]);
 
-    // Acepta "aprobado", "actualizar", "aprobado - actualizar"
+    // AppSheet/IA pueden llenar CAPTURAS libremente. Solo una aprobación explícita
+    // promueve la información a las tablas maestras.
     if (!estado.includes("aprobad") && !estado.includes("actualiz")) continue;
 
-    const nombreTransportista = (row[idxTransportista] || "").toString().trim().toUpperCase();
-    const horario             = (row[idxHorario]       || "").toString().trim().toUpperCase();
-    const observaciones       = (row[idxObservaciones] || "").toString().trim().toUpperCase();
-    const gpsCaptura          = (idxGps !== -1) ? String(row[idxGps] || "").trim() : "";
-    const fotoCaptura         = (idxFoto !== -1) ? String(row[idxFoto] || "").trim() : "";
+    const captura = {
+      nombre: String(row[idx.transportista] || "").trim().toUpperCase(),
+      horario: idx.horario >= 0 ? String(row[idx.horario] || "").trim().toUpperCase() : "",
+      observaciones: idx.observaciones >= 0 ? String(row[idx.observaciones] || "").trim().toUpperCase() : "",
+      gps: idx.gps >= 0 ? String(row[idx.gps] || "").trim() : "",
+      foto: idx.foto >= 0 ? String(row[idx.foto] || "").trim() : "",
+      telefonos: idx.telefonos >= 0 ? splitList(row[idx.telefonos]) : [],
+      destinos: idx.destinos >= 0 ? splitList(row[idx.destinos]) : [],
+      bodegas: idx.bodegas >= 0 ? splitAddressList(row[idx.bodegas]) : [],
+      idExplicito: idx.idTransporte >= 0 ? String(row[idx.idTransporte] || "").trim() : "",
+      alcance: idx.alcance >= 0 ? String(row[idx.alcance] || "").trim().toUpperCase() : "",
+      usuario: idx.usuario >= 0 ? String(row[idx.usuario] || "").trim() : ""
+    };
+    if (!captura.alcance) captura.alcance = "PARCIAL";
 
-    const listaTelefonos = splitList(row[idxTelefonos]);
-    const listaDestinos  = splitList(row[idxDestinos]);
-    const listaBodegas   = splitAddressList(row[idxBodegas]);
-    const nombreKey = normalizarTexto(nombreTransportista);
-    const idTransporteCaptura = idxIdTransporte !== -1
-      ? String(row[idxIdTransporte] || "").trim()
-      : "";
+    const hash = hashCaptura_(captura);
+    if (idx.alcance >= 0 && !String(row[idx.alcance] || "").trim()) {
+      sheetCapturas.getRange(fila, idx.alcance + 1).setValue(captura.alcance);
+    }
 
-    // Validar zona/GPS antes de escribir transportista, teléfonos, destinos o direcciones.
-    const preparacionBodegas = prepararBodegas_(listaBodegas, gpsCaptura);
+    const preparacionBodegas = prepararBodegas_(captura.bodegas, captura.gps);
     if (preparacionBodegas.conflicto) {
       const conflicto = preparacionBodegas.conflicto;
-      registrarConflictoCaptura_(sheetCapturas, i + 1, idxEstado, idxObservaciones,
-        `CONFLICTO DE ZONA: DIRECCIÓN ${conflicto.zonaInfo.zonaTexto} / GPS ${conflicto.zonaInfo.zonaGps}`);
+      const mensaje = "CONFLICTO DE ZONA: DIRECCIÓN " + conflicto.zonaInfo.zonaTexto + " / GPS " + conflicto.zonaInfo.zonaGps;
+      registrarResultadoStaging_(sheetCapturas, fila, idx, {
+        idTransporte: captura.idExplicito,
+        estadoIdentidad: "REVISAR",
+        estadoComparacion: "REVISAR",
+        alcance: captura.alcance,
+        cambios: [{tipo:"BODEGA",accion:"REVISAR",detalle:mensaje}],
+        hash: hash,
+        estadoFinal: "Revisado"
+      });
       continue;
     }
 
-    let idTransporte = "";
-    let esActualizacion = false;
-
-    // 1. IDENTIDAD: IDTRANSPORTE es la única identidad persistente.
-    // Teléfono, GPS y dirección pueden repetirse entre empresas independientes.
     const identidad = decidirIdentidadTransportista_(
-      nombreKey,
-      idTransporteCaptura,
+      normalizarTexto(captura.nombre),
+      captura.idExplicito,
       mapTransportistas,
       idsTransportistas
     );
 
     if (identidad.accion === "REVISAR") {
-      registrarConflictoCaptura_(
-        sheetCapturas,
-        i + 1,
-        idxEstado,
-        idxObservaciones,
-        identidad.mensaje
-      );
+      registrarResultadoStaging_(sheetCapturas, fila, idx, {
+        idTransporte: captura.idExplicito,
+        estadoIdentidad: identidad.mensaje && /varios transportistas/i.test(identidad.mensaje) ? "AMBIGUO" : "REVISAR",
+        estadoComparacion: "REVISAR",
+        alcance: captura.alcance,
+        cambios: [{tipo:"IDENTIDAD",accion:"REVISAR",detalle:identidad.mensaje}],
+        hash: hash,
+        estadoFinal: "Revisado"
+      });
       continue;
     }
 
-    if (identidad.accion === "EXISTENTE") {
-      idTransporte = identidad.id;
-      esActualizacion = true;
-      if (nombreKey) agregarNombreId_(mapTransportistas, nombreKey, idTransporte);
-      actualizarDatosTransportistaExistente_(sheetTransportista, idTransporte, horario, fotoCaptura, observaciones);
-    } else if (identidad.accion === "CREAR") {
-      idTransporte = generarId(sheetTransportista, "TRP-");
-      sheetTransportista.appendRow([idTransporte, nombreTransportista, horario, observaciones, fotoCaptura, "", "", ""]);
-      agregarNombreId_(mapTransportistas, nombreKey, idTransporte);
+    if (identidad.accion === "CREAR") {
+      const idTransporte = generarId(sheetTransportista, "TRP-");
+      sheetTransportista.appendRow([idTransporte, captura.nombre, valorInformativo_(captura.horario), valorInformativo_(captura.observaciones), captura.foto, "", "", ""]);
+      agregarNombreId_(mapTransportistas, captura.nombre, idTransporte);
       idsTransportistas.add(idTransporte);
-    } else {
+      transportistasPorId.set(idTransporte,{id:idTransporte,nombre:captura.nombre,horario:valorInformativo_(captura.horario),observaciones:valorInformativo_(captura.observaciones),imagen:captura.foto});
+
+      aplicarListasCaptura_(idTransporte, captura, preparacionBodegas, {
+        sheetTelefonos, sheetLugares, sheetVisita, sheetDireccion,
+        mapLugares, setTelefonos, setVisitas, direccionesCache,
+        telefonosPorId, destinosPorId
+      });
+
+      registrarResultadoStaging_(sheetCapturas, fila, idx, {
+        idTransporte,
+        estadoIdentidad: "NUEVO",
+        estadoComparacion: "NUEVO",
+        alcance: captura.alcance,
+        cambios: [{tipo:"TRANSPORTISTA",accion:"CREAR",detalle:captura.nombre}],
+        hash,
+        estadoFinal: "Asignado"
+      });
+      procesados++;
       continue;
     }
 
-    // Vincular IDTRANSPORTE en la hoja CAPTURAS
-    if (idxIdTransporte !== -1 && idTransporte) {
-      sheetCapturas.getRange(i + 1, idxIdTransporte + 1).setValue(idTransporte);
+    const idTransporte = identidad.id;
+    const comparacion = compararCapturaConMaestro_(idTransporte, captura, preparacionBodegas, {
+      transportistasPorId, telefonosPorId, destinosPorId, direccionesCache
+    });
+
+    if (comparacion.requiereRevision) {
+      registrarResultadoStaging_(sheetCapturas, fila, idx, {
+        idTransporte,
+        estadoIdentidad: "ENCONTRADO",
+        estadoComparacion: "REVISAR",
+        alcance: captura.alcance,
+        cambios: comparacion.cambios,
+        hash,
+        estadoFinal: "Revisado"
+      });
+      continue;
     }
 
-    // 2. TELÉFONOS (agrega nuevos teléfonos si la foto trae números adicionales)
-    listaTelefonos.forEach(tel => {
-      const telNorm = normalizarTelefono(tel);
-      if (!telNorm) return;
-      const clave = `${idTransporte}_${normalizarTexto(telNorm)}`;
-      if (!setTelefonos.has(clave)) {
-        const idTelefono = generarId(sheetTelefonos, "TEL-");
-        sheetTelefonos.appendRow([idTelefono, idTransporte, telNorm, ""]);
-        setTelefonos.add(clave);
-      }
-    });
-
-    // 3. LUGARES / DESTINOS (agrega nuevas rutas si la foto trae nuevos pueblos)
-    listaDestinos.forEach(destino => {
-      if (!destino) return;
-      const destinoKey = normalizarTexto(destino);
-      let idLugares = mapLugares.get(destinoKey);
-
-      if (!idLugares) {
-        idLugares = generarId(sheetLugares, "LUG-");
-        sheetLugares.appendRow([idLugares, destino]);
-        mapLugares.set(destinoKey, idLugares);
-      }
-
-      const claveVisita = `${idTransporte}_${idLugares}`;
-      if (!setVisitas.has(claveVisita)) {
-        const idVisita = generarId(sheetVisita, "VIS-");
-        sheetVisita.appendRow([idVisita, idTransporte, idLugares]);
-        setVisitas.add(claveVisita);
-      }
-    });
-
-    // 4. BODEGAS: <=100 m mismo predio SOLO dentro del mismo IDTRANSPORTE;
-    //    >100 m otra dirección del mismo transportista. Nunca fusiona IDs distintos.
-    preparacionBodegas.items.forEach(item => {
-      asignarBodegaPorDistancia_(
-        sheetDireccion,
-        direccionesCache,
+    if (!comparacion.cambios.length) {
+      registrarResultadoStaging_(sheetCapturas, fila, idx, {
         idTransporte,
-        item.bodega,
-        item.gps,
-        item.zonaInfo.zona
-      );
+        estadoIdentidad: "ENCONTRADO",
+        estadoComparacion: "DUPLICADO",
+        alcance: captura.alcance,
+        cambios: [],
+        hash,
+        estadoFinal: "Procesado"
+      });
+      procesados++;
+      continue;
+    }
+
+    actualizarDatosTransportistaExistente_(
+      sheetTransportista,
+      idTransporte,
+      captura.horario,
+      captura.foto,
+      captura.observaciones
+    );
+    aplicarListasCaptura_(idTransporte, captura, preparacionBodegas, {
+      sheetTelefonos, sheetLugares, sheetVisita, sheetDireccion,
+      mapLugares, setTelefonos, setVisitas, direccionesCache,
+      telefonosPorId, destinosPorId
     });
 
-    // Estado final en la hoja CAPTURAS
-    // Ambos valores existen en la validación/Enum actual de CAPTURAS y AppSheet.
-    const estadoFinal = esActualizacion ? "Procesado" : "Asignado";
-    sheetCapturas.getRange(i + 1, idxEstado + 1).setValue(estadoFinal);
+    registrarResultadoStaging_(sheetCapturas, fila, idx, {
+      idTransporte,
+      estadoIdentidad: "ENCONTRADO",
+      estadoComparacion: "ACTUALIZAR",
+      alcance: captura.alcance,
+      cambios: comparacion.cambios,
+      hash,
+      estadoFinal: "Procesado"
+    });
     procesados++;
   }
 
@@ -208,29 +246,24 @@ function actualizarDatosTransportistaExistente_(sheetTransportista, idTransporte
   const idxHorario = headers.indexOf("HORARIO");
   const idxObs = headers.indexOf("OBSERVACIONES");
   const idxImg = headers.indexOf("IMAGEN");
-
   if (idxId < 0) return;
 
   for (let i = 1; i < data.length; i++) {
-    if (String(data[i][idxId] || "").trim() === idTransporte) {
-      const fila = i + 1;
-      if (nuevoHorario && idxHorario >= 0 && !String(data[i][idxHorario] || "").trim()) {
-        sheetTransportista.getRange(fila, idxHorario + 1).setValue(nuevoHorario);
-      }
-      if (nuevaFoto && idxImg >= 0 && !String(data[i][idxImg] || "").trim()) {
-        sheetTransportista.getRange(fila, idxImg + 1).setValue(nuevaFoto);
-      }
-      // Actualizar observaciones si hay notas
-      if (nuevasObs && idxObs >= 0) {
-        const obsPrevias = String(data[i][idxObs] || "").trim();
-        const partes = obsPrevias ? obsPrevias.split(/\s*\|\s*/).filter(Boolean) : [];
-        if (!partes.some(obs => normalizarTexto(obs) === normalizarTexto(nuevasObs))) {
-          partes.push(nuevasObs);
-          sheetTransportista.getRange(fila, idxObs + 1).setValue(partes.join(" | "));
-        }
-      }
-      return;
+    if (String(data[i][idxId] || "").trim() !== idTransporte) continue;
+    const fila = i + 1;
+    if (idxHorario >= 0 && esValorInformativo_(nuevoHorario) &&
+        normalizarTexto(data[i][idxHorario]) !== normalizarTexto(nuevoHorario)) {
+      sheetTransportista.getRange(fila, idxHorario + 1).setValue(nuevoHorario);
     }
+    if (idxImg >= 0 && nuevaFoto &&
+        String(data[i][idxImg] || "").trim() !== String(nuevaFoto).trim()) {
+      sheetTransportista.getRange(fila, idxImg + 1).setValue(nuevaFoto);
+    }
+    if (idxObs >= 0 && esValorInformativo_(nuevasObs) &&
+        normalizarTexto(data[i][idxObs]) !== normalizarTexto(nuevasObs)) {
+      sheetTransportista.getRange(fila, idxObs + 1).setValue(nuevasObs);
+    }
+    return;
   }
 }
 
@@ -382,14 +415,20 @@ function asignarBodegaPorDistancia_(sheet, cache, idTransporte, direccion, gps, 
   const decision = decidirCoincidenciaBodega_(existentes, direccion, gps);
   if (decision.registro) {
     const d = decision.registro;
-    if (!d.direccion && direccion) { sheet.getRange(d.fila, 3).setValue(direccion); d.direccion = direccion; }
-    if (!parsearGps_(d.gps) && parsearGps_(gps)) { sheet.getRange(d.fila, 4).setValue(gps); d.gps = gps; }
-    if (!d.zona && zona) { sheet.getRange(d.fila, 5).setValue(zona); d.zona = zona; }
+    if (esValorInformativo_(direccion) && normalizarTexto(d.direccion) !== normalizarTexto(direccion)) {
+      sheet.getRange(d.fila, 3).setValue(direccion); d.direccion = direccion;
+    }
+    if (punto && String(d.gps || "").trim() !== String(gps || "").trim()) {
+      sheet.getRange(d.fila, 4).setValue(gps); d.gps = gps;
+    }
+    if (zona && normalizarTexto(d.zona) !== normalizarTexto(zona)) {
+      sheet.getRange(d.fila, 5).setValue(zona); d.zona = zona;
+    }
     return decision;
   }
   const idDireccion = generarId(sheet, "DIR-");
-  sheet.appendRow([idDireccion, idTransporte, direccion, parsearGps_(gps) ? gps : "", zona || ""]);
-  cache.push({fila:sheet.getLastRow(),id:idDireccion,idTransporte:idTransporte,direccion:direccion,gps:gps,zona:zona || ""});
+  sheet.appendRow([idDireccion, idTransporte, direccion, punto ? gps : "", zona || ""]);
+  cache.push({fila:sheet.getLastRow(),id:idDireccion,idTransporte:idTransporte,direccion:direccion,gps:punto?gps:"",zona:zona || ""});
   return decision;
 }
 
@@ -453,6 +492,195 @@ function registrarConflictoCaptura_(sheet, fila, idxEstado, idxObservaciones, me
   if (!normalizarTexto(anterior).includes(normalizarTexto(mensaje))) {
     celda.setValue([anterior, mensaje].filter(Boolean).join(" | "));
   }
+}
+
+function asegurarColumnasStagingCapturas_(sheet) {
+  const requeridas = ["IDTRANSPORTE","ESTADO IDENTIDAD","ESTADO COMPARACION","ALCANCE CAPTURA","CAMBIOS DETECTADOS","FECHA PROCESAMIENTO","PROCESADO POR","HASH CAPTURA"];
+  const lastColumn = Math.max(sheet.getLastColumn(),1);
+  const headers = sheet.getRange(1,1,1,lastColumn).getDisplayValues()[0].map(v=>String(v||"").trim().toUpperCase());
+  requeridas.forEach(nombre => {
+    if (headers.indexOf(nombre) >= 0) return;
+    sheet.insertColumnAfter(sheet.getLastColumn());
+    sheet.getRange(1,sheet.getLastColumn()).setValue(nombre);
+    headers.push(nombre);
+  });
+}
+
+function leerTransportistasPorId_(sheet) {
+  const data = sheet.getDataRange().getValues(), out = new Map();
+  if (!data.length) return out;
+  const h = data[0].map(v=>String(v||"").trim().toUpperCase());
+  const ix = n=>h.indexOf(n);
+  for (let i=1;i<data.length;i++) {
+    const id=String(data[i][ix("IDTRANSPORTE")]||"").trim();
+    if(!id) continue;
+    out.set(id,{
+      id,
+      nombre:ix("TRANSPORTE")>=0?String(data[i][ix("TRANSPORTE")]||"").trim():"",
+      horario:ix("HORARIO")>=0?String(data[i][ix("HORARIO")]||"").trim():"",
+      observaciones:ix("OBSERVACIONES")>=0?String(data[i][ix("OBSERVACIONES")]||"").trim():"",
+      imagen:ix("IMAGEN")>=0?String(data[i][ix("IMAGEN")]||"").trim():""
+    });
+  }
+  return out;
+}
+
+function leerLugaresPorId_(sheet) {
+  const data=sheet.getDataRange().getValues(), out=new Map();
+  for(let i=1;i<data.length;i++){
+    const id=String(data[i][0]||"").trim(), nombre=String(data[i][1]||"").trim();
+    if(id) out.set(id,nombre);
+  }
+  return out;
+}
+
+function leerTelefonosPorId_(sheet) {
+  const data=sheet.getDataRange().getValues(), out=new Map();
+  for(let i=1;i<data.length;i++){
+    const id=String(data[i][1]||"").trim(), tel=normalizarTelefono(data[i][2]);
+    if(!id||!tel) continue;
+    if(!out.has(id)) out.set(id,new Set());
+    out.get(id).add(normalizarTexto(tel));
+  }
+  return out;
+}
+
+function leerDestinosPorId_(sheetVisita, lugaresPorId) {
+  const data=sheetVisita.getDataRange().getValues(), out=new Map();
+  for(let i=1;i<data.length;i++){
+    const id=String(data[i][1]||"").trim(), lugarId=String(data[i][2]||"").trim();
+    const nombre=lugaresPorId.get(lugarId)||"";
+    if(!id||!nombre) continue;
+    if(!out.has(id)) out.set(id,new Set());
+    out.get(id).add(normalizarTexto(nombre));
+  }
+  return out;
+}
+
+function esValorInformativo_(valor) {
+  const k=normalizarTexto(valor);
+  return Boolean(k) && !/^(no indica|no indicado|no indicada|no especificado|no especificada|sin dato|sin datos|n\/a|na)$/.test(k);
+}
+
+function valorInformativo_(valor) { return esValorInformativo_(valor) ? valor : ""; }
+
+function hashCaptura_(captura) {
+  const payload=[
+    normalizarTexto(captura.nombre),
+    (captura.telefonos||[]).map(normalizarTelefono).map(normalizarTexto).sort().join("|"),
+    (captura.destinos||[]).map(normalizarTexto).sort().join("|"),
+    (captura.bodegas||[]).map(normalizarTexto).sort().join("|"),
+    String(captura.gps||"").trim(),
+    normalizarTexto(captura.horario),
+    String(captura.foto||"").trim(),
+    normalizarTexto(captura.observaciones),
+    String(captura.idExplicito||"").trim(),
+    String(captura.alcance||"").trim().toUpperCase()
+  ].join("¦");
+  let h=2166136261;
+  for(let i=0;i<payload.length;i++){h^=payload.charCodeAt(i);h=Math.imul(h,16777619);}
+  return ("00000000"+(h>>>0).toString(16)).slice(-8).toUpperCase();
+}
+
+function compararCapturaConMaestro_(idTransporte, captura, preparacionBodegas, ctx) {
+  const cambios=[], maestro=ctx.transportistasPorId.get(idTransporte)||{};
+  if(esValorInformativo_(captura.horario) && normalizarTexto(maestro.horario)!==normalizarTexto(captura.horario))
+    cambios.push({tipo:"HORARIO",accion:"ACTUALIZAR",valor:captura.horario});
+  if(captura.foto && String(maestro.imagen||"").trim()!==String(captura.foto).trim())
+    cambios.push({tipo:"IMAGEN",accion:"ACTUALIZAR",valor:captura.foto});
+  if(esValorInformativo_(captura.observaciones) && normalizarTexto(maestro.observaciones)!==normalizarTexto(captura.observaciones))
+    cambios.push({tipo:"OBSERVACIONES",accion:"ACTUALIZAR",valor:captura.observaciones});
+
+  const actualesTel=ctx.telefonosPorId.get(idTransporte)||new Set();
+  const capturadosTel=new Set();
+  (captura.telefonos||[]).forEach(t=>{
+    const tel=normalizarTelefono(t), k=normalizarTexto(tel);
+    if(!k) return; capturadosTel.add(k);
+    if(!actualesTel.has(k)) cambios.push({tipo:"TELEFONO",accion:"AGREGAR",valor:tel});
+  });
+
+  const actualesDest=ctx.destinosPorId.get(idTransporte)||new Set();
+  const capturadosDest=new Set();
+  (captura.destinos||[]).forEach(d=>{
+    const k=normalizarTexto(d); if(!k) return; capturadosDest.add(k);
+    if(!actualesDest.has(k)) cambios.push({tipo:"DESTINO",accion:"AGREGAR",valor:d});
+  });
+
+  const existentes=ctx.direccionesCache.filter(d=>d.idTransporte===idTransporte);
+  (preparacionBodegas.items||[]).forEach(item=>{
+    let direccion=item.bodega;
+    if(esDireccionGenerica_(direccion) && parsearGps_(item.gps)) direccion="UBICACIÓN CAPTURADA POR GPS";
+    const decision=decidirCoincidenciaBodega_(existentes,direccion,item.gps);
+    if(!decision.registro){cambios.push({tipo:"BODEGA",accion:"AGREGAR",valor:direccion,gps:item.gps||""});return;}
+    const d=decision.registro;
+    if(esValorInformativo_(direccion) && normalizarTexto(d.direccion)!==normalizarTexto(direccion))
+      cambios.push({tipo:"BODEGA_DIRECCION",accion:"ACTUALIZAR",valor:direccion});
+    if(parsearGps_(item.gps) && String(d.gps||"").trim()!==String(item.gps||"").trim())
+      cambios.push({tipo:"BODEGA_GPS",accion:"ACTUALIZAR",valor:item.gps});
+    if(item.zonaInfo.zona && normalizarTexto(d.zona)!==normalizarTexto(item.zonaInfo.zona))
+      cambios.push({tipo:"BODEGA_ZONA",accion:"ACTUALIZAR",valor:item.zonaInfo.zona});
+  });
+
+  let requiereRevision=false;
+  if(String(captura.alcance||"").toUpperCase()==="COMPLETA"){
+    const faltanTel=[...actualesTel].filter(k=>!capturadosTel.has(k));
+    const faltanDest=[...actualesDest].filter(k=>!capturadosDest.has(k));
+    if(faltanTel.length||faltanDest.length){
+      requiereRevision=true;
+      cambios.push({tipo:"BAJAS",accion:"REVISAR",detalle:"La captura completa omite datos existentes. Las eliminaciones nunca son automáticas.",telefonos:faltanTel.length,destinos:faltanDest.length});
+    }
+  }
+  return {cambios,requiereRevision};
+}
+
+function aplicarListasCaptura_(idTransporte, captura, preparacionBodegas, ctx) {
+  if(!ctx.telefonosPorId.has(idTransporte)) ctx.telefonosPorId.set(idTransporte,new Set());
+  if(!ctx.destinosPorId.has(idTransporte)) ctx.destinosPorId.set(idTransporte,new Set());
+
+  (captura.telefonos||[]).forEach(tel=>{
+    const telNorm=normalizarTelefono(tel), k=normalizarTexto(telNorm);
+    if(!k) return;
+    const clave=idTransporte+"_"+k;
+    if(!ctx.setTelefonos.has(clave)){
+      const idTelefono=generarId(ctx.sheetTelefonos,"TEL-");
+      ctx.sheetTelefonos.appendRow([idTelefono,idTransporte,telNorm,""]);
+      ctx.setTelefonos.add(clave);ctx.telefonosPorId.get(idTransporte).add(k);
+    }
+  });
+
+  (captura.destinos||[]).forEach(destino=>{
+    if(!destino) return;
+    const destinoKey=normalizarTexto(destino);
+    let idLugares=ctx.mapLugares.get(destinoKey);
+    if(!idLugares){
+      idLugares=generarId(ctx.sheetLugares,"LUG-");
+      ctx.sheetLugares.appendRow([idLugares,destino]);
+      ctx.mapLugares.set(destinoKey,idLugares);
+    }
+    const claveVisita=idTransporte+"_"+idLugares;
+    if(!ctx.setVisitas.has(claveVisita)){
+      const idVisita=generarId(ctx.sheetVisita,"VIS-");
+      ctx.sheetVisita.appendRow([idVisita,idTransporte,idLugares]);
+      ctx.setVisitas.add(claveVisita);ctx.destinosPorId.get(idTransporte).add(destinoKey);
+    }
+  });
+
+  (preparacionBodegas.items||[]).forEach(item=>{
+    asignarBodegaPorDistancia_(ctx.sheetDireccion,ctx.direccionesCache,idTransporte,item.bodega,item.gps,item.zonaInfo.zona);
+  });
+}
+
+function registrarResultadoStaging_(sheet, fila, idx, result) {
+  const write=(i,v)=>{if(i>=0) sheet.getRange(fila,i+1).setValue(v);};
+  write(idx.idTransporte,result.idTransporte||"");
+  write(idx.estadoIdentidad,result.estadoIdentidad||"");
+  write(idx.estadoComparacion,result.estadoComparacion||"");
+  write(idx.alcance,result.alcance||"PARCIAL");
+  write(idx.cambios,JSON.stringify(result.cambios||[]));
+  write(idx.fechaProceso,new Date());
+  write(idx.procesadoPor,"APPS SCRIPT V11");
+  write(idx.hash,result.hash||"");
+  if(result.estadoFinal) write(idx.estado,result.estadoFinal);
 }
 
 function normalizarTexto(texto) {
@@ -538,4 +766,4 @@ function splitAddressList(val) {
   return direccion ? [direccion] : [];
 }
 
-if (typeof module !== "undefined") module.exports = { decidirIdentidadTransportista_, agregarNombreId_ };
+if (typeof module !== "undefined") module.exports = { decidirIdentidadTransportista_, agregarNombreId_, compararCapturaConMaestro_, hashCaptura_, esValorInformativo_, decidirCoincidenciaBodega_, prepararBodegas_, normalizarTexto, normalizarTelefono };
