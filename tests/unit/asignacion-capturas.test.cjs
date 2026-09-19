@@ -4,7 +4,10 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 
 function cargar() {
-  const context = vm.createContext({ console });
+  const context = vm.createContext({
+    console,
+    Utilities: { getUuid: () => 'ABCDEF12-3456-7890-ABCD-EF1234567890' }
+  });
   vm.runInContext(
     fs.readFileSync('apps_script/AsignarCapturas_Mejorado.js', 'utf8'),
     context
@@ -146,4 +149,14 @@ test('la clave de relación VISITA conserva los IDs y es idempotente', () => {
   assert.equal(c.claveRelacion_('TRP-COCORI', 'LUG-0416'), 'TRP-COCORI_LUG-0416');
   assert.equal(c.claveRelacion_(' TRP-COCORI ', ' LUG-0416 '), 'TRP-COCORI_LUG-0416');
   assert.notEqual(c.claveRelacion_('TRP-COCORI', 'LUG-0416'), 'TRP-COCORI_lug-0416');
+});
+
+
+test('genera IDs no secuenciales para evitar colisiones entre automatizaciones', () => {
+  const c = cargar();
+  const sheet = {
+    getLastRow: () => 2,
+    getRange: () => ({ getDisplayValues: () => [['VIS-1028']] })
+  };
+  assert.equal(c.generarId(sheet, 'VIS-'), 'VIS-ABCDEF12');
 });
