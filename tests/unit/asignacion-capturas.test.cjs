@@ -96,7 +96,7 @@ test('teléfono GPS y dirección no forman parte de la identidad del transportis
   const source = fs.readFileSync('apps_script/AsignarCapturas_Mejorado.js', 'utf8');
   assert.doesNotMatch(source, /obtenerIdsPorTelefonos_/);
   assert.doesNotMatch(source, /crearMapaTelefonoAIds_/);
-  assert.match(source, /IDTRANSPORTE es la única identidad persistente/);
+  assert.match(source, /IDTRANSPORTE es la identidad de la empresa/);
 });
 
 test('un teléfono compartido no bloquea ni fusiona nombres diferentes', () => {
@@ -204,8 +204,10 @@ test('GPS inválido o fuera de Costa Rica se rechaza', () => {
   );
 });
 
-test('solo escribe estados admitidos actualmente por CAPTURAS y AppSheet', () => {
+test('V11 usa estados finales compatibles y staging explícito', () => {
   const source = fs.readFileSync('apps_script/AsignarCapturas_Mejorado.js', 'utf8');
-  assert.match(source, /esActualizacion \? "Procesado" : "Asignado"/);
-  assert.doesNotMatch(source, /Actualizado a última toma/);
+  for (const estado of ['Procesado','Asignado','Revisado']) assert.match(source,new RegExp('estadoFinal: "'+estado+'"'));
+  for (const clasificacion of ['DUPLICADO','ACTUALIZAR','NUEVO','REVISAR']) assert.match(source,new RegExp('estadoComparacion: "'+clasificacion+'"'));
+  assert.match(source,/APPS SCRIPT V11/);
+  assert.doesNotMatch(source,/Actualizado a última toma/);
 });
