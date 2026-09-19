@@ -160,3 +160,12 @@ test('genera IDs no secuenciales para evitar colisiones entre automatizaciones',
   };
   assert.equal(c.generarId(sheet, 'VIS-'), 'VIS-ABCDEF12');
 });
+
+
+test('rechaza valores de captura no informativos antes de sobrescribir datos válidos', () => {
+  const c = cargar();
+  assert.equal(c.esDatoCapturadoUtil_('LUNES A VIERNES 8:00-17:00'), true);
+  assert.equal(c.esDatoCapturadoUtil_('NO ESPECIFICADO'), false);
+  assert.equal(c.esDatoCapturadoUtil_('NO INDICA'), false);
+  assert.equal(c.esDatoCapturadoUtil_(''), false);
+});
