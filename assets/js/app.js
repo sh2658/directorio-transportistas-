@@ -50,14 +50,14 @@
     const original=query.value.trim(),matches=C.search(data,mode,original);
     if(mode!=='destino'){renderRows(matches,matches.length?'Transportistas disponibles':'Sin coincidencias',matches.length+' resultado'+(matches.length===1?'':'s')+' para «'+original+'»',focus);return;}
     const exactMatches=C.searchExactDestination(data,original);
-    if(exactMatches.length){renderRows(exactMatches,'Transportistas disponibles',exactMatches.length+' resultado'+(exactMatches.length===1?'':'s')+' exacto'+(exactMatches.length===1?'':'s')+' para «'+original+'»',focus);return;}
     $('buscar').disabled=true;$('resultados').setAttribute('aria-busy','true');$('tituloResultados').textContent='Consultando referencia territorial…';
     try{
       const ref=await loadTerritory();if(sequence!==searchSequence)return;const resolution=C.resolvePlace(original,ref.localities,ref.homonyms,ref.cantons);
       if(resolution.type==='ambiguous'){renderAmbiguous(original,resolution,focus);return;}
+      if(exactMatches.length){renderRows(exactMatches,'Transportistas disponibles',exactMatches.length+' resultado'+(exactMatches.length===1?'':'s')+' exacto'+(exactMatches.length===1?'':'s')+' para «'+original+'»',focus);return;}
       if((resolution.type==='locality'||resolution.type==='canton')&&resolution.logistics.length){renderNearby(original,resolution,focus);return;}
       renderLexical(original,focus);
-    }catch(error){if(sequence!==searchSequence)return;console.warn('Referencia territorial:',error.message);renderRows(matches,matches.length?'Transportistas disponibles':'Sin coincidencias',matches.length+' resultado'+(matches.length===1?'':'s')+' para «'+original+'»',focus,matches.length?null:territorialNotice('Referencia territorial temporalmente no disponible','Puede buscar un destino registrado mientras se recupera la guía de localidades.'));}
+    }catch(error){if(sequence!==searchSequence)return;console.warn('Referencia territorial:',error.message);const fallback=exactMatches.length?exactMatches:matches;renderRows(fallback,fallback.length?'Transportistas disponibles':'Sin coincidencias',fallback.length+' resultado'+(fallback.length===1?'':'s')+' para «'+original+'»',focus,fallback.length?null:territorialNotice('Referencia territorial temporalmente no disponible','Puede buscar un destino registrado mientras se recupera la guía de localidades.'));}
     finally{if(sequence===searchSequence){$('buscar').disabled=false;$('resultados').removeAttribute('aria-busy');}}
   }
   function avatar(t){
@@ -119,7 +119,7 @@
     $('guiaObservaciones').value='';
     $('guiaTitulo').textContent=t?'Guía de embalaje · '+C.displayName(t.nombre):'Guía de embalaje general';
     renderPackingGuide();
-    d.showModal();
+    if(typeof d.showModal==='function')d.showModal();else d.setAttribute('open','');
   }
   function renderPackingGuide(){
     const preview=$('guiaPreview');if(!preview)return;
@@ -159,7 +159,7 @@
   if(window.ResizeObserver)new ResizeObserver(()=>{if(map&&!$('panelMapa').hidden)map.invalidateSize();}).observe($('mapa'));window.addEventListener('orientationchange',()=>setTimeout(()=>{if(map)map.invalidateSize();},200));
   $('ubicacion').addEventListener('click',()=>{if(!navigator.geolocation){$('estadoUbicacion').textContent='Su navegador no admite geolocalización.';return;}$('ubicacion').disabled=true;$('estadoUbicacion').textContent='Buscando su ubicación…';navigator.geolocation.getCurrentPosition(p=>{position={lat:p.coords.latitude,lng:p.coords.longitude};$('ubicacion').disabled=false;$('estadoUbicacion').textContent='Resultados ordenados por la bodega más cercana.';if(hasSearch)search(false);showUser();},()=>{$('ubicacion').disabled=false;$('estadoUbicacion').textContent='No se pudo obtener la ubicación. Puede seguir buscando.';},{timeout:10000,maximumAge:120000,enableHighAccuracy:false});});
   $('cerrarVisor').addEventListener('click',()=>$('visorImagen').close());$('visorImagen').addEventListener('close',()=>{$('imagenAmpliada').removeAttribute('src');});
-  $('abrirGuiaGeneral')?.addEventListener('click',()=>openPackingGuide());$('cerrarGuia')?.addEventListener('click',()=>$('guiaEmbalaje').close());$('imprimirGuia')?.addEventListener('click',printPackingGuide);
+  $('abrirGuiaGeneral')?.addEventListener('click',()=>openPackingGuide());$('cerrarGuia')?.addEventListener('click',()=>{const d=$('guiaEmbalaje');if(typeof d.close==='function')d.close();else d.removeAttribute('open');});$('imprimirGuia')?.addEventListener('click',printPackingGuide);
   ['guiaTransportista','guiaDestino','guiaDestinatario','guiaTelefono','guiaDireccion','guiaRemitente','guiaTelefonoRemitente','guiaContenido','guiaBultos','guiaObservaciones'].forEach(id=>$(id)?.addEventListener('input',renderPackingGuide));
   window.addEventListener('afterprint',()=>document.body.classList.remove('imprimiendo-guia'));
   setInterval(updateScheduleBadges,60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)updateScheduleBadges();});
