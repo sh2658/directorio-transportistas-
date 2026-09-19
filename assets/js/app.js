@@ -5,6 +5,8 @@
   let data=[],results=[],visible=0,position=null,map=null,cluster=null,userMarker=null,loadingMap=null;
   let mode='destino',busy=false,mapActive=false,hasSearch=false,territory=null,territoryPromise=null,searchSequence=0,nearbyResults=false;
   const PAGE=15,query=$('consulta'),iconPath=name=>'./assets/icons/'+name+'.svg';
+  // Bodegas compartidas mal clasificadas históricamente como transportistas.
+  const NON_CARRIER_IDS=new Set(['transp2','TRP-0046']);
   const PUBLIC_DIRECTORY_URL='https://sh2658.github.io/directorio-transportistas-/';
   const QR_URL='https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=8&data='+encodeURIComponent(PUBLIC_DIRECTORY_URL);
   function el(tag,text,cls){const node=document.createElement(tag);if(text!=null)node.textContent=text;if(cls)node.className=cls;return node;}
@@ -20,7 +22,7 @@
       if(!response.ok)throw Error('HTTP '+response.status);
       const snapshot=C.validate(await response.json());
       let images={};try{const manifest=await fetch(new URL('./assets/carriers/manifest.json',document.baseURI),{signal:controller.signal,cache:'no-store',credentials:'omit'});if(manifest.ok)images=(await manifest.json()).images||{};}catch(error){console.warn('Manifiesto de imágenes:',error.message);}
-      data=snapshot.transportistas.map(t=>({...t,imagen:images[t.id]||t.imagen}));
+      data=snapshot.transportistas.filter(t=>!NON_CARRIER_IDS.has(t.id)).map(t=>({...t,imagen:images[t.id]||t.imagen}));
       const date=snapshot.generatedAt?new Date(snapshot.generatedAt):null;
       notice(data.length+' transportistas disponibles'+(date&&Number.isFinite(date.getTime())?' · Actualizado '+date.toLocaleDateString('es-CR'):''));
       suggestions();$('buscar').disabled=false;if(hasSearch)search(false);
