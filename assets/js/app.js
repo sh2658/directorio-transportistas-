@@ -5,6 +5,8 @@
   let data=[],results=[],visible=0,position=null,map=null,cluster=null,userMarker=null,loadingMap=null;
   let mode='destino',busy=false,mapActive=false,hasSearch=false,territory=null,territoryPromise=null,searchSequence=0,nearbyResults=false;
   const PAGE=15,query=$('consulta'),iconPath=name=>'./assets/icons/'+name+'.svg';
+  const PUBLIC_DIRECTORY_URL='https://sh2658.github.io/directorio-transportistas-/';
+  const QR_URL='https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=8&data='+encodeURIComponent(PUBLIC_DIRECTORY_URL);
   function el(tag,text,cls){const node=document.createElement(tag);if(text!=null)node.textContent=text;if(cls)node.className=cls;return node;}
   function icon(name,alt=''){const img=el('img');img.src=iconPath(name);img.alt=alt;img.width=20;img.height=20;img.className='icono';return img;}
   function link(text,url,cls,iconName){const a=el('a',null,cls);a.href=url;if(/^https:/.test(url)){a.target='_blank';a.rel='noopener noreferrer';}if(iconName)a.append(icon(iconName));if(text)a.append(el('span',text));return a;}
@@ -114,9 +116,9 @@
     const d=$('guiaEmbalaje');if(!d)return;
     $('guiaTransportista').value=t?.nombre||'';
     $('guiaDestino').value='';
-    $('guiaDestinatario').value='';
-    $('guiaTelefono').value='';
-    $('guiaDireccion').value='';
+    $('guiaDestinatario').value=t?.nombre||'';
+    $('guiaTelefono').value=t?.telefonos?.[0]?.numero?C.formatPhone(t.telefonos[0].numero):'';
+    $('guiaDireccion').value=t?.bodegas?.[0]?.direccion||'';
     $('guiaRemitente').value='';
     $('guiaTelefonoRemitente').value='';
     $('guiaContenido').value='';
@@ -136,7 +138,10 @@
       to.append(el('h3','DESTINATARIO (PARA)'),el('p',receiver,'guia-nombre'),el('p',receiverPhone,'guia-telefono'),el('p',receiverAddress));
       from.append(el('h3','REMITENTE (DE)'),el('p',sender,'guia-nombre'),el('p',senderPhone,'guia-telefono'));
       grid.append(to,from);sheet.append(grid,el('p','Contenido: '+content,'guia-contenido-linea'));
-      if(notes)sheet.append(el('p','Observaciones: '+notes,'guia-observaciones'));preview.append(sheet);}
+      if(notes)sheet.append(el('p','Observaciones: '+notes,'guia-observaciones'));
+      const promo=el('div',null,'guia-promo'),qr=el('img');qr.src=QR_URL;qr.alt='Código QR para abrir el directorio Rutas CR';qr.width=104;qr.height=104;qr.loading='eager';qr.referrerPolicy='no-referrer';
+      const promoText=el('div');promoText.append(el('strong','Consulte transportistas y destinos en Rutas CR'),el('p',PUBLIC_DIRECTORY_URL));promo.append(qr,promoText);sheet.append(promo);
+      preview.append(sheet);}
   }
   function printPackingGuide(){renderPackingGuide();document.body.classList.add('imprimiendo-guia');window.print();setTimeout(()=>document.body.classList.remove('imprimiendo-guia'),250);}
   function more(){const frag=document.createDocumentFragment();results.slice(visible,visible+PAGE).forEach(t=>frag.append(card(t)));visible+=Math.min(PAGE,results.length-visible);$('tarjetas').append(frag);$('mas').hidden=visible>=results.length;}
