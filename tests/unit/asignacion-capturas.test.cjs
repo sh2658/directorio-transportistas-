@@ -139,3 +139,11 @@ test('solo escribe estados admitidos actualmente por CAPTURAS y AppSheet', () =>
   assert.match(source, /esActualizacion \? "Procesado" : "Asignado"/);
   assert.doesNotMatch(source, /Actualizado a última toma/);
 });
+
+
+test('la clave de relación VISITA conserva los IDs y es idempotente', () => {
+  const c = cargar();
+  assert.equal(c.claveRelacion_('TRP-COCORI', 'LUG-0416'), 'TRP-COCORI_LUG-0416');
+  assert.equal(c.claveRelacion_(' TRP-COCORI ', ' LUG-0416 '), 'TRP-COCORI_LUG-0416');
+  assert.notEqual(c.claveRelacion_('TRP-COCORI', 'LUG-0416'), 'TRP-COCORI_lug-0416');
+});
