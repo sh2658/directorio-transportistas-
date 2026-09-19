@@ -116,9 +116,10 @@
     const d=$('guiaEmbalaje');if(!d)return;
     $('guiaTransportista').value=t?.nombre||'';
     $('guiaDestino').value='';
-    $('guiaDestinatario').value=t?.nombre||'';
-    $('guiaTelefono').value=t?.telefonos?.[0]?.numero?C.formatPhone(t.telefonos[0].numero):'';
-    $('guiaDireccion').value=t?.bodegas?.[0]?.direccion||'';
+    // El transportista no es el destinatario. Estos datos pertenecen al paquete.
+    $('guiaDestinatario').value='';
+    $('guiaTelefono').value='';
+    $('guiaDireccion').value='';
     $('guiaRemitente').value='';
     $('guiaTelefonoRemitente').value='';
     $('guiaContenido').value='';
