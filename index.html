@@ -8,9 +8,9 @@
   <title>Rutas CR · Transportistas y encomiendas</title>
   <link rel="icon" href="./assets/icon-192.png">
   <link rel="manifest" href="./manifest.json">
-  <link rel="stylesheet" href="./assets/css/app.css?v=28">
-  <script defer src="./assets/js/core.js?v=28"></script>
-  <script defer src="./assets/js/app.js?v=28"></script>
+  <link rel="stylesheet" href="./assets/css/app.css?v=29">
+  <script defer src="./assets/js/core.js?v=29"></script>
+  <script defer src="./assets/js/app.js?v=29"></script>
 </head>
 <body>
 <a class="skip-link" href="#busqueda">Ir a buscar transportistas</a>
@@ -38,6 +38,7 @@
   <section class="herramientas" aria-label="Ubicación y mapa">
     <button id="ubicacion" class="boton-secundario" type="button">Ordenar por cercanía</button>
     <button id="mostrarMapa" class="boton-secundario" type="button" aria-expanded="false" aria-controls="panelMapa">Mostrar mapa</button>
+    <button id="abrirGuiaGeneral" class="boton-secundario" type="button">Guía de embalaje general</button>
     <p id="estadoUbicacion" role="status">Puede buscar sin compartir su ubicación.</p>
   </section>
   <section id="panelMapa" class="panel-mapa" hidden aria-label="Mapa de bodegas">
@@ -54,6 +55,40 @@
   <aside class="contenedor-transportistas"><div class="tarjeta-transportistas"><h2>¿Es transportista?</h2><p>Solicite su registro o una corrección de teléfonos, destinos y bodegas.</p><a class="btn-form" href="https://docs.google.com/forms/d/e/1FAIpQLSeX8iJwM3M_SEm4VsUXj6NlhjEq_lPWwxQ4CbMYIFk-HlB4ww/viewform" target="_blank" rel="noopener noreferrer">Enviar o actualizar mis datos</a></div></aside>
 </main>
 <dialog id="visorImagen" aria-label="Imagen del transportista"><button id="cerrarVisor" type="button" aria-label="Cerrar imagen">Cerrar</button><img id="imagenAmpliada" alt=""></dialog>
+<dialog id="guiaEmbalaje" class="guia-dialog" aria-labelledby="guiaTitulo">
+  <form method="dialog" class="guia-panel">
+    <div class="guia-cabecera">
+      <div><p class="eyebrow">Rutas CR · Embalaje</p><h2 id="guiaTitulo">Guía de embalaje general</h2></div>
+      <button id="cerrarGuia" type="button" class="boton-secundario">Cerrar</button>
+    </div>
+    <div class="guia-contenido">
+      <section class="guia-formulario" aria-label="Datos de la guía">
+        <label>Transportista<input id="guiaTransportista" type="text" list="sugerenciasTransportistas" placeholder="Ej.: Transcama"></label>
+        <label>Destino<input id="guiaDestino" type="text" placeholder="Ej.: Limón"></label>
+        <div class="guia-dos-columnas">
+          <label>Destinatario<input id="guiaDestinatario" type="text"></label>
+          <label>Teléfono destinatario<input id="guiaTelefono" type="tel"></label>
+        </div>
+        <label>Dirección destinatario<textarea id="guiaDireccion" rows="3"></textarea></label>
+        <div class="guia-dos-columnas">
+          <label>Remitente<input id="guiaRemitente" type="text"></label>
+          <label>Teléfono remitente<input id="guiaTelefonoRemitente" type="tel"></label>
+        </div>
+        <div class="guia-dos-columnas">
+          <label>Contenido<input id="guiaContenido" type="text"></label>
+          <label>Cantidad de bultos<input id="guiaBultos" type="number" min="1" max="50" value="1"></label>
+        </div>
+        <label>Observaciones<textarea id="guiaObservaciones" rows="2"></textarea></label>
+        <button id="imprimirGuia" type="button" class="boton-principal-guia">Imprimir guía en hoja carta</button>
+      </section>
+      <section class="guia-vista" aria-label="Vista previa de impresión">
+        <p class="guia-ayuda">Vista previa. Cada bulto se imprime en una hoja carta vertical independiente.</p>
+        <div id="guiaPreview"></div>
+      </section>
+    </div>
+  </form>
+</dialog>
+<datalist id="sugerenciasTransportistas"></datalist>
 <footer><p class="footer-titulo">Rutas CR · Directorio comunitario</p><p>Confirme horarios y disponibilidad con el transportista antes de enviar.</p><a href="mailto:santiago2658@gmail.com">Informar un problema</a></footer>
 <noscript>Active JavaScript para consultar el directorio y sus teléfonos.</noscript>
 </body>
