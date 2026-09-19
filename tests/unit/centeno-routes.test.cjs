@@ -29,3 +29,15 @@ test('Centeno is not contaminated with contact data from unrelated carriers',()=
   const contacts=t.telefonos.map(p=>p.contacto||'').join(' ');
   assert.doesNotMatch(contacts,/GOLFO EXPRESS|RODRIGUEZ SERRANO|TRANS SACO|UPALA EXPRESS/i);
 });
+
+
+test('Centeno y Centeno Junior permanecen como empresas separadas aunque compartan propietario, teléfonos o bodega',()=>{
+  const centeno=data.transportistas.find(x=>x.id==='TRP-A8FFEDEA');
+  const junior=data.transportistas.find(x=>x.id==='TRP-0052');
+  assert.ok(centeno);
+  assert.ok(junior);
+  assert.notEqual(centeno.id,junior.id);
+  assert.notEqual(centeno.nombre,junior.nombre);
+  const shared=centeno.telefonos.map(p=>p.numero).filter(n=>junior.telefonos.some(p=>p.numero===n));
+  assert.ok(shared.length>=1,'Pueden compartir teléfonos sin implicar fusión de identidad');
+});
