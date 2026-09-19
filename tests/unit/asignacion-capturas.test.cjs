@@ -92,68 +92,79 @@ test('la dirección de una sola captura no se fragmenta por comas o saltos', () 
   );
 });
 
-test('los teléfonos identifican al transportista aun con formatos distintos', () => {
-  const c = cargar();
-  assert.equal(c.normalizarTelefonoClave_('+506 7152-9650'), '71529650');
-  assert.equal(c.normalizarTelefonoClave_('71529650'), '71529650');
-  assert.equal(c.normalizarTelefonoClave_('123'), '');
+test('teléfono GPS y dirección no forman parte de la identidad del transportista', () => {
+  const source = fs.readFileSync('apps_script/AsignarCapturas_Mejorado.js', 'utf8');
+  assert.doesNotMatch(source, /obtenerIdsPorTelefonos_/);
+  assert.doesNotMatch(source, /crearMapaTelefonoAIds_/);
+  assert.match(source, /IDTRANSPORTE es la única identidad persistente/);
 });
 
-test('un teléfono compartido nunca fusiona automáticamente nombres diferentes', () => {
+test('un teléfono compartido no bloquea ni fusiona nombres diferentes', () => {
   const c = cargar();
   const resultado = c.decidirIdentidadTransportista_(
     'empresa nueva',
     '',
-    new Map([['empresa existente', 'TRP-0001']]),
+    new Map([['empresa existente', new Set(['TRP-0001'])]]),
     new Set(['TRP-0001'])
   );
-  assert.equal(resultado.accion, 'REVISAR');
-  assert.match(resultado.mensaje, /TELÉFONO YA EXISTE/);
+  assert.equal(resultado.accion, 'CREAR');
 });
 
-test('nombre exacto reutiliza el transportista si los teléfonos son congruentes', () => {
+test('nombre exacto único reutiliza solamente ese ID', () => {
   const c = cargar();
   const resultado = c.decidirIdentidadTransportista_(
     'empresa existente',
     '',
-    new Map([['empresa existente', 'TRP-0001']]),
+    new Map([['empresa existente', new Set(['TRP-0001'])]]),
     new Set(['TRP-0001'])
   );
   assert.equal(resultado.accion, 'EXISTENTE');
   assert.equal(resultado.id, 'TRP-0001');
 });
 
-test('un ID explícito permite una variación del nombre pero no un teléfono ajeno', () => {
+test('un mismo nombre en varios IDs exige selección explícita y nunca fusiona', () => {
+  const c = cargar();
+  const resultado = c.decidirIdentidadTransportista_(
+    'empresa compartida',
+    '',
+    new Map([['empresa compartida', new Set(['TRP-0001','TRP-0002'])]]),
+    new Set(['TRP-0001','TRP-0002'])
+  );
+  assert.equal(resultado.accion, 'REVISAR');
+  assert.match(resultado.mensaje, /IDTRANSPORTE/);
+});
+
+test('un ID explícito permite una variación del nombre y no consulta teléfonos', () => {
   const c = cargar();
   const mapa = new Map([
-    ['empresa existente', 'TRP-0001'],
-    ['otra empresa', 'TRP-0002']
+    ['empresa existente', new Set(['TRP-0001'])],
+    ['otra empresa', new Set(['TRP-0002'])]
   ]);
   const permitido = c.decidirIdentidadTransportista_(
     'nombre leído por ia',
     'TRP-0001',
     mapa,
-    new Set(['TRP-0001'])
+    new Set(['TRP-0001','TRP-0002'])
   );
   assert.equal(permitido.accion, 'EXISTENTE');
   assert.equal(permitido.id, 'TRP-0001');
 
   const conflicto = c.decidirIdentidadTransportista_(
-    'nombre leído por ia',
+    'otra empresa',
     'TRP-0001',
     mapa,
-    new Set(['TRP-0002'])
+    new Set(['TRP-0001','TRP-0002'])
   );
   assert.equal(conflicto.accion, 'REVISAR');
 });
 
-test('un nombre y teléfono nuevos crean una empresa sin inferencias', () => {
+test('un nombre nuevo crea una entidad nueva sin inferencias por datos compartidos', () => {
   const c = cargar();
   const resultado = c.decidirIdentidadTransportista_(
     'empresa nueva',
     '',
-    new Map([['empresa existente', 'TRP-0001']]),
-    new Set()
+    new Map([['empresa existente', new Set(['TRP-0001'])]]),
+    new Set(['TRP-0001'])
   );
   assert.equal(resultado.accion, 'CREAR');
 });

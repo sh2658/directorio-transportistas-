@@ -2,12 +2,13 @@
  * ====================================================================
  * SISTEMA DE ASIGNACIÓN Y DISTRIBUCIÓN DE CAPTURAS APROBADAS (V10)
  * ====================================================================
- * - Si el transportista ya existe, reutiliza su ID y completa únicamente
- *   los datos que falten. Nunca crea otra empresa por una segunda bodega.
- * - Una ubicación dentro de 100 m se considera el mismo predio. Una
- *   ubicación a más de 100 m se guarda como otra DIRECCION del mismo ID.
- * - AGREGA NUEVOS TELÉFONOS y DESTINOS sin duplicar los existentes.
- * - Anti-duplicados inteligente (ignora tildes, espacios y mayúsculas).
+ * - IDTRANSPORTE es la identidad de la empresa. Teléfono, GPS, dirección,
+ *   bodega, propietario o cercanía NO identifican ni fusionan transportistas.
+ * - Si no viene ID explícito, un nombre exacto solo se reutiliza cuando
+ *   corresponde a un único ID; nombres repetidos requieren revisión manual.
+ * - Una ubicación dentro de 100 m se considera el mismo predio únicamente
+ *   dentro del MISMO IDTRANSPORTE. Nunca se compara para fusionar empresas.
+ * - AGREGA NUEVOS TELÉFONOS y DESTINOS solo al ID seleccionado/resuelto.
  * - Normaliza teléfonos a formato tico (XXXX-XXXX, 8 dígitos).
  * - Guarda todo estandarizado en MAYÚSCULAS.
  * ====================================================================
@@ -57,11 +58,11 @@ function asignarCapturasAprobadasInterno_() {
 
   if (idxEstado === -1) return 0;
 
-  const mapTransportistas = getMapPorColumnas(sheetTransportista, 1, 0);
+  const mapTransportistas = crearMapaNombreAIds_(sheetTransportista);
+  const idsTransportistas = crearSetIdsTransportistas_(sheetTransportista);
   const mapLugares        = getMapPorColumnas(sheetLugares, 1, 0);
   const setTelefonos      = getCombinedKeys(sheetTelefonos, 1, 2);
   const setVisitas        = getCombinedKeys(sheetVisita, 1, 2);
-  const mapTelefonoAIds   = crearMapaTelefonoAIds_(sheetTelefonos);
   const direccionesCache  = leerDirecciones_(sheetDireccion);
 
   let procesados = 0;
@@ -99,15 +100,13 @@ function asignarCapturasAprobadasInterno_() {
     let idTransporte = "";
     let esActualizacion = false;
 
-    // 1. IDENTIDAD: solo nombre exacto o un ID seleccionado explícitamente.
-    // El teléfono es una señal de conflicto, nunca autorización para fusionar
-    // empresas con nombres diferentes (puede ser una central compartida).
-    const idsPorTelefono = obtenerIdsPorTelefonos_(listaTelefonos, mapTelefonoAIds);
+    // 1. IDENTIDAD: IDTRANSPORTE es la única identidad persistente.
+    // Teléfono, GPS y dirección pueden repetirse entre empresas independientes.
     const identidad = decidirIdentidadTransportista_(
       nombreKey,
       idTransporteCaptura,
       mapTransportistas,
-      idsPorTelefono
+      idsTransportistas
     );
 
     if (identidad.accion === "REVISAR") {
@@ -124,12 +123,13 @@ function asignarCapturasAprobadasInterno_() {
     if (identidad.accion === "EXISTENTE") {
       idTransporte = identidad.id;
       esActualizacion = true;
-      if (nombreKey) mapTransportistas.set(nombreKey, idTransporte);
+      if (nombreKey) agregarNombreId_(mapTransportistas, nombreKey, idTransporte);
       actualizarDatosTransportistaExistente_(sheetTransportista, idTransporte, horario, fotoCaptura, observaciones);
     } else if (identidad.accion === "CREAR") {
       idTransporte = generarId(sheetTransportista, "TRP-");
       sheetTransportista.appendRow([idTransporte, nombreTransportista, horario, observaciones, fotoCaptura, "", "", ""]);
-      mapTransportistas.set(nombreKey, idTransporte);
+      agregarNombreId_(mapTransportistas, nombreKey, idTransporte);
+      idsTransportistas.add(idTransporte);
     } else {
       continue;
     }
@@ -148,8 +148,6 @@ function asignarCapturasAprobadasInterno_() {
         const idTelefono = generarId(sheetTelefonos, "TEL-");
         sheetTelefonos.appendRow([idTelefono, idTransporte, telNorm, ""]);
         setTelefonos.add(clave);
-        if (!mapTelefonoAIds.has(normalizarTelefonoClave_(telNorm))) mapTelefonoAIds.set(normalizarTelefonoClave_(telNorm), new Set());
-        mapTelefonoAIds.get(normalizarTelefonoClave_(telNorm)).add(idTransporte);
       }
     });
 
@@ -173,7 +171,8 @@ function asignarCapturasAprobadasInterno_() {
       }
     });
 
-    // 4. BODEGAS: <=100 m mismo predio; >100 m otra dirección del mismo transportista.
+    // 4. BODEGAS: <=100 m mismo predio SOLO dentro del mismo IDTRANSPORTE;
+    //    >100 m otra dirección del mismo transportista. Nunca fusiona IDs distintos.
     preparacionBodegas.items.forEach(item => {
       asignarBodegaPorDistancia_(
         sheetDireccion,
@@ -243,66 +242,65 @@ const DISTANCIA_MISMO_PREDIO_METROS_ = 100;
 // Absorbe únicamente el error de redondeo de punto flotante en el límite exacto.
 const TOLERANCIA_DISTANCIA_METROS_ = 0.01;
 
-function normalizarTelefonoClave_(tel) {
-  let digits = String(tel || "").replace(/\D/g, "");
-  if (digits.length === 11 && digits.startsWith("506")) digits = digits.slice(3);
-  return digits.length === 8 ? digits : "";
-}
-
-function crearMapaTelefonoAIds_(sheetTelefonos) {
+function crearMapaNombreAIds_(sheetTransportista) {
   const mapa = new Map();
-  const data = sheetTelefonos.getDataRange().getValues();
+  const data = sheetTransportista.getDataRange().getValues();
   for (let i = 1; i < data.length; i++) {
-    const id = String(data[i][1] || "").trim();
-    const tel = normalizarTelefonoClave_(data[i][2]);
-    if (!id || !tel) continue;
-    if (!mapa.has(tel)) mapa.set(tel, new Set());
-    mapa.get(tel).add(id);
+    const id = String(data[i][0] || "").trim();
+    const nombre = normalizarTexto(data[i][1]);
+    if (!id || !nombre) continue;
+    agregarNombreId_(mapa, nombre, id);
   }
   return mapa;
 }
 
-function obtenerIdsPorTelefonos_(telefonos, mapa) {
+function crearSetIdsTransportistas_(sheetTransportista) {
   const ids = new Set();
-  telefonos.forEach(tel => {
-    const key = normalizarTelefonoClave_(tel);
-    if (!key || !mapa.has(key)) return;
-    mapa.get(key).forEach(id => ids.add(id));
-  });
+  const data = sheetTransportista.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    const id = String(data[i][0] || "").trim();
+    if (id) ids.add(id);
+  }
   return ids;
 }
 
-function decidirIdentidadTransportista_(nombreKey, idExplicito, mapaNombres, idsPorTelefono) {
-  const nombre = String(nombreKey || "").trim();
+function agregarNombreId_(mapa, nombreKey, id) {
+  const nombre = normalizarTexto(nombreKey);
+  const value = String(id || "").trim();
+  if (!nombre || !value) return;
+  if (!mapa.has(nombre)) mapa.set(nombre, new Set());
+  mapa.get(nombre).add(value);
+}
+
+function decidirIdentidadTransportista_(nombreKey, idExplicito, mapaNombres, idsExistentes) {
+  const nombre = normalizarTexto(nombreKey);
   const idSeleccionado = String(idExplicito || "").trim();
-  const idPorNombre = nombre && mapaNombres.has(nombre) ? mapaNombres.get(nombre) : "";
-  const idsExistentes = new Set(Array.from(mapaNombres.values()));
-  const idsTelefono = new Set(Array.from(idsPorTelefono || []));
+  const idsNombre = nombre && mapaNombres.has(nombre)
+    ? new Set(Array.from(mapaNombres.get(nombre)))
+    : new Set();
+  const existentes = new Set(Array.from(idsExistentes || []));
 
   if (idSeleccionado) {
-    if (!idsExistentes.has(idSeleccionado)) {
+    if (!existentes.has(idSeleccionado)) {
       return { accion: "REVISAR", mensaje: "CONFLICTO: EL ID DE TRANSPORTISTA SELECCIONADO NO EXISTE" };
     }
-    if (idPorNombre && idPorNombre !== idSeleccionado) {
-      return { accion: "REVISAR", mensaje: "CONFLICTO: EL NOMBRE Y EL ID SELECCIONADO PERTENECEN A EMPRESAS DISTINTAS" };
-    }
-    if (Array.from(idsTelefono).some(id => id !== idSeleccionado)) {
-      return { accion: "REVISAR", mensaje: "CONFLICTO: UN TELÉFONO PERTENECE A OTRO TRANSPORTISTA" };
+    if (idsNombre.size && !idsNombre.has(idSeleccionado)) {
+      return {
+        accion: "REVISAR",
+        mensaje: "CONFLICTO: EL NOMBRE DE LA CAPTURA CORRESPONDE A OTRO ID. CONFIRME EL TRANSPORTISTA SELECCIONADO"
+      };
     }
     return { accion: "EXISTENTE", id: idSeleccionado, origen: "ID_EXPLICITO" };
   }
 
-  if (idPorNombre) {
-    if (Array.from(idsTelefono).some(id => id !== idPorNombre)) {
-      return { accion: "REVISAR", mensaje: "CONFLICTO: EL NOMBRE Y EL TELÉFONO PERTENECEN A EMPRESAS DISTINTAS" };
-    }
-    return { accion: "EXISTENTE", id: idPorNombre, origen: "NOMBRE" };
+  if (idsNombre.size === 1) {
+    return { accion: "EXISTENTE", id: Array.from(idsNombre)[0], origen: "NOMBRE_UNICO" };
   }
 
-  if (idsTelefono.size) {
+  if (idsNombre.size > 1) {
     return {
       accion: "REVISAR",
-      mensaje: "REVISAR IDENTIDAD: EL TELÉFONO YA EXISTE, PERO EL NOMBRE DEL TRANSPORTISTA ES DIFERENTE"
+      mensaje: "REVISAR IDENTIDAD: HAY VARIOS TRANSPORTISTAS CON EL MISMO NOMBRE. SELECCIONE IDTRANSPORTE"
     };
   }
 
@@ -539,3 +537,5 @@ function splitAddressList(val) {
   const direccion = val.toString().replace(/\s+/g, " ").trim().toUpperCase();
   return direccion ? [direccion] : [];
 }
+
+if (typeof module !== "undefined") module.exports = { decidirIdentidadTransportista_, agregarNombreId_ };
