@@ -25,7 +25,7 @@
     }catch(error){notice('No se pudo cargar el directorio. Puede reintentar.');$('reintentar').hidden=false;console.error('Carga del directorio:',error.message);}
     finally{clearTimeout(timer);busy=false;}
   }
-  function suggestions(){const vals=mode==='destino'?data.flatMap(t=>t.destinos):data.map(t=>t.nombre);const unique=new Map();vals.forEach(v=>{if(!unique.has(C.key(v)))unique.set(C.key(v),v);});const frag=document.createDocumentFragment();[...unique.values()].sort((a,b)=>a.localeCompare(b,'es')).forEach(v=>{const o=el('option');o.value=v;frag.append(o);});$('sugerencias').replaceChildren(frag);}
+  function suggestions(){const vals=mode==='destino'?data.flatMap(t=>t.destinos):data.map(t=>t.nombre);const unique=new Map();vals.forEach(v=>{if(!unique.has(C.key(v)))unique.set(C.key(v),v);});const frag=document.createDocumentFragment();[...unique.values()].sort((a,b)=>a.localeCompare(b,'es')).forEach(v=>{const o=el('option');o.value=v;frag.append(o);});$('sugerencias').replaceChildren(frag);const carrierFrag=document.createDocumentFragment();data.map(t=>t.nombre).sort((a,b)=>a.localeCompare(b,'es')).forEach(v=>{const o=el('option');o.value=v;carrierFrag.append(o);});$('sugerenciasTransportistas')?.replaceChildren(carrierFrag);}
   async function loadTerritory(){
     if(territory)return territory;if(territoryPromise)return territoryPromise;
     territoryPromise=Promise.all(['localidades_dta_cr.json','cantones_logistica_cr.json','homonimos_dta_cr.json'].map(async file=>{const response=await fetch(new URL('./assets/'+file,document.baseURI),{cache:'force-cache',credentials:'omit'});if(!response.ok)throw Error(file+' HTTP '+response.status);const value=await response.json();if(!value||Array.isArray(value)||typeof value!=='object')throw Error(file+' inválido');return value;})).then(([localities,cantons,homonyms])=>(territory={localities,cantons,homonyms})).catch(error=>{territoryPromise=null;throw error;});
@@ -35,7 +35,7 @@
   function renderRows(rows,title,summary,focus=true,prefix=null,isNearby=false){results=ordered(rows);nearbyResults=isNearby;visible=0;$('tarjetas').replaceChildren();if(prefix)$('tarjetas').append(prefix);$('tituloResultados').textContent=title;$('resumenResultados').textContent=summary+(position&&results.length?' · Ordenados por la bodega más cercana':'');more();renderMap();if(focus)$('tituloResultados').focus();}
   function centersList(centers){const list=el('div',null,'territorial-centros');centers.forEach(center=>list.append(el('span',C.displayName(center),'chip')));return list;}
   function territorialNotice(title,message,centers=[]){const box=el('aside',null,'territorial-aviso');box.append(el('strong',title,'territorial-titulo'),el('p',message));if(centers.length)box.append(centersList(centers));return box;}
-  function renderNearby(original,place,focus=true){const centers=place.logistics||[],matches=C.searchNearby(data,centers),where=place.canton+(place.province?' · '+place.province:'');const detail=place.district&&C.key(place.district)!==C.key(place.canton)?' (distrito '+C.displayName(place.district)+')':'';const box=territorialNotice('Aún no hay servicio confirmado a '+C.displayName(original),'Estos transportistas viajan por localidades cercanas o por el corredor de acceso a '+C.displayName(original)+', que pertenece a '+C.displayName(place.canton)+detail+', '+C.displayName(place.province)+'. Consulte directamente si pueden recibir o entregar su encomienda.',centers);renderRows(matches,matches.length?'Transportistas que viajan por el área':'Sin rutas cercanas registradas',matches.length+' transportista'+(matches.length===1?'':'s')+' relacionado'+(matches.length===1?'':'s')+' con '+where,focus,box,true);}
+  function renderNearby(original,place,focus=true){const centers=(place.logistics||[]).filter(center=>data.some(t=>t.destinos.some(d=>C.destinationMatches(d,center)))),matches=C.searchNearby(data,centers),where=place.canton+(place.province?' · '+place.province:'');const detail=place.district&&C.key(place.district)!==C.key(place.canton)?' (distrito '+C.displayName(place.district)+')':'';const box=territorialNotice('Aún no hay servicio confirmado a '+C.displayName(original),matches.length?'Estos transportistas sí tienen registrado al menos uno de los centros cercanos o la cabecera de '+C.displayName(place.canton)+detail+', '+C.displayName(place.province)+'. Consulte directamente si pueden recibir o entregar su encomienda.':'No hay transportistas con destinos registrados en la cabecera o centros cercanos disponibles para '+C.displayName(original)+'.',centers);renderRows(matches,matches.length?'Transportistas que viajan por el área':'Sin rutas cercanas registradas',matches.length+' transportista'+(matches.length===1?'':'s')+' relacionado'+(matches.length===1?'':'s')+' con '+where,focus,box,true);}
   function renderAmbiguous(original,resolution,focus){
     results=[];visible=0;renderMap();$('tituloResultados').textContent='Necesitamos precisar el lugar';$('resumenResultados').textContent='Hay '+resolution.locations.length+' lugares llamados «'+original+'» en Costa Rica.';$('mas').hidden=true;
     const box=territorialNotice('Este nombre tiene homónimos','Elija el cantón y la provincia correctos antes de mostrar rutas. Así evitamos recomendar transportistas de otro lugar.'),options=el('div',null,'territorial-opciones');
@@ -49,14 +49,15 @@
     if(!hasSearch){results=[];nearbyResults=false;visible=0;$('tarjetas').replaceChildren();$('tituloResultados').textContent='Busque un destino o transportista';$('resumenResultados').textContent='';$('mas').hidden=true;$('buscar').disabled=false;$('resultados').removeAttribute('aria-busy');renderMap();query.focus();return;}
     const original=query.value.trim(),matches=C.search(data,mode,original);
     if(mode!=='destino'){renderRows(matches,matches.length?'Transportistas disponibles':'Sin coincidencias',matches.length+' resultado'+(matches.length===1?'':'s')+' para «'+original+'»',focus);return;}
+    const exactMatches=C.searchExactDestination(data,original);
     $('buscar').disabled=true;$('resultados').setAttribute('aria-busy','true');$('tituloResultados').textContent='Consultando referencia territorial…';
     try{
       const ref=await loadTerritory();if(sequence!==searchSequence)return;const resolution=C.resolvePlace(original,ref.localities,ref.homonyms,ref.cantons);
       if(resolution.type==='ambiguous'){renderAmbiguous(original,resolution,focus);return;}
-      if(matches.length){renderRows(matches,'Transportistas disponibles',matches.length+' resultado'+(matches.length===1?'':'s')+' para «'+original+'»',focus);return;}
+      if(exactMatches.length){renderRows(exactMatches,'Transportistas disponibles',exactMatches.length+' resultado'+(exactMatches.length===1?'':'s')+' exacto'+(exactMatches.length===1?'':'s')+' para «'+original+'»',focus);return;}
       if((resolution.type==='locality'||resolution.type==='canton')&&resolution.logistics.length){renderNearby(original,resolution,focus);return;}
       renderLexical(original,focus);
-    }catch(error){if(sequence!==searchSequence)return;console.warn('Referencia territorial:',error.message);renderRows(matches,matches.length?'Transportistas disponibles':'Sin coincidencias',matches.length+' resultado'+(matches.length===1?'':'s')+' para «'+original+'»',focus,matches.length?null:territorialNotice('Referencia territorial temporalmente no disponible','Puede buscar un destino registrado mientras se recupera la guía de localidades.'));}
+    }catch(error){if(sequence!==searchSequence)return;console.warn('Referencia territorial:',error.message);const fallback=exactMatches.length?exactMatches:matches;renderRows(fallback,fallback.length?'Transportistas disponibles':'Sin coincidencias',fallback.length+' resultado'+(fallback.length===1?'':'s')+' para «'+original+'»',focus,fallback.length?null:territorialNotice('Referencia territorial temporalmente no disponible','Puede buscar un destino registrado mientras se recupera la guía de localidades.'));}
     finally{if(sequence===searchSequence){$('buscar').disabled=false;$('resultados').removeAttribute('aria-busy');}}
   }
   function avatar(t){
@@ -99,8 +100,40 @@
     const article=el('article',null,'transportista-card'+(nearbyResults?' sugerencia-card':'')),head=el('div',null,'card-head'),identity=el('div',null,'card-identidad');identity.append(el('h3',C.displayName(t.nombre)),scheduleBadge(t));if(nearbyResults)identity.append(el('span','Viaja por el área · confirme cobertura','cobertura-badge'));head.append(avatar(t),identity);article.append(head);
     if(t.telefonos.length)article.append(contacts(t));
     const details=el('details',null,'bodegas');details.open=true;details.append(el('summary',t.bodegas.length+' bodega'+(t.bodegas.length===1?'':'s')));
-    const ordered=C.warehouseOrder(t,position);ordered.forEach((item,index)=>details.append(warehouse(t,item,!!position&&index===0&&Number.isFinite(item.km))));article.append(details,destinations(t));return article;
+    const ordered=C.warehouseOrder(t,position);ordered.forEach((item,index)=>details.append(warehouse(t,item,!!position&&index===0&&Number.isFinite(item.km))));
+    const tools=el('div',null,'card-herramientas'),printButton=el('button','Imprimir guía de embalaje','boton-secundario boton-embalaje');printButton.type='button';printButton.addEventListener('click',()=>openPackingGuide(t));tools.append(printButton);
+    article.append(details,destinations(t),tools);return article;
   }
+  function fieldValue(id){return ($(id)?.value||'').trim();}
+  function openPackingGuide(t=null){
+    const d=$('guiaEmbalaje');if(!d)return;
+    $('guiaTransportista').value=t?.nombre||'';
+    $('guiaDestino').value='';
+    $('guiaDestinatario').value='';
+    $('guiaTelefono').value='';
+    $('guiaDireccion').value='';
+    $('guiaRemitente').value='';
+    $('guiaTelefonoRemitente').value='';
+    $('guiaContenido').value='';
+    $('guiaBultos').value='1';
+    $('guiaObservaciones').value='';
+    $('guiaTitulo').textContent=t?'Guía de embalaje · '+C.displayName(t.nombre):'Guía de embalaje general';
+    renderPackingGuide();
+    if(typeof d.showModal==='function')d.showModal();else d.setAttribute('open','');
+  }
+  function renderPackingGuide(){
+    const preview=$('guiaPreview');if(!preview)return;
+    const carrier=fieldValue('guiaTransportista')||'TRANSPORTISTA POR DEFINIR',dest=fieldValue('guiaDestino')||'DESTINO POR DEFINIR',receiver=fieldValue('guiaDestinatario')||'DESTINATARIO',receiverPhone=fieldValue('guiaTelefono')||'TELÉFONO',receiverAddress=fieldValue('guiaDireccion')||'DIRECCIÓN POR DEFINIR',sender=fieldValue('guiaRemitente')||'REMITENTE',senderPhone=fieldValue('guiaTelefonoRemitente')||'TELÉFONO',content=fieldValue('guiaContenido')||'CONTENIDO POR DEFINIR',notes=fieldValue('guiaObservaciones'),qty=Math.max(1,Math.min(50,Number(fieldValue('guiaBultos'))||1));
+    preview.replaceChildren();
+    for(let i=1;i<=qty;i++){const sheet=el('section',null,'guia-hoja');sheet.append(el('h2','EMBALAJE DE ENCOMIENDA'),el('div','BULTO '+i+' / '+qty,'guia-bulto'));
+      const meta=el('div',null,'guia-meta');meta.append(el('strong',C.displayName(carrier)),el('span','Destino: '+C.displayName(dest)));sheet.append(meta);
+      const grid=el('div',null,'guia-grid'),to=el('div',null,'guia-bloque'),from=el('div',null,'guia-bloque');
+      to.append(el('h3','DESTINATARIO (PARA)'),el('p',receiver,'guia-nombre'),el('p',receiverPhone,'guia-telefono'),el('p',receiverAddress));
+      from.append(el('h3','REMITENTE (DE)'),el('p',sender,'guia-nombre'),el('p',senderPhone,'guia-telefono'));
+      grid.append(to,from);sheet.append(grid,el('p','Contenido: '+content,'guia-contenido-linea'));
+      if(notes)sheet.append(el('p','Observaciones: '+notes,'guia-observaciones'));preview.append(sheet);}
+  }
+  function printPackingGuide(){renderPackingGuide();document.body.classList.add('imprimiendo-guia');window.print();setTimeout(()=>document.body.classList.remove('imprimiendo-guia'),250);}
   function more(){const frag=document.createDocumentFragment();results.slice(visible,visible+PAGE).forEach(t=>frag.append(card(t)));visible+=Math.min(PAGE,results.length-visible);$('tarjetas').append(frag);$('mas').hidden=visible>=results.length;}
   function setInteraction(active){mapActive=active;$('activarMapa').setAttribute('aria-pressed',String(active));$('activarMapa').textContent=active?'Bloquear interacción':'Activar interacción';if(!map)return;for(const name of ['scrollWheelZoom','dragging','touchZoom','doubleClickZoom','boxZoom','keyboard'])if(map[name])map[name][active?'enable':'disable']();}
   function style(href){if(document.querySelector('link[data-map-style="'+href+'"]'))return;const l=el('link');l.rel='stylesheet';l.href=href;l.dataset.mapStyle=href;document.head.append(l);}
@@ -126,6 +159,9 @@
   if(window.ResizeObserver)new ResizeObserver(()=>{if(map&&!$('panelMapa').hidden)map.invalidateSize();}).observe($('mapa'));window.addEventListener('orientationchange',()=>setTimeout(()=>{if(map)map.invalidateSize();},200));
   $('ubicacion').addEventListener('click',()=>{if(!navigator.geolocation){$('estadoUbicacion').textContent='Su navegador no admite geolocalización.';return;}$('ubicacion').disabled=true;$('estadoUbicacion').textContent='Buscando su ubicación…';navigator.geolocation.getCurrentPosition(p=>{position={lat:p.coords.latitude,lng:p.coords.longitude};$('ubicacion').disabled=false;$('estadoUbicacion').textContent='Resultados ordenados por la bodega más cercana.';if(hasSearch)search(false);showUser();},()=>{$('ubicacion').disabled=false;$('estadoUbicacion').textContent='No se pudo obtener la ubicación. Puede seguir buscando.';},{timeout:10000,maximumAge:120000,enableHighAccuracy:false});});
   $('cerrarVisor').addEventListener('click',()=>$('visorImagen').close());$('visorImagen').addEventListener('close',()=>{$('imagenAmpliada').removeAttribute('src');});
+  $('abrirGuiaGeneral')?.addEventListener('click',()=>openPackingGuide());$('cerrarGuia')?.addEventListener('click',()=>{const d=$('guiaEmbalaje');if(typeof d.close==='function')d.close();else d.removeAttribute('open');});$('imprimirGuia')?.addEventListener('click',printPackingGuide);
+  ['guiaTransportista','guiaDestino','guiaDestinatario','guiaTelefono','guiaDireccion','guiaRemitente','guiaTelefonoRemitente','guiaContenido','guiaBultos','guiaObservaciones'].forEach(id=>$(id)?.addEventListener('input',renderPackingGuide));
+  window.addEventListener('afterprint',()=>document.body.classList.remove('imprimiendo-guia'));
   setInterval(updateScheduleBadges,60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)updateScheduleBadges();});
   if('serviceWorker'in navigator&&location.protocol==='https:')window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});load();
 })();
