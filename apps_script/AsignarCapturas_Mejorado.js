@@ -480,17 +480,20 @@ function getCombinedKeys(sheet, col1, col2) {
 
 function generarId(sheet, prefijo) {
   const lastRow = sheet.getLastRow();
-  if (lastRow < 2) return prefijo + "0001";
+  const existentes = new Set(
+    lastRow < 2 ? [] : sheet.getRange(2, 1, lastRow - 1, 1).getDisplayValues().flat()
+      .map(id => String(id || "").trim())
+      .filter(Boolean)
+  );
 
-  const ids = sheet.getRange(2, 1, lastRow - 1, 1).getDisplayValues().flat();
-  let maximo = 0;
-  ids.forEach(id => {
-    const texto = String(id || "").trim();
-    if (!texto.toUpperCase().startsWith(prefijo.toUpperCase())) return;
-    const sufijo = texto.slice(prefijo.length);
-    if (/^\d+$/.test(sufijo)) maximo = Math.max(maximo, Number(sufijo));
-  });
-  return prefijo + String(maximo + 1).padStart(4, "0");
+  // No usar MAX+1: AppSheet u otro proyecto de Apps Script puede escribir al mismo
+  // tiempo y dos procesos podrían calcular el mismo siguiente número.
+  for (let intento = 0; intento < 20; intento++) {
+    const token = Utilities.getUuid().replace(/-/g, "").slice(0, 8).toUpperCase();
+    const candidato = prefijo + token;
+    if (!existentes.has(candidato)) return candidato;
+  }
+  throw new Error("No se pudo generar un ID único para " + prefijo);
 }
 function splitList(val) {
   if (!val) return [];
