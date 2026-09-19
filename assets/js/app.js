@@ -5,6 +5,8 @@
   let data=[],results=[],visible=0,position=null,map=null,cluster=null,userMarker=null,loadingMap=null;
   let mode='destino',busy=false,mapActive=false,hasSearch=false;
   const PAGE=15, query=$('consulta');
+  // Bodegas compartidas mal clasificadas históricamente como transportistas.
+  const NON_CARRIER_IDS=new Set(['transp2','TRP-0046']);
   function el(tag,text,cls){const node=document.createElement(tag);if(text!=null)node.textContent=text;if(cls)node.className=cls;return node;}
   function link(text,url,cls){const a=el('a',text,cls);a.href=url;if(/^https:/.test(url)){a.target='_blank';a.rel='noopener noreferrer';}return a;}
   function https(raw){try{const u=new URL(raw);return u.protocol==='https:'?u.href:'';}catch{return '';}}
@@ -15,7 +17,7 @@
     try{
       const response=await fetch(new URL('./data/transportistas.json',document.baseURI),{signal:controller.signal,cache:'no-store',credentials:'omit'});
       if(!response.ok)throw Error('HTTP '+response.status);
-      const snapshot=C.validate(await response.json());data=snapshot.transportistas;
+      const snapshot=C.validate(await response.json());data=snapshot.transportistas.filter(t=>!NON_CARRIER_IDS.has(t.id));
       const date=snapshot.generatedAt?new Date(snapshot.generatedAt):null;
       notice(data.length+' transportistas disponibles'+(date&&Number.isFinite(date.getTime())?' · Actualizado '+date.toLocaleDateString('es-CR'):''));
       suggestions();$('buscar').disabled=false;if(hasSearch)search(false);
