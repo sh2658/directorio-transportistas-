@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-13T14:29:10.000Z",
-  "contentHash": "dac0f62e6ff36f7b0c15f27ac8f65c8019ce398cb57f2f611cf7378af677115e",
+  "generatedAt": "2026-09-19T21:25:00.000Z",
+  "contentHash": "86621c715bdd00d1c919402d09bb10a4909ffcca9d70f75bec71a1b0b22d88d5",
   "transportistas": [
     {
       "id": "0de57703",
@@ -1714,15 +1714,13 @@
         "JUAN VILLAS",
         "LA PITAYA",
         "LA SUIZA",
-        "LUGARES ALEDAÑOS",
-        "LUGARES CERCANOS",
         "OREAMUNO",
         "OROSI",
         "PACAYAS",
         "PARAÍSO",
         "PAVONES",
         "PEJIBAYE",
-        "SANTA CRUZ",
+        "SANTA CRUZ DE TURRIALBA",
         "TEJAS",
         "TIERRA BLANCA",
         "TRES EQUIS",
@@ -2032,24 +2030,8 @@
           "contacto": ""
         },
         {
-          "numero": "50683210966",
-          "contacto": "Encomiendas Golfo Express"
-        },
-        {
           "numero": "50683403547",
           "contacto": "Encomiendas y Mudanzas Centeno Junior"
-        },
-        {
-          "numero": "50683759370",
-          "contacto": "Transporte Rodriguez Serrano"
-        },
-        {
-          "numero": "50687377373",
-          "contacto": "Transportes Upala Express"
-        },
-        {
-          "numero": "50688149106",
-          "contacto": "Trans Saco"
         },
         {
           "numero": "50689309711",
@@ -2057,56 +2039,33 @@
         }
       ],
       "destinos": [
-        "AGUA BUENA",
         "AGUA CALIENTE",
         "ATIRRO",
-        "BIJAGUA",
         "BIRRISITO",
-        "BUENOS AIRES",
-        "CABECERAS DE TILARAN",
-        "CABUYA",
-        "CANALETE",
         "CAPELLADES",
         "CARTAGO",
         "CERVANTES",
         "CHITARA",
-        "COBANO",
         "ESLABÓN",
-        "GUACIMAL",
         "JABILLOS",
         "JUAN VILLAS",
         "JUAN VIÑAS",
         "LA PITAYA",
         "LA SUIZA",
-        "MAL PAÍS",
-        "MANZANILLO",
-        "MONTEVERDE",
-        "MONTEZUMA",
         "OREAMUNO",
         "OROSI",
         "PACAYAS",
-        "PAQUERA",
         "PARAÍSO",
         "PAVONES",
         "PEJIBAYE",
-        "POTRERO GRANDE",
-        "RIO NARANJO",
-        "SABALITO",
-        "SAN RAFAEL DE ABANGARES",
-        "SAN VITO",
-        "SANTA CRUZ",
-        "SANTA ELENA",
-        "SANTA TERESA",
-        "SARDINAL DE PUNTARENAS",
-        "TAMBOR",
+        "SANTA CRUZ DE TURRIALBA",
         "TEJAS",
         "TIERRA BLANCA",
         "TRES EQUIS",
         "TUCURRIQUE",
         "TUIS",
         "TURRIALBA",
-        "Taras",
-        "UPALA CENTRO"
+        "Taras"
       ]
     },
     {
