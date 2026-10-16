@@ -2,7 +2,7 @@ const fs=require('node:fs'),path=require('node:path'),{execFileSync}=require('no
 execFileSync(process.execPath,['scripts/validate-data.cjs'],{stdio:'inherit'});
 const target='.local/site';fs.rmSync(target,{recursive:true,force:true});fs.mkdirSync(target,{recursive:true});
 // Strict publication allowlist: never publish source tables, Apps Script, tests or documentation.
-for(const f of ['index.html','manifest.json','sw.js','robots.txt','sitemap.xml','assets','data'])fs.cpSync(f,path.join(target,f),{recursive:true});
+for(const f of ['index.html','manifest.json','sw.js','robots.txt','sitemap.xml','google4a27a4bec872dd4b.html','assets','data'])fs.cpSync(f,path.join(target,f),{recursive:true});
 const territorial=JSON.parse(fs.readFileSync('docs/homonimos_oficiales_cr.json','utf8'));
 if(!Array.isArray(territorial)||!territorial.length)throw Error('Referencia territorial de homónimos vacía');
 const homonimos={};
