@@ -8,9 +8,9 @@
   <title>Rutas CR · Transportistas y encomiendas</title>
   <link rel="icon" href="./assets/icon-192.png">
   <link rel="manifest" href="./manifest.json">
-  <link rel="stylesheet" href="./assets/css/app.css?v=31">
-  <script defer src="./assets/js/core.js?v=31"></script>
-  <script defer src="./assets/js/app.js?v=31"></script>
+  <link rel="stylesheet" href="./assets/css/app.css?v=32">
+  <script defer src="./assets/js/core.js?v=32"></script>
+  <script defer src="./assets/js/app.js?v=32"></script>
 </head>
 <body>
 <a class="skip-link" href="#busqueda">Ir a buscar transportistas</a>
@@ -63,8 +63,8 @@
     </div>
     <div class="guia-contenido">
       <section class="guia-formulario" aria-label="Datos de la guía">
-        <label>Transportista<input id="guiaTransportista" type="text" list="sugerenciasTransportistas" placeholder="Ej.: Transcama"></label>
-        <label>Destino<input id="guiaDestino" type="text" placeholder="Ej.: Limón"></label>
+        <label>Transportista<select id="guiaTransportista"><option value="">Seleccione un transportista</option></select></label>
+        <label>Destino<input id="guiaDestino" type="text" list="sugerenciasDestinosGuia" placeholder="Ej.: Limón"></label>
         <div class="guia-dos-columnas">
           <label>Destinatario<input id="guiaDestinatario" type="text"></label>
           <label>Teléfono destinatario<input id="guiaTelefono" type="tel"></label>
@@ -79,7 +79,7 @@
           <label>Cantidad de bultos<input id="guiaBultos" type="number" min="1" max="50" value="1"></label>
         </div>
         <label>Observaciones<textarea id="guiaObservaciones" rows="2"></textarea></label>
-        <button id="imprimirGuia" type="button" class="boton-principal-guia">Imprimir guía en hoja carta</button>
+        <button id="imprimirGuia" type="button" class="boton-principal-guia" disabled>Imprimir guía en hoja carta</button>
       </section>
       <section class="guia-vista" aria-label="Vista previa de impresión">
         <p class="guia-ayuda">Vista previa. Cada bulto se imprime en una hoja carta vertical independiente.</p>
@@ -88,7 +88,7 @@
     </div>
   </form>
 </dialog>
-<datalist id="sugerenciasTransportistas"></datalist>
+<datalist id="sugerenciasDestinosGuia"></datalist>
 <footer><p class="footer-titulo">Rutas CR · Directorio comunitario</p><p>Confirme horarios y disponibilidad con el transportista antes de enviar.</p><a href="mailto:santiago2658@gmail.com">Informar un problema</a></footer>
 <noscript>Active JavaScript para consultar el directorio y sus teléfonos.</noscript>
 </body>

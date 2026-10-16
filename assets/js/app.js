@@ -29,7 +29,7 @@
     }catch(error){notice('No se pudo cargar el directorio. Puede reintentar.');$('reintentar').hidden=false;console.error('Carga del directorio:',error.message);}
     finally{clearTimeout(timer);busy=false;}
   }
-  function suggestions(){const vals=mode==='destino'?data.flatMap(t=>t.destinos):data.map(t=>t.nombre);const unique=new Map();vals.forEach(v=>{if(!unique.has(C.key(v)))unique.set(C.key(v),v);});const frag=document.createDocumentFragment();[...unique.values()].sort((a,b)=>a.localeCompare(b,'es')).forEach(v=>{const o=el('option');o.value=v;frag.append(o);});$('sugerencias').replaceChildren(frag);const carrierFrag=document.createDocumentFragment();data.map(t=>t.nombre).sort((a,b)=>a.localeCompare(b,'es')).forEach(v=>{const o=el('option');o.value=v;carrierFrag.append(o);});$('sugerenciasTransportistas')?.replaceChildren(carrierFrag);}
+  function suggestions(){const vals=mode==='destino'?data.flatMap(t=>t.destinos):data.map(t=>t.nombre);const unique=new Map();vals.forEach(v=>{if(!unique.has(C.key(v)))unique.set(C.key(v),v);});const frag=document.createDocumentFragment();[...unique.values()].sort((a,b)=>a.localeCompare(b,'es')).forEach(v=>{const o=el('option');o.value=v;frag.append(o);});$('sugerencias').replaceChildren(frag);const select=$('guiaTransportista');if(select){const current=select.value,frag2=document.createDocumentFragment(),first=el('option','Seleccione un transportista');first.value='';frag2.append(first);[...data].sort((a,b)=>a.nombre.localeCompare(b.nombre,'es')).forEach(t=>{const o=el('option',C.displayName(t.nombre));o.value=t.id;frag2.append(o);});select.replaceChildren(frag2);select.value=data.some(t=>t.id===current)?current:'';}}
   async function loadTerritory(){
     if(territory)return territory;if(territoryPromise)return territoryPromise;
     territoryPromise=Promise.all(['localidades_dta_cr.json','cantones_logistica_cr.json','homonimos_dta_cr.json'].map(async file=>{const response=await fetch(new URL('./assets/'+file,document.baseURI),{cache:'force-cache',credentials:'omit'});if(!response.ok)throw Error(file+' HTTP '+response.status);const value=await response.json();if(!value||Array.isArray(value)||typeof value!=='object')throw Error(file+' inválido');return value;})).then(([localities,cantons,homonyms])=>(territory={localities,cantons,homonyms})).catch(error=>{territoryPromise=null;throw error;});
@@ -101,7 +101,7 @@
     }else section.append(el('p','Ubicación GPS pendiente','aviso-suave'));return section;
   }
   function destinations(t){
-    const details=el('details',null,'destinos'),summary=el('summary','Destinos ('+t.destinos.length+')'),body=el('div',null,'destinos-cuerpo'),chips=el('div',null,'chips');details.open=true;details.append(summary);body.append(chips);
+    const details=el('details',null,'destinos'),summary=el('summary','Destinos ('+t.destinos.length+')'),body=el('div',null,'destinos-cuerpo'),chips=el('div',null,'chips');details.open=false;details.append(summary);body.append(chips);
     const paint=value=>{const q=C.key(value);chips.replaceChildren(...t.destinos.filter(d=>!q||C.key(d).includes(q)).map(d=>el('span',C.displayName(d),'chip')));if(!chips.children.length)chips.append(el('span','Sin coincidencias','chips-vacio'));};
     if(t.destinos.length>12){const label=el('label','Filtrar destinos','filtro-label'),input=el('input');input.type='search';input.placeholder='Ej.: Bagaces';input.className='filtro-destinos';input.setAttribute('aria-label','Filtrar destinos de '+t.nombre);input.addEventListener('input',()=>paint(input.value));body.prepend(label,input);}paint('');details.append(body);return details;
   }
@@ -116,7 +116,7 @@
   function fieldValue(id){return ($(id)?.value||'').trim();}
   function openPackingGuide(t=null){
     const d=$('guiaEmbalaje');if(!d)return;
-    $('guiaTransportista').value=t?.nombre||'';
+    $('guiaTransportista').value=t?t.id:'';updateGuideDestinations();
     $('guiaDestino').value='';
     // El transportista no es el destinatario. Estos datos pertenecen al paquete.
     $('guiaDestinatario').value='';
@@ -127,16 +127,19 @@
     $('guiaContenido').value='';
     $('guiaBultos').value='1';
     $('guiaObservaciones').value='';
-    $('guiaTitulo').textContent=t?'Guía de embalaje · '+C.displayName(t.nombre):'Guía de embalaje general';
+    $('guiaTitulo').textContent=t?'Guía de embalaje · '+C.displayName(t.nombre):'Guía de embalaje';
     renderPackingGuide();
     if(typeof d.showModal==='function')d.showModal();else d.setAttribute('open','');
   }
+  function guideCarrier(){const id=fieldValue('guiaTransportista');return data.find(t=>t.id===id)||null;}
+  function updateGuideDestinations(){const list=$('sugerenciasDestinosGuia');if(!list)return;const t=guideCarrier(),frag=document.createDocumentFragment();(t?[...t.destinos]:[]).sort((a,b)=>a.localeCompare(b,'es')).forEach(v=>{const o=el('option');o.value=C.displayName(v);frag.append(o);});list.replaceChildren(frag);}
   function renderPackingGuide(){
     const preview=$('guiaPreview');if(!preview)return;
-    const carrier=fieldValue('guiaTransportista')||'TRANSPORTISTA POR DEFINIR',dest=fieldValue('guiaDestino')||'DESTINO POR DEFINIR',receiver=fieldValue('guiaDestinatario')||'DESTINATARIO',receiverPhone=fieldValue('guiaTelefono')||'TELÉFONO',receiverAddress=fieldValue('guiaDireccion')||'DIRECCIÓN POR DEFINIR',sender=fieldValue('guiaRemitente')||'REMITENTE',senderPhone=fieldValue('guiaTelefonoRemitente')||'TELÉFONO',content=fieldValue('guiaContenido')||'CONTENIDO POR DEFINIR',notes=fieldValue('guiaObservaciones'),qty=Math.max(1,Math.min(50,Number(fieldValue('guiaBultos'))||1));
-    preview.replaceChildren();
+    const selected=guideCarrier(),carrier=selected?selected.nombre:'TRANSPORTISTA POR DEFINIR',dest=fieldValue('guiaDestino')||'DESTINO POR DEFINIR',receiver=fieldValue('guiaDestinatario')||'DESTINATARIO',receiverPhone=fieldValue('guiaTelefono')||'TELÉFONO',receiverAddress=fieldValue('guiaDireccion')||'DIRECCIÓN POR DEFINIR',sender=fieldValue('guiaRemitente')||'REMITENTE',senderPhone=fieldValue('guiaTelefonoRemitente')||'TELÉFONO',content=fieldValue('guiaContenido')||'CONTENIDO POR DEFINIR',notes=fieldValue('guiaObservaciones'),qty=Math.max(1,Math.min(50,Number(fieldValue('guiaBultos'))||1));
+    preview.replaceChildren();if($('imprimirGuia'))$('imprimirGuia').disabled=!selected;
     for(let i=1;i<=qty;i++){const sheet=el('section',null,'guia-hoja');sheet.append(el('h2','EMBALAJE DE ENCOMIENDA'),el('div','BULTO '+i+' / '+qty,'guia-bulto'));
       const meta=el('div',null,'guia-meta');meta.append(el('strong',C.displayName(carrier)),el('span','Destino: '+C.displayName(dest)));sheet.append(meta);
+      if(selected){const info=el('div',null,'guia-carrier'),phones=selected.telefonos.map(p=>C.formatPhone(p.numero)).join(' · '),b=C.warehouseOrder(selected,position)[0]?.b;if(phones)info.append(el('p','Teléfonos del transportista: '+phones));if(b&&(b.direccion||b.zona))info.append(el('p','Entregar en bodega: '+[b.zona&&C.displayName(b.zona),b.direccion].filter(Boolean).join(' · ')));if(info.children.length)sheet.append(info);}
       const grid=el('div',null,'guia-grid'),to=el('div',null,'guia-bloque'),from=el('div',null,'guia-bloque');
       to.append(el('h3','DESTINATARIO (PARA)'),el('p',receiver,'guia-nombre'),el('p',receiverPhone,'guia-telefono'),el('p',receiverAddress));
       from.append(el('h3','REMITENTE (DE)'),el('p',sender,'guia-nombre'),el('p',senderPhone,'guia-telefono'));
@@ -173,7 +176,8 @@
   $('ubicacion').addEventListener('click',()=>{if(!navigator.geolocation){$('estadoUbicacion').textContent='Su navegador no admite geolocalización.';return;}$('ubicacion').disabled=true;$('estadoUbicacion').textContent='Buscando su ubicación…';navigator.geolocation.getCurrentPosition(p=>{position={lat:p.coords.latitude,lng:p.coords.longitude};$('ubicacion').disabled=false;$('estadoUbicacion').textContent='Resultados ordenados por la bodega más cercana.';if(hasSearch)search(false);showUser();},()=>{$('ubicacion').disabled=false;$('estadoUbicacion').textContent='No se pudo obtener la ubicación. Puede seguir buscando.';},{timeout:10000,maximumAge:120000,enableHighAccuracy:false});});
   $('cerrarVisor').addEventListener('click',()=>$('visorImagen').close());$('visorImagen').addEventListener('close',()=>{$('imagenAmpliada').removeAttribute('src');});
   $('abrirGuiaGeneral')?.addEventListener('click',()=>openPackingGuide());$('cerrarGuia')?.addEventListener('click',()=>{const d=$('guiaEmbalaje');if(typeof d.close==='function')d.close();else d.removeAttribute('open');});$('imprimirGuia')?.addEventListener('click',printPackingGuide);
-  ['guiaTransportista','guiaDestino','guiaDestinatario','guiaTelefono','guiaDireccion','guiaRemitente','guiaTelefonoRemitente','guiaContenido','guiaBultos','guiaObservaciones'].forEach(id=>$(id)?.addEventListener('input',renderPackingGuide));
+  ['guiaDestino','guiaDestinatario','guiaTelefono','guiaDireccion','guiaRemitente','guiaTelefonoRemitente','guiaContenido','guiaBultos','guiaObservaciones'].forEach(id=>$(id)?.addEventListener('input',renderPackingGuide));
+  $('guiaTransportista')?.addEventListener('change',()=>{updateGuideDestinations();renderPackingGuide();});
   window.addEventListener('afterprint',()=>document.body.classList.remove('imprimiendo-guia'));
   setInterval(updateScheduleBadges,60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)updateScheduleBadges();});
   if('serviceWorker'in navigator&&location.protocol==='https:')window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});load();
