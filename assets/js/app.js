@@ -103,7 +103,7 @@
     if(C.validGPS(b)){if(position)section.append(el('p',item.km.toFixed(1)+' km en línea recta','distancia'));
       const actions=el('div',null,'navegacion'),coords=b.lat+','+b.lng;
       const waze=link('Waze', 'https://waze.com/ul?ll='+encodeURIComponent(coords)+'&navigate=yes','icono-boton waze','waze');waze.setAttribute('aria-label','Abrir esta bodega en Waze');waze.title='Abrir en Waze';
-      const maps=link('Maps', 'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(coords),'icono-boton maps','google-maps');maps.setAttribute('aria-label','Abrir esta bodega en Google Maps');maps.title='Abrir en Google Maps';
+      const maps=link('Google Maps', 'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(coords),'icono-boton maps','google-maps');maps.setAttribute('aria-label','Abrir esta bodega en Google Maps');maps.title='Abrir en Google Maps';
       actions.append(waze,maps);section.append(actions);
     }else section.append(el('p','Ubicación GPS pendiente','aviso-suave'));return section;
   }
