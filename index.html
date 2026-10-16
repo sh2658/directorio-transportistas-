@@ -8,9 +8,9 @@
   <title>Rutas CR · Transportistas y encomiendas</title>
   <link rel="icon" href="./assets/icon-192.png">
   <link rel="manifest" href="./manifest.json">
-  <link rel="stylesheet" href="./assets/css/app.css?v=32">
-  <script defer src="./assets/js/core.js?v=32"></script>
-  <script defer src="./assets/js/app.js?v=32"></script>
+  <link rel="stylesheet" href="./assets/css/app.css?v=33">
+  <script defer src="./assets/js/core.js?v=33"></script>
+  <script defer src="./assets/js/app.js?v=33"></script>
 </head>
 <body>
 <a class="skip-link" href="#busqueda">Ir a buscar transportistas</a>
@@ -25,7 +25,7 @@
       <label id="etiquetaBusqueda" for="consulta">¿A dónde envía?</label>
       <div class="fila-input">
         <div class="campo-busqueda">
-          <input type="search" id="consulta" list="sugerencias" autocomplete="off" placeholder="Ej.: Liberia, Nosara…" maxlength="120" enterkeyhint="search">
+          <input type="search" id="consulta" list="sugerencias" autocomplete="off" placeholder="Ej.: Liberia" maxlength="120" enterkeyhint="search">
           <button id="limpiar" class="limpiar" type="button" aria-label="Borrar búsqueda" hidden>×</button>
         </div>
         <button type="submit" id="buscar" disabled>Buscar</button>
@@ -38,6 +38,7 @@
   <section class="herramientas" aria-label="Ubicación y mapa">
     <button id="ubicacion" class="boton-secundario" type="button">Ordenar por cercanía</button>
     <button id="mostrarMapa" class="boton-secundario" type="button" aria-expanded="false" aria-controls="panelMapa">Mostrar mapa</button>
+    <button id="soloAbiertos" class="boton-secundario" type="button" aria-pressed="false">Solo abiertos ahora</button>
     <button id="abrirGuiaGeneral" class="boton-secundario" type="button">Guía de embalaje general</button>
     <p id="estadoUbicacion" role="status">Puede buscar sin compartir su ubicación.</p>
   </section>
@@ -49,6 +50,7 @@
   <section id="resultados" aria-labelledby="tituloResultados" aria-busy="false">
     <h2 id="tituloResultados" tabindex="-1">Busque un destino o transportista</h2>
     <p id="resumenResultados" role="status" aria-live="polite"></p>
+    <div id="rapidos" class="rapidos" hidden></div>
     <div id="tarjetas"></div>
     <button id="mas" class="boton-secundario" type="button" hidden>Mostrar más resultados</button>
   </section>
@@ -67,12 +69,12 @@
         <label>Destino<input id="guiaDestino" type="text" list="sugerenciasDestinosGuia" placeholder="Ej.: Limón"></label>
         <div class="guia-dos-columnas">
           <label>Destinatario<input id="guiaDestinatario" type="text"></label>
-          <label>Teléfono destinatario<input id="guiaTelefono" type="tel"></label>
+          <label>Teléfono destinatario<input id="guiaTelefono" type="tel" inputmode="tel" autocomplete="off" maxlength="20"></label>
         </div>
         <label>Dirección destinatario<textarea id="guiaDireccion" rows="3"></textarea></label>
         <div class="guia-dos-columnas">
           <label>Remitente<input id="guiaRemitente" type="text"></label>
-          <label>Teléfono remitente<input id="guiaTelefonoRemitente" type="tel"></label>
+          <label>Teléfono remitente<input id="guiaTelefonoRemitente" type="tel" inputmode="tel" autocomplete="off" maxlength="20"></label>
         </div>
         <div class="guia-dos-columnas">
           <label>Contenido<input id="guiaContenido" type="text"></label>
@@ -80,8 +82,9 @@
         </div>
         <label>Observaciones<textarea id="guiaObservaciones" rows="2"></textarea></label>
         <button id="imprimirGuia" type="button" class="boton-principal-guia" disabled>Imprimir guía en hoja carta</button>
+        <a class="guia-ir-previa" href="#guiaVista">Ver vista previa ↓</a>
       </section>
-      <section class="guia-vista" aria-label="Vista previa de impresión">
+      <section class="guia-vista" id="guiaVista" aria-label="Vista previa de impresión">
         <p class="guia-ayuda">Vista previa. Cada bulto se imprime en una hoja carta vertical independiente.</p>
         <div id="guiaPreview"></div>
       </section>
