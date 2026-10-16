@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sh2658.github.io/directorio-transportistas-/sitemap.xml
