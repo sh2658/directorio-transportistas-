@@ -14,9 +14,9 @@
   <title>Rutas CR · Transportistas y encomiendas en Costa Rica</title>
   <link rel="icon" href="./assets/icon-192.png">
   <link rel="manifest" href="./manifest.json">
-  <link rel="stylesheet" href="./assets/css/app.css?v=34">
-  <script defer src="./assets/js/core.js?v=34"></script>
-  <script defer src="./assets/js/app.js?v=34"></script>
+  <link rel="stylesheet" href="./assets/css/app.css?v=35">
+  <script defer src="./assets/js/core.js?v=35"></script>
+  <script defer src="./assets/js/app.js?v=35"></script>
 </head>
 <body>
 <a class="skip-link" href="#busqueda">Ir a buscar transportistas</a>
@@ -26,7 +26,7 @@
     <form id="busqueda" class="buscador" role="search">
       <fieldset class="segmentado"><legend class="sr-only">Buscar por</legend>
         <label><input type="radio" name="modo" value="destino" checked><span>Destino</span></label>
-        <label><input type="radio" name="modo" value="transportista"><span>Transportista</span></label>
+        <label><input type="radio" name="modo" value="transportista"><span>Transportista o bodega</span></label>
       </fieldset>
       <label id="etiquetaBusqueda" for="consulta">¿A dónde envía?</label>
       <div class="fila-input">
@@ -71,7 +71,7 @@
     </div>
     <div class="guia-contenido">
       <section class="guia-formulario" aria-label="Datos de la guía">
-        <label>Transportista<select id="guiaTransportista"><option value="">Seleccione un transportista</option></select></label>
+        <label>Transportista (opcional)<select id="guiaTransportista"><option value="">Sin transportista asignado</option></select></label>
         <label>Destino<input id="guiaDestino" type="text" list="sugerenciasDestinosGuia" placeholder="Ej.: Limón"></label>
         <div class="guia-dos-columnas">
           <label>Destinatario<input id="guiaDestinatario" type="text"></label>
@@ -87,7 +87,7 @@
           <label>Cantidad de bultos<input id="guiaBultos" type="number" min="1" max="50" value="1"></label>
         </div>
         <label>Observaciones<textarea id="guiaObservaciones" rows="2"></textarea></label>
-        <button id="imprimirGuia" type="button" class="boton-principal-guia" disabled>Imprimir guía en hoja carta</button>
+        <button id="imprimirGuia" type="button" class="boton-principal-guia">Imprimir guía en hoja carta</button>
         <a class="guia-ir-previa" href="#guiaVista">Ver vista previa ↓</a>
       </section>
       <section class="guia-vista" id="guiaVista" aria-label="Vista previa de impresión">
@@ -102,3 +102,4 @@
 <noscript>Active JavaScript para consultar el directorio y sus teléfonos.</noscript>
 </body>
 </html>
+

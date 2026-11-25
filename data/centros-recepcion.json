@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "centros": [
+    {
+      "id": "transp2",
+      "operadoresAnunciados": ["El Macho", "Mata", "Frailes", "Solís y Zúñiga", "Hnos. Enríquez", "Gaby", "Pacífico Central", "Colombia", "Méndez", "EW Logistic", "Chico", "Alfaro", "Lázaro", "MYM Express", "Bogantes", "Mau Jiménez", "Pacífico Sur", "Varma"],
+      "fuente": "Folleto RUTAS BODEGA ANAY aportado por Santiago, sin fecha visible; revisión documental del 8 de noviembre de 2026.",
+      "estado": "ANUNCIADOS_PENDIENTES_DE_VIGENCIA"
+    }
+  ]
+}
