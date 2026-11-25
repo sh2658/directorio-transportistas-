@@ -17,7 +17,26 @@
       const nums=new Set();t.telefonos.forEach(p=>{if(!p||typeof p.numero!=='string'||!/^(506[2-9]\d{7}|507\d{7,8})$/.test(p.numero)||typeof p.contacto!=='string'||nums.has(p.numero))throw Error('Teléfono inválido');nums.add(p.numero);});
     });return data;
   }
-  function search(rows,mode,query){const q=key(query);if(!q)return [];const values=t=>mode==='destino'?t.destinos:[t.nombre];const exact=rows.filter(t=>values(t).some(v=>key(v)===q));return exact.length?exact:rows.filter(t=>values(t).some(v=>key(v).includes(q)));}
+  const receptionCenterIds=new Set(['transp2','TRP-0046']);
+  function isReceptionCenter(t){return !!t&&receptionCenterIds.has(t.id);}
+  function warehouseSearch(rows,query){
+    const q=key(query);if(!q)return [];
+    const centers=rows.filter(t=>isReceptionCenter(t)&&key(t.nombre).includes(q));
+    const addresses=new Set(centers.flatMap(t=>(t.bodegas||[]).map(b=>key(b.direccion))).filter(Boolean));
+    const names=centers.map(t=>key(t.nombre));
+    // Existing warehouse names or exact addresses only: proximity is not proof of membership.
+    return rows.filter(t=>centers.includes(t)||(t.bodegas||[]).some(b=>{
+      const address=key(b.direccion);return address.includes(q)||key(b.zona).includes(q)||addresses.has(address)||names.some(name=>address.includes(name));
+    }));
+  }
+  function search(rows,mode,query){
+    const q=key(query);if(!q)return [];
+    if(mode==='destino'){const exact=rows.filter(t=>t.destinos.some(v=>key(v)===q));return exact.length?exact:rows.filter(t=>t.destinos.some(v=>key(v).includes(q)));}
+    const exact=rows.filter(t=>key(t.nombre)===q);
+    if(exact.length&&!exact.some(isReceptionCenter))return exact;
+    const named=rows.filter(t=>key(t.nombre).includes(q)),warehouses=warehouseSearch(rows,q);
+    return rows.filter(t=>named.includes(t)||warehouses.includes(t));
+  }
   function searchExactDestination(rows,query){const q=canonicalDestination(query);if(!q)return [];return rows.filter(t=>t.destinos.some(v=>canonicalDestination(v)===q));}
   function levenshtein(a,b){const x=key(a),y=key(b);if(!x)return y.length;if(!y)return x.length;let prev=Array.from({length:y.length+1},(_,i)=>i);for(let i=1;i<=x.length;i++){const next=[i];for(let j=1;j<=y.length;j++)next[j]=Math.min(next[j-1]+1,prev[j]+1,prev[j-1]+(x[i-1]===y[j-1]?0:1));prev=next;}return prev[y.length];}
   function cantonEntry(name,cantons){const wanted=key(name);return Object.entries(cantons||{}).find(([c])=>key(c)===wanted);}
@@ -81,5 +100,6 @@
   }
   function costaRicaClock(date=new Date()){const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Costa_Rica',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(date);const get=t=>parts.find(p=>p.type===t)?.value||'';const days={Sun:0,Mon:1,Tue:2,Wed:3,Thu:4,Fri:5,Sat:6};return {day:days[get('weekday')],minutes:Number(get('hour'))*60+Number(get('minute'))};}
   function scheduleStatus(t,date){const c=costaRicaClock(date);return scheduleStatusAt(t,c.day,c.minutes);}
-  return {key,validGPS,distance,validate,search,searchExactDestination,levenshtein,canonicalDestination,destinationMatches,searchExactPlace,resolvePlace,searchNearby,lexicalDestinations,markers,operatorCount,initials,displayName,phoneType,hasWhatsApp,formatPhone,warehouseOrder,nearestDistance,sortByNearest,scheduleSlots,scheduleStatusAt,scheduleStatus,costaRicaClock,timeLabel};
+  return {key,validGPS,distance,validate,search,isReceptionCenter,warehouseSearch,searchExactDestination,levenshtein,canonicalDestination,destinationMatches,searchExactPlace,resolvePlace,searchNearby,lexicalDestinations,markers,operatorCount,initials,displayName,phoneType,hasWhatsApp,formatPhone,warehouseOrder,nearestDistance,sortByNearest,scheduleSlots,scheduleStatusAt,scheduleStatus,costaRicaClock,timeLabel};
 });
+
