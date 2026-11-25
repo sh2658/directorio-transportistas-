@@ -3,6 +3,7 @@
   'use strict';
   const C=window.RutasCore,$=id=>document.getElementById(id);
   let data=[],results=[],visible=0,position=null,map=null,cluster=null,userMarker=null,loadingMap=null;
+  let baseData=[],movePlan=null;
   let mode='destino',busy=false,mapActive=false,hasSearch=false,territory=null,territoryPromise=null,searchSequence=0,nearbyResults=false,onlyOpen=false;
   const PAGE=15,query=$('consulta'),iconPath=name=>'./assets/icons/'+name+'.svg';
   // Anay remains visible as a reception center, with its own coverage and contacts.
@@ -23,7 +24,11 @@
       const snapshot=C.validate(await response.json());
       let images={};try{const manifest=await fetch(new URL('./assets/carriers/manifest.json',document.baseURI),{signal:controller.signal,cache:'no-store',credentials:'omit'});if(manifest.ok)images=(await manifest.json()).images||{};}catch(error){console.warn('Manifiesto de imágenes:',error.message);}
       let centers=[];try{const response=await fetch(new URL('./data/centros-recepcion.json',document.baseURI),{signal:controller.signal,cache:'no-store',credentials:'omit'});if(response.ok){const metadata=await response.json();if(metadata.schemaVersion===1&&Array.isArray(metadata.centros))centers=metadata.centros;}}catch(error){console.warn('Información de centros de recepción:',error.message);}
-      data=snapshot.transportistas.filter(t=>!NON_CARRIER_IDS.has(t.id)).map(t=>({...t,imagen:images[t.id]||t.imagen,centroRecepcion:centers.find(c=>c.id===t.id)||null}));
+      const planResponse=await fetch(new URL('./data/traslados-programados.json',document.baseURI),{signal:controller.signal,cache:'no-store',credentials:'omit'});
+      if(!planResponse.ok)throw Error('No se pudo comprobar la vigencia de las ubicaciones');
+      movePlan=await planResponse.json();
+      baseData=snapshot.transportistas.filter(t=>!NON_CARRIER_IDS.has(t.id)).map(t=>({...t,imagen:images[t.id]||t.imagen,centroRecepcion:centers.find(c=>c.id===t.id)||null}));
+      data=window.RutasMoves.apply(baseData,movePlan);C.validate({schemaVersion:1,transportistas:data});
       const date=snapshot.generatedAt?new Date(snapshot.generatedAt):null;
       notice(data.filter(t=>!C.isReceptionCenter(t)).length+' transportistas y '+data.filter(C.isReceptionCenter).length+' centros de recepción disponibles'+(date&&Number.isFinite(date.getTime())?' · Actualizado '+date.toLocaleDateString('es-CR'):''));
       suggestions();renderQuick();$('buscar').disabled=false;if(hasSearch)search(false);
@@ -122,6 +127,7 @@
       if(Array.isArray(names)&&names.length){const announced=el('details',null,'operadores-anunciados'),list=el('div',null,'chips');announced.append(el('summary','Transportistas anunciados en Anay ('+names.length+')'),el('p','Anunciados en un folleto sin fecha visible. Confirme recepción actual y destinos de cada operador.','aviso-suave'));names.filter(n=>typeof n==='string').forEach(name=>list.append(el('span',name,'chip')));announced.append(list);article.append(announced);}
     }
     if(t.telefonos.length)article.append(contacts(t));
+    if(t.traslado){const move=t.traslado,box=el('aside',null,'territorial-aviso aviso-traslado'),coords=move.destination.lat+','+move.destination.lng;box.append(el('strong',move.active?'Nueva ubicación vigente desde el '+move.fecha:'Próximo traslado: '+move.fecha),el('p',move.destination.direccion));if(!move.active)box.append(el('p','Hasta esa fecha, utilice la ubicación actual de esta sucursal.'));box.append(link(move.active?'Ver nueva ubicación':'Consultar ubicación futura','https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(coords),'boton-secundario'));article.append(box);}
     const details=el('details',null,'bodegas');details.open=true;details.append(el('summary',t.bodegas.length+' bodega'+(t.bodegas.length===1?'':'s')));
     const ordered=C.warehouseOrder(t,position);ordered.slice(0,1).forEach(item=>details.append(warehouse(t,item,!!position&&Number.isFinite(item.km))));
     if(ordered.length>1){const rest=ordered.slice(1),more=el('details',null,'bodegas-extra');more.append(el('summary','Ver '+rest.length+' bodega'+(rest.length===1?'':'s')+' más'));rest.forEach(item=>more.append(warehouse(t,item,false)));details.append(more);}
@@ -195,7 +201,8 @@
   ['guiaDestino','guiaDestinatario','guiaTelefono','guiaDireccion','guiaRemitente','guiaTelefonoRemitente','guiaContenido','guiaBultos','guiaObservaciones'].forEach(id=>$(id)?.addEventListener('input',renderPackingGuide));
   $('guiaTransportista')?.addEventListener('change',()=>{updateGuideDestinations();renderPackingGuide();});
   window.addEventListener('afterprint',()=>document.body.classList.remove('imprimiendo-guia'));
-  setInterval(updateScheduleBadges,60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)updateScheduleBadges();});
+  function refreshMoves(){if(!movePlan)return;const updated=window.RutasMoves.apply(baseData,movePlan);if(JSON.stringify(updated)===JSON.stringify(data))return;data=updated;suggestions();renderQuick();if(hasSearch)search(false);if($('guiaEmbalaje')?.open)renderPackingGuide();}
+  setInterval(()=>{refreshMoves();updateScheduleBadges();},60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden){refreshMoves();updateScheduleBadges();}});
   if('serviceWorker'in navigator&&location.protocol==='https:')window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js').catch(()=>{});});load();
 })();
 

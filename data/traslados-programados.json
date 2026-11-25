@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "timezone": "America/Costa_Rica",
+  "supplementalCarriers": [
+    {
+      "id": "TRP-FALLAS-VEGA",
+      "nombre": "TRANSPORTES FALLAS Y VEGA",
+      "horario": "",
+      "imagen": "",
+      "telefonos": [],
+      "destinos": [],
+      "bodegas": [{"id":"DIR-FV-MAU","direccion":"Bodega Mau Jiménez y Álvarez, 50 al este de Corporación CEK, Tibás","zona":"TIBÁS","lat":9.950492,"lng":-84.08405}]
+    }
+  ],
+  "changes": [
+    {
+      "id": "TRASLADO-MAU-20270111",
+      "effectiveAt": "2027-01-11T00:00:00-06:00",
+      "fechaVisible": "11 de enero de 2027",
+      "destination": {"direccion":"Bodega Mau Jiménez y Álvarez, Barrio México, 75 metros sur de la terminal de Pulmitán","zona":"BARRIO MÉXICO","lat":9.938538,"lng":-84.088788},
+      "targets": [
+        {"carrierId":"51b25c54","warehouseId":"586fc606"},
+        {"carrierId":"TRP-E0C73E19","warehouseId":"DIR-0D875184"},
+        {"carrierId":"b1cbf101","warehouseId":"963fadb3"},
+        {"carrierId":"TRP-FALLAS-VEGA","warehouseId":"DIR-FV-MAU"}
+      ],
+      "source": "Anuncio Bodega Mau Jiménez y Álvarez aportado por Santiago; operadores, coordenadas y vigencia confirmados expresamente por Santiago el 24 de noviembre de 2026."
+    }
+  ]
+}
