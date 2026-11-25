@@ -164,7 +164,7 @@
       const promoText=el('div');promoText.append(el('strong','Consulte transportistas y destinos en Rutas CR'),el('p',PUBLIC_DIRECTORY_URL));promo.append(qr,promoText);sheet.append(promo);
       preview.append(sheet);}
   }
-  function printPackingGuide(){renderPackingGuide();document.body.classList.add('imprimiendo-guia');window.print();setTimeout(()=>document.body.classList.remove('imprimiendo-guia'),250);}
+  function printPackingGuide(){renderPackingGuide();document.body.classList.add('imprimiendo-guia');try{window.print();}catch(error){document.body.classList.remove('imprimiendo-guia');throw error;}}
   function more(){const frag=document.createDocumentFragment();results.slice(visible,visible+PAGE).forEach(t=>frag.append(card(t)));visible+=Math.min(PAGE,results.length-visible);$('tarjetas').append(frag);$('mas').hidden=visible>=results.length;}
   function setInteraction(active){mapActive=active;$('activarMapa').setAttribute('aria-pressed',String(active));$('activarMapa').textContent=active?'Bloquear interacción':'Activar interacción';if(!map)return;for(const name of ['scrollWheelZoom','dragging','touchZoom','doubleClickZoom','boxZoom','keyboard'])if(map[name])map[name][active?'enable':'disable']();}
   function style(href){if(document.querySelector('link[data-map-style="'+href+'"]'))return;const l=el('link');l.rel='stylesheet';l.href=href;l.dataset.mapStyle=href;document.head.append(l);}
